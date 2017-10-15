@@ -21,6 +21,7 @@
 #include "RenderSystem.h"
 #include "Scene.h"
 #include "GameplayLogicSystem.h"
+#include "NetworkSystem.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
@@ -39,6 +40,7 @@ int main()
 	MovementSystem movementSystem(scene);
 	InputSystem inputSystem(window, scene);
 	GameplayLogicSystem gameplayLogicSystem(scene, inputSystem);
+	NetworkSystem networkSystem;
 
 	// Create 3D entities.
 	// Order matters right now, selection buttons are assigned to the first four entities created
@@ -70,6 +72,7 @@ int main()
 	while (!glfwWindowShouldClose(window)) {
 		// Do any operations that should only happen once per frame.
 		inputSystem.beginFrame();
+		networkSystem.beginFrame();
 		renderSystem.beginRender();
 
 		// Update all the entities using all the systems.
