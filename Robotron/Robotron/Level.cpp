@@ -1,14 +1,26 @@
 #include "Level.h"
 
+#include "NetworkClientSystem.h"
+
+#include <iostream>
+#include <string>
+
 Level::Level(GLFWwindow* window, Scene& scene, int levelNum):
 	  m_renderSystem(window, scene)
 	, m_movementSystem(scene)
 	, m_inputSystem(window, scene)
-	, m_networkServerSystem(scene)
 	, m_scene(scene)
 {
 	m_window = window;
 	m_levelNum = levelNum;
+
+	std::string strServerMode;
+	std::cout << "Run in server mode: ";
+	std::cin >> strServerMode;
+	if (strServerMode == "y")
+		m_networkSystem = std::make_unique<NetworkServerSystem>(scene);
+	else
+		m_networkSystem = std::make_unique<NetworkClientSystem>(scene);
 
 	// Create 3D entities.
 	SceneUtils::createQuad(scene,
@@ -64,13 +76,13 @@ void Level::process()
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
-	m_networkServerSystem.beginFrame();
+	m_networkSystem->beginFrame();
 
 	// Update all the entities using all the systems.
 	for (size_t entityID = 0; entityID < SceneUtils::getEntityCount(m_scene); ++entityID) {
 		m_inputSystem.update(entityID);
 		m_movementSystem.update(entityID);
-		m_networkServerSystem.update(entityID);
+		m_networkSystem->update(entityID);
 		m_renderSystem.update(entityID);
 	}
 

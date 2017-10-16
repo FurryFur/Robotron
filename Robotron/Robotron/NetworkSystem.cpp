@@ -61,7 +61,7 @@ bool NetworkSystem::receiveData(Packet& outPacket)
 
 	// Retrieve a dataframe from the socket
 	int numBytesRead = recvfrom(
-		m_socket2.getSocketHandle(),
+		m_socket.getSocketHandle(),
 		reinterpret_cast<char*>(&outPacket),
 		sizeof(outPacket),
 		0,

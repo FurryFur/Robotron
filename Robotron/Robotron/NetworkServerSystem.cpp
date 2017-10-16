@@ -9,14 +9,16 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene)
 	m_socket.initialise(8456);
 
 	// Temp socket for receiving from self for testing.
-	m_socket2.initialise(4567);
+	//m_socket2.initialise(4567);
 }
 
 void NetworkServerSystem::beginFrame()
 {
 	Packet packet;
 	while (receiveData(packet)) {
-
+		if (packet.type == PACKET_TYPE_INPUT) {
+			m_scene.inputComponents.at(packet.entityNetID) = packet.input;
+		}
 	}
 }
 
@@ -26,7 +28,7 @@ void NetworkServerSystem::update(size_t entityID)
 	if ((m_scene.componentMasks.at(entityID) & kNetworkedFilter) == kNetworkedFilter) {
 		// TODO: Make serialize functions for the different packet types
 		Packet packet;
-		packet.serialize(m_scene.transformComponents.at(entityID));
+		packet.serialize(entityID, m_scene.transformComponents.at(entityID));
 		
 		// Fill out address to send to (including port)
 		sockaddr_in address;

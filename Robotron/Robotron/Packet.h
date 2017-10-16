@@ -13,6 +13,7 @@ enum PacketType {
 
 struct Packet {
 	PacketType type;
+	size_t entityNetID;
 
 	union {
 		PhysicsComponent ghostSnapshot;
@@ -22,7 +23,7 @@ struct Packet {
 
 	Packet() {}
 
-	void serialize(glm::mat4 transform);
-	void serialize(PhysicsComponent ghostSnapshot);
-	void serialize(InputComponent input);
+	void serialize(size_t entityNetID, glm::mat4 transform);
+	void serialize(size_t entityNetID, PhysicsComponent ghostSnapshot);
+	void serialize(size_t entityNetID, InputComponent input);
 };

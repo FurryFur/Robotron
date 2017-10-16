@@ -17,6 +17,6 @@ protected:
 	bool receiveData(Packet&);
 
 	CSocket m_socket;
-	CSocket m_socket2; // TODO: Remove temporary receive socket
+	//CSocket m_socket2; // TODO: Remove temporary receive socket
 	Scene& m_scene;
 };

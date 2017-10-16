@@ -30,6 +30,7 @@
 #include <glm\gtc\matrix_transform.hpp>
 
 #include <cmath>
+#include <memory>
 
 #pragma once
 class Level
@@ -46,7 +47,7 @@ private:
 	RenderSystem m_renderSystem;
 	PlayerControlSystem m_movementSystem;
 	InputSystem m_inputSystem;
-	NetworkServerSystem m_networkServerSystem;
+	std::unique_ptr<NetworkSystem> m_networkSystem;
 
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	int m_levelNum;
