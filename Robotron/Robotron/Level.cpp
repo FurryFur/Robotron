@@ -25,14 +25,12 @@ Level::Level(GLFWwindow* window, Scene& scene, int levelNum):
 	{
 		float randX = randomReal<float>(-20.0f, -5.0f);
 		if (randomInt(0, 1) == 0)
-		{
 			randX += 25;
-		}
+
 		float randZ = randomReal<float>(-20.0f, -5.0f);
 		if (randomInt(0, 1) == 0)
-		{
 			randZ += 25;
-		}
+
 		SceneUtils::createEnemy01(scene,
 			glm::translate({}, glm::vec3{ randX, 0.0f, randZ }));
 	}
