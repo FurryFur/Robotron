@@ -42,14 +42,14 @@ void GameplayLogicSystem::update(size_t entityID)
 	if (!m_oldPossessedEntityUpdated && entityID == m_oldPossessedEntity) {
 		// Update the old possessed entity so it doesn't respond to input
 		size_t& componentMask = m_scene.componentMasks.at(entityID);
-		componentMask &= ~(COMPONENT_INPUT | COMPONENT_MOVEMENT);
+		componentMask &= ~(COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL);
 		m_oldPossessedEntityUpdated = true;
 		return;
 	}
 	if (!m_newPossessedEntityUpdated && entityID == m_possessedEntity) {
 		// Update the new possessed entity so it response to input
 		size_t& componentMask = m_scene.componentMasks.at(entityID);
-		componentMask |= (COMPONENT_INPUT | COMPONENT_MOVEMENT);
+		componentMask |= (COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL);
 		m_newPossessedEntityUpdated = true;
 		return;
 	}

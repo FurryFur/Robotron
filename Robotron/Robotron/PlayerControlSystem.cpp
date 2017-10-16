@@ -35,7 +35,7 @@ PlayerControlSystem::PlayerControlSystem(Scene & scene)
 void PlayerControlSystem::update(size_t entityID)
 {
 	// Filter movable
-	const size_t kMovableMask = COMPONENT_MOVEMENT | COMPONENT_INPUT | COMPONENT_TRANSFORM;
+	const size_t kMovableMask = COMPONENT_PLAYER_CONTROL | COMPONENT_INPUT | COMPONENT_TRANSFORM;
 	if ((m_scene.componentMasks.at(entityID) & kMovableMask) != kMovableMask)
 		return;
 
