@@ -121,6 +121,40 @@ size_t SceneUtils::createSphere(Scene& scene, const glm::mat4& _transform)
 	return entityID;
 }
 
+size_t SceneUtils::createEnemy01(Scene& scene, const glm::mat4& _transform)
+{
+	size_t entityID = createEntity(scene);
+	size_t& componentMask = scene.componentMasks.at(entityID);
+	componentMask |= COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+
+	// Get references to components
+	glm::mat4& transform = scene.transformComponents.at(entityID);
+	MeshComponent& mesh = scene.meshComponents.at(entityID);
+	MaterialComponent& material = scene.materialComponents.at(entityID);
+	InputMapComponent& inputMap = scene.inputMapComponents.at(entityID);
+	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
+	LogicComponent& logicVars = scene.logicComponents.at(entityID);
+
+	transform = _transform;
+
+	material.shader = GLUtils::getDefaultShader();
+	material.texture = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+	material.textureType = GL_TEXTURE_2D;
+	material.enableDepth = true;
+	material.shaderParams.metallicness = 0.3f;
+	material.shaderParams.glossiness = 2.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+
+	mesh = getSphereMesh();
+
+	movementVars.moveSpeed = 0.1f;
+	movementVars.orientationSensitivity = 0.05f;
+	movementVars.worldSpaceMove = true;
+
+	logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
+
+	return entityID;
+}
+
 size_t SceneUtils::createPlayer(Scene& scene, const glm::mat4& _transform)
 {
 	size_t entityID = createEntity(scene);
@@ -147,7 +181,7 @@ size_t SceneUtils::createPlayer(Scene& scene, const glm::mat4& _transform)
 	mesh = getSphereMesh();
 
 	inputMap = {};
-	inputMap.mouseInputEnabled = true;
+	inputMap.mouseInputEnabled = false;
 	inputMap.leftBtnMap = GLFW_KEY_A;
 	inputMap.rightBtnMap = GLFW_KEY_D;
 	inputMap.forwardBtnMap = GLFW_KEY_W;

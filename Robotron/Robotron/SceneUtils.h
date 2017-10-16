@@ -42,6 +42,8 @@ namespace SceneUtils {
 	// transform;
 	size_t createSphere(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 
+	size_t createEnemy01(Scene &, const glm::mat4 & _transform = glm::mat4{ 1 });
+
 	// Creates a  Player (currently a unit sphere), centered at the origin, with the specified 
 	// transform;
 	size_t createPlayer(Scene&, const glm::mat4& transform = glm::mat4{ 1 });

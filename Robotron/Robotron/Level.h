@@ -14,6 +14,7 @@
 
 #define _USE_MATH_DEFINES
 
+#include "Utils.h"
 #include "GLUtils.h"
 #include "SceneUtils.h"
 #include "InputSystem.h"
@@ -33,7 +34,7 @@
 class Level
 {
 public:
-	Level(GLFWwindow* window, Scene& scene);
+	Level(GLFWwindow* window, Scene& scene, int levelNum);
 	~Level();
 
 	void process();
@@ -45,5 +46,8 @@ private:
 	PlayerControlSystem m_movementSystem;
 	InputSystem m_inputSystem;
 	NetworkSystem m_networkSystem;
+
+	//stores the level current on. effects enemy spawn rate and spawn positioning
+	int m_levelNum;
 };
 
