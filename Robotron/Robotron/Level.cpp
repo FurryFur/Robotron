@@ -1,6 +1,6 @@
 #include "Level.h"
 
-Level::Level(GLFWwindow* window, Scene& scene):
+Level::Level(GLFWwindow* window, Scene& scene, int levelNum):
 	  m_renderSystem(window, scene)
 	, m_movementSystem(scene)
 	, m_inputSystem(window, scene)
@@ -8,6 +8,7 @@ Level::Level(GLFWwindow* window, Scene& scene):
 	, m_scene(scene)
 {
 	m_window = window;
+	m_levelNum = levelNum;
 
 	// Create 3D entities.
 	SceneUtils::createQuad(scene,
@@ -16,6 +17,25 @@ Level::Level(GLFWwindow* window, Scene& scene):
 
 	SceneUtils::createPlayer(scene, 
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
+
+	//create the number of enemy01 based on current level with some random variance.
+	unsigned int numberOfEnemy01 = 9 + m_levelNum + randomInt(-2, 2);
+	
+	for (unsigned int i = 0; i <= numberOfEnemy01; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+		{
+			randX += 25;
+		}
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+		{
+			randZ += 25;
+		}
+		SceneUtils::createEnemy01(scene,
+			glm::translate({}, glm::vec3{ randX, 0.0f, randZ }));
+	}
 
 	// Create the skybox
 	size_t skybox = SceneUtils::createSkybox(scene, {

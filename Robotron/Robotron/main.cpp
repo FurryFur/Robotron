@@ -23,8 +23,7 @@ int main()
 	GLFWwindow* window = GLUtils::initOpenGL();
 	Scene scene;
 
-	Level level(window, scene);
-
+	Level level(window, scene, 1);
 
 	while (!glfwWindowShouldClose(window)) {
 		level.process();
