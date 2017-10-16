@@ -5,7 +5,7 @@ Level::Level(GLFWwindow* window, Scene& scene):
 	, m_movementSystem(scene)
 	, m_inputSystem(window, scene)
 	, m_gameplayLogicSystem(scene, m_inputSystem)
-	, m_networkSystem()
+	, m_networkServerSystem(scene)
 	, m_scene(scene)
 {
 	m_window = window;
@@ -45,13 +45,14 @@ void Level::process()
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
-	m_networkSystem.beginFrame();
+	m_networkServerSystem.beginFrame();
 
 	// Update all the entities using all the systems.
 	for (size_t entityID = 0; entityID < SceneUtils::getEntityCount(m_scene); ++entityID) {
 		m_gameplayLogicSystem.update(entityID);
 		m_inputSystem.update(entityID);
 		m_movementSystem.update(entityID);
+		m_networkServerSystem.update(entityID);
 		m_renderSystem.update(entityID);
 	}
 

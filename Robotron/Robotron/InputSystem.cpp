@@ -38,6 +38,7 @@ void InputSystem::registerKeyObserver(IKeyObserver* observer)
 	m_keyObservers.push_back(observer);
 }
 
+// Record Action keys here
 void InputSystem::keyCallback(int key, int scancode, int action, int mods)
 {
 	// Close window on exit

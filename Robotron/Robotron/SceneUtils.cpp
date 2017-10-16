@@ -27,8 +27,6 @@ size_t SceneUtils::createEntity(Scene& scene)
 	// Allocate memory for new entityID
 	scene.componentMasks.emplace_back(COMPONENT_NONE);
 	scene.transformComponents.emplace_back();
-	scene.velocityComponents.emplace_back();
-	scene.angualarVelocityComponent.emplace_back();
 	scene.meshComponents.emplace_back();
 	scene.materialComponents.emplace_back();
 	scene.inputComponents.emplace_back();

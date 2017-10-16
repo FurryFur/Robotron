@@ -21,6 +21,7 @@
 #include "RenderSystem.h"
 #include "Scene.h"
 #include "NetworkSystem.h"
+#include "NetworkServerSystem.h"
 #include "GameplayLogicSystem.h"
 
 #include <GLFW\glfw3.h>
@@ -45,6 +46,6 @@ private:
 	PlayerControlSystem m_movementSystem;
 	InputSystem m_inputSystem;
 	GameplayLogicSystem m_gameplayLogicSystem;
-	NetworkSystem m_networkSystem;
+	NetworkServerSystem m_networkServerSystem;
 };
 

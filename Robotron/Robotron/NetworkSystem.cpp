@@ -2,11 +2,13 @@
 
 #include "InputComponent.h"
 #include "Packet.h"
+#include "Scene.h"
 
 #include <iostream>
 #include <memory>
 
-NetworkSystem::NetworkSystem()
+NetworkSystem::NetworkSystem(Scene& scene)
+	: m_scene{ scene }
 {
 	// Startup windows sockets:
 	WSADATA wsaData;
@@ -16,17 +18,10 @@ NetworkSystem::NetworkSystem()
 		error = WSAGetLastError();
 		std::cout << "Windows Socket Error: " << error << std::endl;
 	}
-
-	m_socket.initialise(8456);
-	m_socket2.initialise(4567);
 }
 
 void NetworkSystem::beginFrame()
 {
-	
-	sendData();
-	receiveData();
-
 	// Server: Update inputs for entities
 
 	// Client: Update ghost snapshots for ghost entities
@@ -39,40 +34,8 @@ void NetworkSystem::update(size_t entityID)
 	// Client: Do interpolation between current state and snapshot
 }
 
-void NetworkSystem::sendData()
+void NetworkSystem::sendData(const Packet& packet, const sockaddr_in& address)
 {
-	// A test packet to send
-	Packet packet;
-
-	static bool sendInput = true;
-	if (sendInput) {
-		InputComponent input;
-		input.axis.x = 1.255;
-		input.axis.y = 0.5;
-		input.axis.z = 0.2;
-		input.btn1Down = true;
-		input.btn2Down = false;
-		input.btn3Down = true;
-		input.btn4Down = true;
-		input.orientationDelta.x = 1.5;
-		input.orientationDelta.y = 0.2;
-		input.orientationDelta.z = 0.1;
-
-		packet.type = PacketType::Input;
-		packet.input = input;
-	} else {
-		packet.type = PacketType::GhostSnapshot;
-		packet.ghostSnapshot = {};
-		packet.ghostSnapshot.acceleration.z = 0.2548;
-	}
-	sendInput = !sendInput;
-
-	// Fill out address to send to (including port)
-	sockaddr_in address;
-	inet_pton(AF_INET, "127.0.0.1", &address.sin_addr);
-	address.sin_port = htons(4567);
-	address.sin_family = AF_INET;
-
 	// Send the packet
 	int numBytesSent = sendto(
 		m_socket.getSocketHandle(),                     // socket to send through.
@@ -85,21 +48,22 @@ void NetworkSystem::sendData()
 
 	// Do error checking
 	int error = WSAGetLastError();
-	if (error != 0)
+	if (error != 0) {
+		// TODO: Log these error messages properly
 		std::cout << "Error sending data, error code: " << error << std::endl;
+	}
 }
 
-void NetworkSystem::receiveData()
+bool NetworkSystem::receiveData(Packet& outPacket)
 {
 	sockaddr_in fromAddress;
 	int sizeofAddress = sizeof(fromAddress);
 
 	// Retrieve a dataframe from the socket
-	Packet receivedPacket;
 	int numBytesRead = recvfrom(
 		m_socket2.getSocketHandle(),
-		reinterpret_cast<char*>(&receivedPacket),
-		sizeof(receivedPacket),
+		reinterpret_cast<char*>(&outPacket),
+		sizeof(outPacket),
 		0,
 		reinterpret_cast<sockaddr*>(&fromAddress),
 		&sizeofAddress
@@ -107,8 +71,12 @@ void NetworkSystem::receiveData()
 
 	// Do error checking
 	int error = WSAGetLastError();
-	if (error != 0 && error != WSAEWOULDBLOCK)
+	if (error == WSAEWOULDBLOCK)
+		return false;
+	if (error != 0 && error != WSAEWOULDBLOCK) {
 		std::cout << "Error receiving data, error code: " << error << std::endl;
+		return false;
+	}
 
 	// Do stuff with result
 	if (numBytesRead > 0) {
@@ -117,18 +85,27 @@ void NetworkSystem::receiveData()
 		inet_ntop(AF_INET, &fromAddress, pcAddress, sizeofAddress);
 		u_short port = ntohs(fromAddress.sin_port);
 		std::cout << "Received a packet from " << pcAddress << ":" << port << std::endl;
-		if (receivedPacket.type == PacketType::Input) {
+		if (outPacket.type == PacketType::PACKET_TYPE_INPUT) {
 			std::cout << "Packet type is Input" << std::endl;
-			std::cout << "Input x axis is: " << receivedPacket.input.axis.x << std::endl;
-			std::cout << "Input btn4 down state is: " << receivedPacket.input.btn4Down << std::endl;
+			std::cout << "Input x axis is: " << outPacket.input.axis.x << std::endl;
+			std::cout << "Input btn4 down state is: " << outPacket.input.btn4Down << std::endl;
+			std::cout << std::endl;
+		} else if (outPacket.type == PACKET_TYPE_GHOST_SNAPSHOT) {
+			std::cout << "Packet type is Ghost Snapshot" << std::endl;
+			std::cout << "Acceleration.z is: " << outPacket.ghostSnapshot.acceleration.z << std::endl;
 			std::cout << std::endl;
 		} else {
-			std::cout << "Packet type is Ghost Snapshot" << std::endl;
-			std::cout << "Acceleration.z is: " << receivedPacket.ghostSnapshot.acceleration.z << std::endl;
-			std::cout << std::endl;
+			std::cout << "Packet type is Transform" << std::endl;
+			std::cout << "X position is: " << outPacket.transform[3].x << std::endl;
+			std::cout << "Y position is: " << outPacket.transform[3].y << std::endl;
+			std::cout << "Z position is: " << outPacket.transform[3].z << std::endl;
 		}
 
 		// Cleanup
 		delete[] pcAddress;
+
+		return true;
 	}
+
+	return false;
 }

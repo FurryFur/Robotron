@@ -20,6 +20,7 @@
 #include "PlayerControlComponent.h"
 #include "LogicComponent.h"
 #include "InputMapComponent.h"
+#include "PhysicsComponent.h"
 
 #include <glm\glm.hpp>
 
@@ -28,22 +29,20 @@
 enum ComponentMask {
 	COMPONENT_NONE = 0,
 	COMPONENT_TRANSFORM = 1 << 0,
-	COMPONENT_VELOCITY = 1 << 1,
-	COMPONENT_ANGULAR_VELOCITY = 1 << 2,
-	COMPONENT_MESH = 1 << 3,
-	COMPONENT_MATERIAL = 1 << 4,
-	COMPONENT_CAMERA = 1 << 5,
-	COMPONENT_MOVEMENT = 1 << 6,
-	COMPONENT_INPUT = 1 << 7,
-	COMPONENT_INPUT_MAP = 1 << 8,
-	COMPONENT_LOGIC = 1 << 9
+	COMPONENT_PHYSICS = 1 << 1,
+	COMPONENT_MESH = 1 << 2,
+	COMPONENT_MATERIAL = 1 << 3,
+	COMPONENT_CAMERA = 1 << 4,
+	COMPONENT_MOVEMENT = 1 << 5,
+	COMPONENT_INPUT = 1 << 6,
+	COMPONENT_INPUT_MAP = 1 << 7,
+	COMPONENT_LOGIC = 1 << 8
 };
 
 struct Scene {
 	std::vector<size_t> componentMasks;
 	std::vector<glm::mat4> transformComponents;
-	std::vector<glm::vec3> velocityComponents;
-	std::vector<glm::vec3> angualarVelocityComponent;
+	std::vector<PhysicsComponent> physicsComponents;
 	std::vector<MeshComponent> meshComponents;
 	std::vector<MaterialComponent> materialComponents;
 	std::vector<PlayerControlComponent> movementComponents;
