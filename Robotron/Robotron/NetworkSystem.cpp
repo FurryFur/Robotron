@@ -32,6 +32,7 @@ void NetworkSystem::update(size_t entityID)
 	// Server: Send snapshot of entity to clients
 
 	// Client: Do interpolation between current state and snapshot
+	// Client: Send inputs to server
 }
 
 void NetworkSystem::sendData(const Packet& packet, const sockaddr_in& address)
@@ -80,29 +81,29 @@ bool NetworkSystem::receiveData(Packet& outPacket)
 
 	// Do stuff with result
 	if (numBytesRead > 0) {
-		// Create a human readable version of the address
-		char* pcAddress = new char[sizeofAddress];
-		inet_ntop(AF_INET, &fromAddress, pcAddress, sizeofAddress);
-		u_short port = ntohs(fromAddress.sin_port);
-		std::cout << "Received a packet from " << pcAddress << ":" << port << std::endl;
-		if (outPacket.type == PacketType::PACKET_TYPE_INPUT) {
-			std::cout << "Packet type is Input" << std::endl;
-			std::cout << "Input x axis is: " << outPacket.input.axis.x << std::endl;
-			std::cout << "Input btn4 down state is: " << outPacket.input.btn4Down << std::endl;
-			std::cout << std::endl;
-		} else if (outPacket.type == PACKET_TYPE_GHOST_SNAPSHOT) {
-			std::cout << "Packet type is Ghost Snapshot" << std::endl;
-			std::cout << "Acceleration.z is: " << outPacket.ghostSnapshot.acceleration.z << std::endl;
-			std::cout << std::endl;
-		} else {
-			std::cout << "Packet type is Transform" << std::endl;
-			std::cout << "X position is: " << outPacket.transform[3].x << std::endl;
-			std::cout << "Y position is: " << outPacket.transform[3].y << std::endl;
-			std::cout << "Z position is: " << outPacket.transform[3].z << std::endl;
-		}
+		//// Create a human readable version of the address
+		//char* pcAddress = new char[sizeofAddress];
+		//inet_ntop(AF_INET, &fromAddress, pcAddress, sizeofAddress);
+		//u_short port = ntohs(fromAddress.sin_port);
+		//std::cout << "Received a packet from " << pcAddress << ":" << port << std::endl;
+		//if (outPacket.type == PacketType::PACKET_TYPE_INPUT) {
+		//	std::cout << "Packet type is Input" << std::endl;
+		//	std::cout << "Input x axis is: " << outPacket.input.axis.x << std::endl;
+		//	std::cout << "Input btn4 down state is: " << outPacket.input.btn4Down << std::endl;
+		//	std::cout << std::endl;
+		//} else if (outPacket.type == PACKET_TYPE_GHOST_SNAPSHOT) {
+		//	std::cout << "Packet type is Ghost Snapshot" << std::endl;
+		//	std::cout << "Acceleration.z is: " << outPacket.ghostSnapshot.acceleration.z << std::endl;
+		//	std::cout << std::endl;
+		//} else {
+		//	std::cout << "Packet type is Transform" << std::endl;
+		//	std::cout << "X position is: " << outPacket.transform[3].x << std::endl;
+		//	std::cout << "Y position is: " << outPacket.transform[3].y << std::endl;
+		//	std::cout << "Z position is: " << outPacket.transform[3].z << std::endl;
+		//}
 
-		// Cleanup
-		delete[] pcAddress;
+		//// Cleanup
+		//delete[] pcAddress;
 
 		return true;
 	}
