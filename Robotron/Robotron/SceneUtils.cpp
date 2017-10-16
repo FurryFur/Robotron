@@ -32,6 +32,7 @@ size_t SceneUtils::createEntity(Scene& scene)
 	scene.meshComponents.emplace_back();
 	scene.materialComponents.emplace_back();
 	scene.inputComponents.emplace_back();
+	scene.inputMapComponents.emplace_back();
 	scene.movementComponents.emplace_back();
 	scene.logicComponents.emplace_back();
 
@@ -60,6 +61,7 @@ size_t SceneUtils::createQuad(Scene& scene, const glm::mat4& transform)
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
 	InputComponent& input = scene.inputComponents.at(entityID);
+	InputMapComponent& inputMap = scene.inputMapComponents.at(entityID);
 	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
@@ -70,7 +72,7 @@ size_t SceneUtils::createQuad(Scene& scene, const glm::mat4& transform)
 	material.shaderParams.metallicness = 1.0f;
 	material.shaderParams.glossiness = 75.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
 
-	setDefaultInputBindings(input);
+	setDefaultInputBindings(inputMap);
 
 	movementVars.moveSpeed = 0.1f;
 	movementVars.orientationSensitivity = 0.05f;
@@ -87,13 +89,13 @@ size_t SceneUtils::createSphere(Scene& scene, const glm::mat4& _transform)
 {
 	size_t entityID = createEntity(scene);
 	size_t& componentMask = scene.componentMasks.at(entityID);
-	componentMask |= COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
 	// Get references to components
 	glm::mat4& transform = scene.transformComponents.at(entityID);
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
-	InputComponent& input = scene.inputComponents.at(entityID);
+	InputMapComponent& inputMap = scene.inputMapComponents.at(entityID);
 	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
@@ -108,7 +110,7 @@ size_t SceneUtils::createSphere(Scene& scene, const glm::mat4& _transform)
 
 	mesh = getSphereMesh();
 
-	setDefaultInputBindings(input);
+	setDefaultInputBindings(inputMap);
 
 	movementVars.moveSpeed = 0.1f;
 	movementVars.orientationSensitivity = 0.05f;
@@ -123,13 +125,13 @@ size_t SceneUtils::createCylinder(Scene& scene, float radius, float height, cons
 {
 	size_t entityID = createEntity(scene);
 	size_t& componentMask = scene.componentMasks.at(entityID);
-	componentMask |= COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
 	// Get references to components
 	glm::mat4& transform = scene.transformComponents.at(entityID);
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
-	InputComponent& input = scene.inputComponents.at(entityID);
+	InputMapComponent& inputMap = scene.inputMapComponents.at(entityID);
 	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
@@ -144,7 +146,7 @@ size_t SceneUtils::createCylinder(Scene& scene, float radius, float height, cons
 
 	mesh = getCylinderMesh();
 
-	setDefaultInputBindings(input);
+	setDefaultInputBindings(inputMap);
 
 	movementVars.moveSpeed = 0.1f;
 	movementVars.orientationSensitivity = 0.05f;
@@ -159,13 +161,13 @@ size_t SceneUtils::createPyramid(Scene& scene, const glm::mat4& _transform)
 {
 	size_t entityID = createEntity(scene);
 	size_t& componentMask = scene.componentMasks.at(entityID);
-	componentMask |= COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
 	// Get references to components
 	glm::mat4& transform = scene.transformComponents.at(entityID);
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
-	InputComponent& input = scene.inputComponents.at(entityID);
+	InputMapComponent& inputMap = scene.inputMapComponents.at(entityID);
 	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
@@ -180,7 +182,7 @@ size_t SceneUtils::createPyramid(Scene& scene, const glm::mat4& _transform)
 
 	mesh = getPyramidMesh();
 
-	setDefaultInputBindings(input);
+	setDefaultInputBindings(inputMap);
 
 	movementVars.moveSpeed = 0.1f;
 	movementVars.orientationSensitivity = 0.05f;
@@ -195,13 +197,13 @@ size_t SceneUtils::createCube(Scene& scene, const glm::mat4 & _transform)
 {
 	size_t entityID = createEntity(scene);
 	size_t& componentMask = scene.componentMasks.at(entityID);
-	componentMask |= COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
 	// Get references to components
 	glm::mat4& transform = scene.transformComponents.at(entityID);
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
-	InputComponent& input = scene.inputComponents.at(entityID);
+	InputMapComponent& inputMap = scene.inputMapComponents.at(entityID);
 	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
@@ -216,7 +218,7 @@ size_t SceneUtils::createCube(Scene& scene, const glm::mat4 & _transform)
 
 	mesh = getCubeMesh();
 
-	setDefaultInputBindings(input);
+	setDefaultInputBindings(inputMap);
 
 	movementVars.moveSpeed = 0.1f;
 	movementVars.orientationSensitivity = 0.05f;
@@ -232,20 +234,20 @@ size_t SceneUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm::v
 	size_t entityID = createEntity(scene);
 
 	size_t& componentMask = scene.componentMasks.at(entityID);
-	componentMask = COMPONENT_CAMERA | COMPONENT_INPUT | COMPONENT_MOVEMENT | COMPONENT_TRANSFORM;
+	componentMask = COMPONENT_INPUT_MAP | COMPONENT_CAMERA | COMPONENT_INPUT | COMPONENT_MOVEMENT | COMPONENT_TRANSFORM;
 
-	InputComponent& input = scene.inputComponents.at(entityID);
+	InputMapComponent& inputMap = scene.inputMapComponents.at(entityID);
 	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	glm::mat4& transform = scene.transformComponents.at(entityID);
 
-	input = {};
-	input.mouseInputEnabled = true;
-	input.leftBtnMap = GLFW_KEY_A;
-	input.rightBtnMap = GLFW_KEY_D;
-	input.forwardBtnMap = GLFW_KEY_W;
-	input.backwardBtnMap = GLFW_KEY_S;
-	input.downBtnMap = GLFW_KEY_Q;
-	input.upBtnMap = GLFW_KEY_E;
+	inputMap = {};
+	inputMap.mouseInputEnabled = true;
+	inputMap.leftBtnMap = GLFW_KEY_A;
+	inputMap.rightBtnMap = GLFW_KEY_D;
+	inputMap.forwardBtnMap = GLFW_KEY_W;
+	inputMap.backwardBtnMap = GLFW_KEY_S;
+	inputMap.downBtnMap = GLFW_KEY_Q;
+	inputMap.upBtnMap = GLFW_KEY_E;
 
 	movementVars.moveSpeed = 0.1f;
 	movementVars.orientationSensitivity = 0.005f;
@@ -279,24 +281,24 @@ size_t SceneUtils::createSkybox(Scene& scene, const std::vector<std::string>& fa
 	return entityID;
 }
 
-void SceneUtils::setDefaultInputBindings(InputComponent& input)
+void SceneUtils::setDefaultInputBindings(InputMapComponent& inputMap)
 {
-	input = {};
-	input.leftBtnMap = GLFW_KEY_KP_4;
-	input.rightBtnMap = GLFW_KEY_KP_6;
-	input.forwardBtnMap = GLFW_KEY_KP_8;
-	input.backwardBtnMap = GLFW_KEY_KP_5;
-	input.downBtnMap = GLFW_KEY_KP_7;
-	input.upBtnMap = GLFW_KEY_KP_9;
-	input.azimuthPosBtnMap = GLFW_KEY_KP_1;
-	input.azimuthNegBtnMap = GLFW_KEY_KP_2;
-	input.elevationPosBtnMap = GLFW_KEY_KP_3;
-	input.elevationNegBtnMap = GLFW_KEY_KP_DECIMAL;
-	input.rollBtnMap = GLFW_KEY_KP_0;
-	input.btn1Map = GLFW_KEY_KP_ADD;
-	input.btn2Map = GLFW_KEY_KP_SUBTRACT;
-	input.btn3Map = GLFW_KEY_KP_MULTIPLY;
-	input.btn4Map = GLFW_KEY_KP_DIVIDE;
+	inputMap = {};
+	inputMap.leftBtnMap = GLFW_KEY_KP_4;
+	inputMap.rightBtnMap = GLFW_KEY_KP_6;
+	inputMap.forwardBtnMap = GLFW_KEY_KP_8;
+	inputMap.backwardBtnMap = GLFW_KEY_KP_5;
+	inputMap.downBtnMap = GLFW_KEY_KP_7;
+	inputMap.upBtnMap = GLFW_KEY_KP_9;
+	inputMap.azimuthPosBtnMap = GLFW_KEY_KP_1;
+	inputMap.azimuthNegBtnMap = GLFW_KEY_KP_2;
+	inputMap.elevationPosBtnMap = GLFW_KEY_KP_3;
+	inputMap.elevationNegBtnMap = GLFW_KEY_KP_DECIMAL;
+	inputMap.rollBtnMap = GLFW_KEY_KP_0;
+	inputMap.btn1Map = GLFW_KEY_KP_ADD;
+	inputMap.btn2Map = GLFW_KEY_KP_SUBTRACT;
+	inputMap.btn3Map = GLFW_KEY_KP_MULTIPLY;
+	inputMap.btn4Map = GLFW_KEY_KP_DIVIDE;
 }
 
 const std::vector<VertexFormat>& SceneUtils::getSphereVertices()
