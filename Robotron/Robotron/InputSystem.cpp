@@ -74,47 +74,48 @@ void InputSystem::beginFrame()
 void InputSystem::update(size_t entityID)
 {
 	// Filter input receivers
-	const size_t kInputReceiverMask = COMPONENT_INPUT;
+	const size_t kInputReceiverMask = COMPONENT_INPUT | COMPONENT_INPUT_MAP;
 	if ((m_scene.componentMasks.at(entityID) & kInputReceiverMask) != kInputReceiverMask)
 		return;
 
 	InputComponent& input = m_scene.inputComponents.at(entityID);
+	InputMapComponent& inputMap = m_scene.inputMapComponents.at(entityID);
 
 	// Update input from mouse
 	input.orientationDelta = {};
-	if (input.mouseInputEnabled)
+	if (inputMap.mouseInputEnabled)
 		input.orientationDelta = glm::vec3{ m_mouseDelta, 0 };
 
 	// Update input from buttons
 	input.axis = {};
-	if (input.leftBtnMap && glfwGetKey(m_window, input.leftBtnMap) == GLFW_PRESS)
+	if (inputMap.leftBtnMap && glfwGetKey(m_window, inputMap.leftBtnMap) == GLFW_PRESS)
 		input.axis.x -= 1;
-	if (input.rightBtnMap && glfwGetKey(m_window, input.rightBtnMap) == GLFW_PRESS)
+	if (inputMap.rightBtnMap && glfwGetKey(m_window, inputMap.rightBtnMap) == GLFW_PRESS)
 		input.axis.x += 1;
-	if (input.forwardBtnMap && glfwGetKey(m_window, input.forwardBtnMap) == GLFW_PRESS)
+	if (inputMap.forwardBtnMap && glfwGetKey(m_window, inputMap.forwardBtnMap) == GLFW_PRESS)
 		input.axis.z -= 1;
-	if (input.backwardBtnMap && glfwGetKey(m_window, input.backwardBtnMap) == GLFW_PRESS)
+	if (inputMap.backwardBtnMap && glfwGetKey(m_window, inputMap.backwardBtnMap) == GLFW_PRESS)
 		input.axis.z += 1;
-	if (input.downBtnMap && glfwGetKey(m_window, input.downBtnMap) == GLFW_PRESS)
+	if (inputMap.downBtnMap && glfwGetKey(m_window, inputMap.downBtnMap) == GLFW_PRESS)
 		input.axis.y -= 1;
-	if (input.upBtnMap && glfwGetKey(m_window, input.upBtnMap) == GLFW_PRESS)
+	if (inputMap.upBtnMap && glfwGetKey(m_window, inputMap.upBtnMap) == GLFW_PRESS)
 		input.axis.y += 1;
-	if (input.azimuthPosBtnMap && glfwGetKey(m_window, input.azimuthPosBtnMap) == GLFW_PRESS)
+	if (inputMap.azimuthPosBtnMap && glfwGetKey(m_window, inputMap.azimuthPosBtnMap) == GLFW_PRESS)
 		input.orientationDelta.x += 1;
-	if (input.azimuthNegBtnMap && glfwGetKey(m_window, input.azimuthNegBtnMap) == GLFW_PRESS)
+	if (inputMap.azimuthNegBtnMap && glfwGetKey(m_window, inputMap.azimuthNegBtnMap) == GLFW_PRESS)
 		input.orientationDelta.x -= 1;
-	if (input.elevationPosBtnMap && glfwGetKey(m_window, input.elevationPosBtnMap) == GLFW_PRESS)
+	if (inputMap.elevationPosBtnMap && glfwGetKey(m_window, inputMap.elevationPosBtnMap) == GLFW_PRESS)
 		input.orientationDelta.y += 1;
-	if (input.elevationNegBtnMap && glfwGetKey(m_window, input.elevationNegBtnMap) == GLFW_PRESS)
+	if (inputMap.elevationNegBtnMap && glfwGetKey(m_window, inputMap.elevationNegBtnMap) == GLFW_PRESS)
 		input.orientationDelta.y -= 1;
-	if (input.rollBtnMap && glfwGetKey(m_window, input.rollBtnMap) == GLFW_PRESS)
+	if (inputMap.rollBtnMap && glfwGetKey(m_window, inputMap.rollBtnMap) == GLFW_PRESS)
 		input.orientationDelta.z += 1;
-	if (input.btn1Map)
-		input.btn1Down = glfwGetKey(m_window, input.btn1Map) == GLFW_PRESS;
-	if (input.btn2Map)
-		input.btn2Down = glfwGetKey(m_window, input.btn2Map) == GLFW_PRESS;
-	if (input.btn3Map)
-		input.btn3Down = glfwGetKey(m_window, input.btn3Map) == GLFW_PRESS;
-	if (input.btn4Map)
-		input.btn4Down = glfwGetKey(m_window, input.btn4Map) == GLFW_PRESS;
+	if (inputMap.btn1Map)
+		input.btn1Down = glfwGetKey(m_window, inputMap.btn1Map) == GLFW_PRESS;
+	if (inputMap.btn2Map)
+		input.btn2Down = glfwGetKey(m_window, inputMap.btn2Map) == GLFW_PRESS;
+	if (inputMap.btn3Map)
+		input.btn3Down = glfwGetKey(m_window, inputMap.btn3Map) == GLFW_PRESS;
+	if (inputMap.btn4Map)
+		input.btn4Down = glfwGetKey(m_window, inputMap.btn4Map) == GLFW_PRESS;
 }

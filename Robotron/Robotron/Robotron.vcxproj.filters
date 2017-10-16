@@ -137,6 +137,12 @@
     <ClInclude Include="PlayerControlComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InputMapComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>

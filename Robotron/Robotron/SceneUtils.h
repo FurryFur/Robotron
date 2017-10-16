@@ -22,6 +22,7 @@ struct Scene;
 struct VertexFormat;
 struct MeshComponent;
 struct InputComponent;
+struct InputMapComponent;
 
 namespace SceneUtils {
 	// Creates a new entity in the scene and returns its ID
@@ -59,7 +60,7 @@ namespace SceneUtils {
 	size_t createSkybox(Scene&, const std::vector<std::string>& faceFilenames);
 	
 	// Handles boilerplate input binding
-	void setDefaultInputBindings(InputComponent& input);
+	void setDefaultInputBindings(InputMapComponent& input);
 
 	// Returns the vertices to construct a quad.
 	// This function is cached for efficiency 
