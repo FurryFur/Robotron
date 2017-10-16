@@ -16,9 +16,9 @@
 
 struct Scene;
 
-class MovementSystem {
+class PlayerControlSystem {
 public:
-	MovementSystem(Scene& scene);
+	PlayerControlSystem(Scene& scene);
 
 	// Updates the entities position from input
 	void update(size_t entityID);

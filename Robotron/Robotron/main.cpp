@@ -17,7 +17,7 @@
 #include "GLUtils.h"
 #include "SceneUtils.h"
 #include "InputSystem.h"
-#include "MovementSystem.h"
+#include "PlayerControlSystem.h"
 #include "RenderSystem.h"
 #include "Scene.h"
 #include "GameplayLogicSystem.h"
@@ -36,8 +36,9 @@ int main()
 
 	// Initialize the systems that act on components.
 	Scene scene;
+
 	RenderSystem renderSystem(window, scene);
-	MovementSystem movementSystem(scene);
+	PlayerControlSystem movementSystem(scene);
 	InputSystem inputSystem(window, scene);
 	GameplayLogicSystem gameplayLogicSystem(scene, inputSystem);
 	NetworkSystem networkSystem;

@@ -60,7 +60,7 @@ size_t SceneUtils::createQuad(Scene& scene, const glm::mat4& transform)
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
 	InputComponent& input = scene.inputComponents.at(entityID);
-	MovementComponent& movementVars = scene.movementComponents.at(entityID);
+	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
 	material.shader = GLUtils::getDefaultShader();
@@ -94,7 +94,7 @@ size_t SceneUtils::createSphere(Scene& scene, const glm::mat4& _transform)
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
 	InputComponent& input = scene.inputComponents.at(entityID);
-	MovementComponent& movementVars = scene.movementComponents.at(entityID);
+	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
 	transform = _transform;
@@ -130,7 +130,7 @@ size_t SceneUtils::createCylinder(Scene& scene, float radius, float height, cons
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
 	InputComponent& input = scene.inputComponents.at(entityID);
-	MovementComponent& movementVars = scene.movementComponents.at(entityID);
+	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
 	transform = _transform * glm::scale(glm::mat4{ 1 }, glm::vec3{ radius, height, radius });
@@ -166,7 +166,7 @@ size_t SceneUtils::createPyramid(Scene& scene, const glm::mat4& _transform)
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
 	InputComponent& input = scene.inputComponents.at(entityID);
-	MovementComponent& movementVars = scene.movementComponents.at(entityID);
+	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
 	transform = _transform;
@@ -202,7 +202,7 @@ size_t SceneUtils::createCube(Scene& scene, const glm::mat4 & _transform)
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 	MaterialComponent& material = scene.materialComponents.at(entityID);
 	InputComponent& input = scene.inputComponents.at(entityID);
-	MovementComponent& movementVars = scene.movementComponents.at(entityID);
+	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	LogicComponent& logicVars = scene.logicComponents.at(entityID);
 
 	transform = _transform;
@@ -235,7 +235,7 @@ size_t SceneUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm::v
 	componentMask = COMPONENT_CAMERA | COMPONENT_INPUT | COMPONENT_MOVEMENT | COMPONENT_TRANSFORM;
 
 	InputComponent& input = scene.inputComponents.at(entityID);
-	MovementComponent& movementVars = scene.movementComponents.at(entityID);
+	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	glm::mat4& transform = scene.transformComponents.at(entityID);
 
 	input = {};
@@ -265,7 +265,7 @@ size_t SceneUtils::createSkybox(Scene& scene, const std::vector<std::string>& fa
 
 	MaterialComponent& material = scene.materialComponents.at(entityID);
 	InputComponent& input = scene.inputComponents.at(entityID);
-	MovementComponent& movementVars = scene.movementComponents.at(entityID);
+	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	MeshComponent& mesh = scene.meshComponents.at(entityID);
 
 	material = {};

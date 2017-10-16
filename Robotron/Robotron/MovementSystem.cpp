@@ -14,9 +14,9 @@
 
 #define _USE_MATH_DEFINES
 
-#include "MovementSystem.h"
+#include "PlayerControlSystem.h"
 
-#include "MovementComponent.h"
+#include "PlayerControlComponent.h"
 #include "GLUtils.h"
 #include "GLMUtils.h"
 #include "Scene.h"
@@ -27,12 +27,12 @@
 
 #include <cmath>
 
-MovementSystem::MovementSystem(Scene & scene)
+PlayerControlSystem::PlayerControlSystem(Scene & scene)
 	: m_scene{ scene }
 {
 }
 
-void MovementSystem::update(size_t entityID)
+void PlayerControlSystem::update(size_t entityID)
 {
 	// Filter movable
 	const size_t kMovableMask = COMPONENT_MOVEMENT | COMPONENT_INPUT | COMPONENT_TRANSFORM;
@@ -40,7 +40,7 @@ void MovementSystem::update(size_t entityID)
 		return;
 
 	glm::mat4& transform = m_scene.transformComponents.at(entityID);
-	MovementComponent& movementVars = m_scene.movementComponents.at(entityID);
+	PlayerControlComponent& movementVars = m_scene.movementComponents.at(entityID);
 	InputComponent& input = m_scene.inputComponents.at(entityID);
 
 	float moveSpeed = movementVars.moveSpeed;

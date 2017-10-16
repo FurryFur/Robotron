@@ -17,7 +17,7 @@
 #include "InputComponent.h"
 #include "MeshComponent.h"
 #include "MaterialComponent.h"
-#include "MovementComponent.h"
+#include "PlayerControlComponent.h"
 #include "LogicComponent.h"
 
 #include <glm\glm.hpp>
@@ -44,7 +44,7 @@ struct Scene {
 	std::vector<glm::vec3> angualarVelocityComponent;
 	std::vector<MeshComponent> meshComponents;
 	std::vector<MaterialComponent> materialComponents;
-	std::vector<MovementComponent> movementComponents;
+	std::vector<PlayerControlComponent> movementComponents;
 	std::vector<InputComponent> inputComponents;
 	std::vector<LogicComponent> logicComponents;
 };
