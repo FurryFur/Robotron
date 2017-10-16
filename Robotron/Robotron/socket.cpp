@@ -41,7 +41,13 @@ bool CSocket::initialise(unsigned short portNumber)
 	}
 	else
 	{
-		std::cout << "Successfully created the socket" << std::endl;
+		// Set Non-Blocking
+		u_long mode = 1;
+		int result = ioctlsocket(m_hSocket, FIONBIO, &mode);
+		if (result != NO_ERROR)
+			printf("ioctlsocket failed with error: %ld\n", result);
+		else
+			std::cout << "Successfully created the socket" << std::endl;
 	}
 
 	// now bind the socket to the address and port number supplied.

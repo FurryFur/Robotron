@@ -60,10 +60,10 @@
     <ClCompile Include="GameplayLogicSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NetworkSystem.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
