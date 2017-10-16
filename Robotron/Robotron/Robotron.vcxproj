@@ -153,6 +153,7 @@
     <ClCompile Include="GameplayLogicSystem.cpp" />
     <ClCompile Include="GLUtils.cpp" />
     <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MovementSystem.cpp" />
     <ClCompile Include="NetworkSystem.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="KeyObserver.h" />
     <ClInclude Include="InputComponent.h" />
     <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="LogicComponent.h" />
     <ClInclude Include="MaterialComponent.h" />
     <ClInclude Include="MeshComponent.h" />
