@@ -20,8 +20,20 @@ NetworkSystem::NetworkSystem()
 
 void NetworkSystem::beginFrame()
 {
-	sendData();
+	
+	//sendData();
 	receiveData();
+
+	// Server: Update inputs for entities
+
+	// Client: Update ghost snapshots for ghost entities
+}
+
+void NetworkSystem::update(size_t entityID) 
+{
+	// Server: Send snapshot of entity to clients
+
+	// Client: Do interpolation between current state and snapshot
 }
 
 void NetworkSystem::sendData()

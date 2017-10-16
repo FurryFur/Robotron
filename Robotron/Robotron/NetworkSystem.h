@@ -6,7 +6,8 @@ class NetworkSystem {
 public:
 	NetworkSystem();
 
-	void beginFrame();
+	virtual void beginFrame(); // = 0
+	virtual void update(size_t entityID); // = 0
 
 private:
 	void sendData();
