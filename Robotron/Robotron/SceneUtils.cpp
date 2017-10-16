@@ -125,7 +125,7 @@ size_t SceneUtils::createPlayer(Scene& scene, const glm::mat4& _transform)
 {
 	size_t entityID = createEntity(scene);
 	size_t& componentMask = scene.componentMasks.at(entityID);
-	componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	componentMask |= COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL | COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
 	// Get references to components
 	glm::mat4& transform = scene.transformComponents.at(entityID);
@@ -146,7 +146,12 @@ size_t SceneUtils::createPlayer(Scene& scene, const glm::mat4& _transform)
 
 	mesh = getSphereMesh();
 
-	setDefaultInputBindings(inputMap);
+	inputMap = {};
+	inputMap.mouseInputEnabled = true;
+	inputMap.leftBtnMap = GLFW_KEY_A;
+	inputMap.rightBtnMap = GLFW_KEY_D;
+	inputMap.forwardBtnMap = GLFW_KEY_W;
+	inputMap.backwardBtnMap = GLFW_KEY_S;
 
 	movementVars.moveSpeed = 0.1f;
 	movementVars.orientationSensitivity = 0.05f;
@@ -270,20 +275,10 @@ size_t SceneUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm::v
 	size_t entityID = createEntity(scene);
 
 	size_t& componentMask = scene.componentMasks.at(entityID);
-	componentMask = COMPONENT_INPUT_MAP | COMPONENT_CAMERA | COMPONENT_INPUT | COMPONENT_MOVEMENT | COMPONENT_TRANSFORM;
+	componentMask = COMPONENT_CAMERA | COMPONENT_TRANSFORM;
 
-	InputMapComponent& inputMap = scene.inputMapComponents.at(entityID);
 	PlayerControlComponent& movementVars = scene.movementComponents.at(entityID);
 	glm::mat4& transform = scene.transformComponents.at(entityID);
-
-	inputMap = {};
-	inputMap.mouseInputEnabled = true;
-	inputMap.leftBtnMap = GLFW_KEY_A;
-	inputMap.rightBtnMap = GLFW_KEY_D;
-	inputMap.forwardBtnMap = GLFW_KEY_W;
-	inputMap.backwardBtnMap = GLFW_KEY_S;
-	inputMap.downBtnMap = GLFW_KEY_Q;
-	inputMap.upBtnMap = GLFW_KEY_E;
 
 	movementVars.moveSpeed = 0.1f;
 	movementVars.orientationSensitivity = 0.005f;

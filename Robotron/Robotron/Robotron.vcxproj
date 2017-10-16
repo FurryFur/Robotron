@@ -155,7 +155,7 @@
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MovementSystem.cpp" />
+    <ClCompile Include="PlayerControlSystem.cpp" />
     <ClCompile Include="NetworkSystem.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SceneUtils.cpp" />

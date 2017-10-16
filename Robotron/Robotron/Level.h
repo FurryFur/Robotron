@@ -44,7 +44,6 @@ private:
 	RenderSystem m_renderSystem;
 	PlayerControlSystem m_movementSystem;
 	InputSystem m_inputSystem;
-	GameplayLogicSystem m_gameplayLogicSystem;
 	NetworkSystem m_networkSystem;
 };
 
