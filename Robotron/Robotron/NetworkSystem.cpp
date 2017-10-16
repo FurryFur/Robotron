@@ -1,5 +1,8 @@
 #include "NetworkSystem.h"
 
+#include "InputComponent.h"
+#include "Packet.h"
+
 #include <iostream>
 #include <memory>
 
@@ -21,7 +24,7 @@ NetworkSystem::NetworkSystem()
 void NetworkSystem::beginFrame()
 {
 	
-	//sendData();
+	sendData();
 	receiveData();
 
 	// Server: Update inputs for entities
@@ -39,7 +42,30 @@ void NetworkSystem::update(size_t entityID)
 void NetworkSystem::sendData()
 {
 	// A test packet to send
-	char testPacket = 'a';
+	Packet packet;
+
+	static bool sendInput = true;
+	if (sendInput) {
+		InputComponent input;
+		input.axis.x = 1.255;
+		input.axis.y = 0.5;
+		input.axis.z = 0.2;
+		input.btn1Down = true;
+		input.btn2Down = false;
+		input.btn3Down = true;
+		input.btn4Down = true;
+		input.orientationDelta.x = 1.5;
+		input.orientationDelta.y = 0.2;
+		input.orientationDelta.z = 0.1;
+
+		packet.type = PacketType::Input;
+		packet.input = input;
+	} else {
+		packet.type = PacketType::GhostSnapshot;
+		packet.ghostSnapshot = {};
+		packet.ghostSnapshot.acceleration.z = 0.2548;
+	}
+	sendInput = !sendInput;
 
 	// Fill out address to send to (including port)
 	sockaddr_in address;
@@ -50,8 +76,8 @@ void NetworkSystem::sendData()
 	// Send the packet
 	int numBytesSent = sendto(
 		m_socket.getSocketHandle(),                     // socket to send through.
-		&testPacket,                                    // data to send
-		sizeof(testPacket),                             // number of bytes to send
+		reinterpret_cast<const char*>(&packet),         // data to send
+		sizeof(packet),                                 // number of bytes to send
 		0,                                              // flags
 		reinterpret_cast<const sockaddr*>(&address),    // address to be filled with packet target
 		sizeof(address)                                 // size of the above address struct.
@@ -69,10 +95,10 @@ void NetworkSystem::receiveData()
 	int sizeofAddress = sizeof(fromAddress);
 
 	// Retrieve a dataframe from the socket
-	char receivedPacket;
+	Packet receivedPacket;
 	int numBytesRead = recvfrom(
 		m_socket2.getSocketHandle(),
-		&receivedPacket,
+		reinterpret_cast<char*>(&receivedPacket),
 		sizeof(receivedPacket),
 		0,
 		reinterpret_cast<sockaddr*>(&fromAddress),
@@ -90,7 +116,17 @@ void NetworkSystem::receiveData()
 		char* pcAddress = new char[sizeofAddress];
 		inet_ntop(AF_INET, &fromAddress, pcAddress, sizeofAddress);
 		u_short port = ntohs(fromAddress.sin_port);
-		std::cout << "Received " << receivedPacket << " from " << pcAddress << ":" << port << std::endl;
+		std::cout << "Received a packet from " << pcAddress << ":" << port << std::endl;
+		if (receivedPacket.type == PacketType::Input) {
+			std::cout << "Packet type is Input" << std::endl;
+			std::cout << "Input x axis is: " << receivedPacket.input.axis.x << std::endl;
+			std::cout << "Input btn4 down state is: " << receivedPacket.input.btn4Down << std::endl;
+			std::cout << std::endl;
+		} else {
+			std::cout << "Packet type is Ghost Snapshot" << std::endl;
+			std::cout << "Acceleration.z is: " << receivedPacket.ghostSnapshot.acceleration.z << std::endl;
+			std::cout << std::endl;
+		}
 
 		// Cleanup
 		delete[] pcAddress;

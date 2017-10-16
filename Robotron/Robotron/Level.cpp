@@ -44,6 +44,7 @@ void Level::process()
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
+	m_networkSystem.beginFrame();
 
 	// Update all the entities using all the systems.
 	for (size_t entityID = 0; entityID < SceneUtils::getEntityCount(m_scene); ++entityID) {
