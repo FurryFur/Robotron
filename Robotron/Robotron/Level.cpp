@@ -11,15 +11,12 @@ Level::Level(GLFWwindow* window, Scene& scene):
 	m_window = window;
 
 	// Create 3D entities.
-	// Order matters right now, selection buttons are assigned to the first four entities created
-	SceneUtils::createSphere(scene, glm::translate({}, glm::vec3{ -1.5f, 1.5f, 0 }));
 	SceneUtils::createQuad(scene,
-		glm::translate({}, glm::vec3{ 1.5f, 1.5f, 0 })
-		* glm::rotate(glm::mat4{}, static_cast<float>(-M_PI / 16), glm::vec3{ 1, 0, 0 }));
-	SceneUtils::createCylinder(scene, 1.5, 1.5,
-		glm::translate(glm::mat4{}, glm::vec3{ -1.5f, -1.5f, 0 })
-		* glm::rotate(glm::mat4{}, static_cast<float>(M_PI / 4), glm::vec3{ 0, 0, 1 }));
-	SceneUtils::createPyramid(scene, glm::translate({}, glm::vec3{ 1.5f, -1.5f, 0 }));
+		glm::rotate(glm::mat4{}, static_cast<float>(M_PI / 2), glm::vec3{ 1, 0, 0 })
+		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 1.0f }));
+
+	SceneUtils::createPlayer(scene, 
+		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 
 	// Create the skybox
 	size_t skybox = SceneUtils::createSkybox(scene, {
@@ -34,7 +31,7 @@ Level::Level(GLFWwindow* window, Scene& scene):
 	m_renderSystem.setEnvironmentMap(skybox);
 
 	// Setup the camera
-	size_t cameraEntity = SceneUtils::createCamera(scene, { 0, 0, 6 }, { 0, 0, 0 }, { 0, 1, 0 });
+	size_t cameraEntity = SceneUtils::createCamera(scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
 	m_renderSystem.setCamera(cameraEntity);
 }
 
