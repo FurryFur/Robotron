@@ -14,13 +14,21 @@
 
 #pragma once
 
-#include "VertexFormat.h"
-
 #include <glad\glad.h>
 
 #include <vector>
 
-struct MeshComponent {
+struct Mesh {
+	size_t materialIndex;
 	GLuint VAO;
 	GLsizei numIndices;
+};
+
+// A tree structure of mesh nodes.
+// Mesh nodes only contain mesh ids and child nodes.
+// The actual meshes can be access by indexing into the
+// corosponding model components mesh array using the meshID.
+struct MeshNode {
+	std::vector<size_t> meshIDs;
+	std::vector<MeshNode> childNodes;
 };
