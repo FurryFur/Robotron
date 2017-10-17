@@ -17,6 +17,7 @@
 #include <glm\glm.hpp>
 
 #include <vector>
+#include <string>
 
 struct Scene;
 struct Entity;
@@ -57,7 +58,9 @@ namespace EntityUtils {
 	// Can be used to set the environment map for the renderer.
 	Entity& createSkybox(Scene&, const std::vector<std::string>& faceFilenames);
 
-	Entity& createArena(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	// Creates an entity from a 3D model file.
+	// The entity returned is a simple entity with only a model and a transform component.
+	Entity& createModel(Scene&, const std::string& path, const glm::mat4& transform = glm::mat4{ 1 });
 	
 	// Handles boilerplate input binding
 	void setDefaultInputBindings(InputMapComponent& input);

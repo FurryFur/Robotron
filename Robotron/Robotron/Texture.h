@@ -5,6 +5,5 @@
 
 struct Texture {
 	GLuint id;
-	aiTextureType type;
 	GLenum target;
 };

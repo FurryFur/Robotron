@@ -25,11 +25,15 @@ Level::Level(GLFWwindow* window, int levelNum)
 
 	// Create 3D entities.
 	EntityUtils::createQuad(m_scene,
-		glm::rotate(glm::mat4{}, static_cast<float>(M_PI / 2), glm::vec3{ 1, 0, 0 })
+		  glm::rotate(glm::mat4{}, static_cast<float>(M_PI / 2), glm::vec3{ 1, 0, 0 })
 		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 1.0f }));
 
 	EntityUtils::createPlayer(m_scene,
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
+
+	EntityUtils::createModel(m_scene, "Assets/Models/Cherry_Tomato/VG18_1.obj", 
+		  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
+		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 20.0f }));
 
 	//create the number of enemy01 based on current level with some random variance.
 	unsigned int numberOfEnemy01 = 9 + m_levelNum + randomInt(-2, 2);

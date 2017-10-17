@@ -298,7 +298,7 @@ const Mesh& GLPrimitives::getQuadMesh()
 	static const std::vector<GLuint>& indices = getQuadIndices();
 	static const Mesh mesh{
 		0,
-		GLUtils::bufferVertices(vertices, indices),
+		GLUtils::bufferMeshData(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
 
@@ -316,7 +316,7 @@ const ModelComponent& GLPrimitives::getQuadModel()
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();
-		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
+		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
 		material.willDrawDepth = true;
 		material.shaderParams.metallicness = 1.0f;
 		material.shaderParams.glossiness = 75.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
@@ -334,7 +334,7 @@ const Mesh& GLPrimitives::getSphereMesh()
 	static const std::vector<GLuint>& indices = getSphereIndices();
 	static const Mesh mesh{
 		0, // Use the first material on the model
-		GLUtils::bufferVertices(vertices, indices),
+		GLUtils::bufferMeshData(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
 
@@ -352,7 +352,7 @@ const ModelComponent& GLPrimitives::getSphereModel()
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();
-		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture2.jpg"));
+		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture2.jpg"));
 		material.willDrawDepth = true;
 		material.shaderParams.metallicness = 0.3f;
 		material.shaderParams.glossiness = 2.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
@@ -370,7 +370,7 @@ const Mesh& GLPrimitives::getCylinderMesh()
 	static const std::vector<GLuint>& indices = getCylinderIndices();
 	static const Mesh mesh{
 		0, // Use the first material on the model
-		GLUtils::bufferVertices(vertices, indices),
+		GLUtils::bufferMeshData(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
 
@@ -388,7 +388,7 @@ const ModelComponent& GLPrimitives::getCylinderModel()
 
 		Material material;
 		material.shader = GLUtils::getThresholdShader();
-		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture4.jpg"));
+		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture4.jpg"));
 		material.willDrawDepth = true;
 		material.shaderParams.metallicness = 0.75f;
 		material.shaderParams.glossiness = 40.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
@@ -406,7 +406,7 @@ const Mesh& GLPrimitives::getPyramidMesh()
 	static const std::vector<GLuint>& indices = getPyramidIndices();
 	static const Mesh mesh{
 		0,
-		GLUtils::bufferVertices(vertices, indices),
+		GLUtils::bufferMeshData(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
 
@@ -424,7 +424,7 @@ const ModelComponent& GLPrimitives::getPyramidModel()
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();
-		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture.jpg"));
+		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture.jpg"));
 		material.willDrawDepth = true;
 		material.shaderParams.metallicness = 0.95f;
 		material.shaderParams.glossiness = 10.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
@@ -442,7 +442,7 @@ const Mesh& GLPrimitives::getCubeMesh()
 	static const std::vector<GLuint>& indices = getCubeIndices();
 	static const Mesh mesh{
 		0, // Use the first material on the model
-		GLUtils::bufferVertices(vertices, indices),
+		GLUtils::bufferMeshData(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
 
@@ -460,7 +460,7 @@ const ModelComponent& GLPrimitives::getCubeModel()
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();
-		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
+		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
 		material.willDrawDepth = true;
 		material.shaderParams.metallicness = 0.95f;
 		material.shaderParams.glossiness = 10.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason

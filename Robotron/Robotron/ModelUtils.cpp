@@ -15,7 +15,7 @@
 
 // Checks all material textures of a given type and loads the textures if they're not loaded yet.
 // The required info is returned as a Texture struct.
-std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type)
+std::vector<Texture> loadMaterialTextures(const aiMaterial* mat, aiTextureType type)
 {
 	static std::unordered_map<std::string, Texture> s_texturesLoaded;	// Stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 
@@ -37,7 +37,7 @@ std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type)
 		}
 		if (!skip)
 		{   // If texture hasn't been loaded already, load it
-			Texture texture = GLUtils::loadTexture(str.C_Str(), type);
+			Texture texture = GLUtils::loadTexture(str.C_Str());
 			s_texturesLoaded.insert(std::make_pair(str.C_Str(), texture));  // Store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
 			textures.push_back(std::move(texture));
 		}
@@ -45,99 +45,145 @@ std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type)
 	return textures;
 }
 
-Mesh processMesh(aiMesh* _mesh, const aiScene* scene)
+Material processMaterial(const aiMaterial* _aiMaterial, const aiScene* scene) 
 {
-	// Data to fill
-	Mesh mesh;
+	Material material;
+	material.willDrawDepth = true;
+
+	// 1. diffuse maps
+	std::vector<Texture> colorMaps = loadMaterialTextures(_aiMaterial, aiTextureType_DIFFUSE);
+	material.colorMaps.insert(material.colorMaps.end(), colorMaps.begin(), colorMaps.end());
+	// 2. specular maps
+	std::vector<Texture> metallicnessMaps = loadMaterialTextures(_aiMaterial, aiTextureType_SPECULAR);
+	material.metallicnessMaps.insert(material.metallicnessMaps.end(), metallicnessMaps.begin(), metallicnessMaps.end());
+	// 3. gloss map
+	std::vector<Texture> shininessMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_SHININESS);
+	material.shininessMaps.insert(material.shininessMaps.end(), shininessMaps.begin(), shininessMaps.end());
+	// 4. normal maps
+	std::vector<Texture> normalMaps = loadMaterialTextures(_aiMaterial, aiTextureType_NORMALS);
+	material.normalMaps.insert(material.normalMaps.end(), normalMaps.begin(), normalMaps.end());
+	// 5. height maps
+	std::vector<Texture> heightMaps = loadMaterialTextures(_aiMaterial, aiTextureType_HEIGHT);
+	material.heightMaps.insert(material.heightMaps.end(), heightMaps.begin(), heightMaps.end());
+	// 6. displacement maps
+	std::vector<Texture> displacementMaps = loadMaterialTextures(_aiMaterial, aiTextureType_DISPLACEMENT);
+	material.displacementMaps.insert(material.displacementMaps.end(), displacementMaps.begin(), displacementMaps.end());
+
+	// TODO: Add more of these to the material class
+	std::vector<Texture> ambientMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_AMBIENT);
+	std::vector<Texture> emissiveMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_EMISSIVE);
+	std::vector<Texture> lightMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_LIGHTMAP);
+	std::vector<Texture> opacityMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_OPACITY);
+	std::vector<Texture> reflectionMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_REFLECTION);
+	std::vector<Texture> unknownTextureMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_UNKNOWN);
+
+	// TODO: Swap shader model based on the textures we have
+	material.shader = GLUtils::getDefaultShader();
+
+	return material;
+}
+
+Mesh processMesh(const aiMesh* _aiMesh, const aiScene* scene)
+{
+	bool hasNormals = _aiMesh->mNormals != nullptr;
 
 	// Walk through each of the mesh's vertices
 	std::vector<VertexFormat> vertices;
-	for (GLuint i = 0; i < _mesh->mNumVertices; i++)
+	for (GLuint i = 0; i < _aiMesh->mNumVertices; i++)
 	{
 		VertexFormat vertex;
-		glm::vec3 vector; // We declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
-						  // Positions
-		vector.x = _mesh->mVertices[i].x;
-		vector.y = _mesh->mVertices[i].y;
-		vector.z = _mesh->mVertices[i].z;
-		vertex.position = vector;
+
+		// Position
+		vertex.position.x = _aiMesh->mVertices[i].x;
+		vertex.position.y = _aiMesh->mVertices[i].y;
+		vertex.position.z = _aiMesh->mVertices[i].z;
+
 		// Normals
-		vector.x = _mesh->mNormals[i].x;
-		vector.y = _mesh->mNormals[i].y;
-		vector.z = _mesh->mNormals[i].z;
-		vertex.normal = vector;
+		if (hasNormals) {
+			vertex.normal.x = _aiMesh->mNormals[i].x;
+			vertex.normal.y = _aiMesh->mNormals[i].y;
+			vertex.normal.z = _aiMesh->mNormals[i].z;
+		}
+
 		// Texture Coordinates
-		if (_mesh->mTextureCoords[0]) // Does the mesh contain texture coordinates?
+		if (_aiMesh->mTextureCoords[0]) // Does the mesh contain texture coordinates?
 		{
 			glm::vec2 vec;
 			// A vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
 			// use models where a vertex can have multiple texture coordinates so we always take the first set (0).
-			vec.x = _mesh->mTextureCoords[0][i].x;
-			vec.y = _mesh->mTextureCoords[0][i].y;
+			vec.x = _aiMesh->mTextureCoords[0][i].x;
+			vec.y = _aiMesh->mTextureCoords[0][i].y;
 			vertex.texCoord = vec;
 		}
 		else
 			vertex.texCoord = glm::vec2(0.0f, 0.0f);
+
 		vertices.push_back(std::move(vertex));
 	}
 
-	// Now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+	// Walk through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 	std::vector<GLuint> indices;
-	for (GLuint i = 0; i < _mesh->mNumFaces; i++)
+	for (GLuint i = 0; i < _aiMesh->mNumFaces; i++)
 	{
-		aiFace face = _mesh->mFaces[i];
+		aiFace& face = _aiMesh->mFaces[i];
 		// Retrieve all indices of the face and store them in the indices vector
 		for (GLuint j = 0; j < face.mNumIndices; j++)
 			indices.push_back(face.mIndices[j]);
+
+		// If the vertices have no normal information then calculate them from the face.
+		// Assume flat shading and 3 vertices per faces.
+		if (!hasNormals) {
+			VertexFormat& triVert1 = vertices.at(face.mIndices[0]);
+			VertexFormat& triVert2 = vertices.at(face.mIndices[1]);
+			VertexFormat& triVert3 = vertices.at(face.mIndices[2]);
+			glm::vec3 triEdge1 = triVert2.position - triVert1.position;
+			glm::vec3 triEdge2 = triVert3.position - triVert2.position;
+			glm::vec3 normal = glm::cross(triEdge1, triEdge2);
+			triVert1.normal = normal;
+			triVert2.normal = normal;
+			triVert3.normal = normal;
+		}
 	}
 
-	// Process materials
-	if (_mesh->mMaterialIndex >= 0)
-	{
-		aiMaterial* material = scene->mMaterials[_mesh->mMaterialIndex];
-		// We assume a convention for sampler names in the shaders. Each diffuse texture should be named
-		// as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-		// Same applies to other texture as the following list summarizes:
-		// Diffuse: texture_diffuseN
-		// Specular: texture_specularN
-		// Normal: texture_normalN
-
-		// 1. Diffuse maps
-		std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
-
-		mesh.textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		// 2. Specular maps
-		std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-	}
+	Mesh mesh;
+	mesh.materialIndex = _aiMesh->mMaterialIndex;
+	mesh.VAO = GLUtils::bufferMeshData(vertices, indices);
+	mesh.numIndices = indices.size();
 
 	// Return a mesh object created from the extracted mesh data
-	return Mesh(vertices, indices, textures);
+	return mesh;
 }
 
 // Processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
-void processNode(aiNode* node, const aiScene* scene, ModelComponent& outModel) 
+void processNode(const aiNode* _aiNode, const aiScene* scene, MeshNode& outNode) 
 {
-	// Process each mesh located at the current node
-	for (GLuint i = 0; i < node->mNumMeshes; i++)
+	// Link each mesh located at the current node
+	for (GLuint i = 0; i < _aiNode->mNumMeshes; i++)
 	{
 		// The node object only contains indices to index the actual objects in the scene. 
 		// The scene contains all the data, node is just to keep stuff organized (like relations between nodes).
-		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		outModel.meshes.push_back(processMesh(mesh, scene));
+		outNode.meshIDs.push_back(_aiNode->mMeshes[i]);
 	}
 
-
 	// After we've processed all of the meshes (if any) we then recursively process each of the children nodes
-	for (GLuint i = 0; i < node->mNumChildren; i++)
+	for (GLuint i = 0; i < _aiNode->mNumChildren; i++)
 	{
-		processNode(node->mChildren[i], scene, outModel);
+		outNode.childNodes.emplace_back();
+		processNode(_aiNode->mChildren[i], scene, outNode.childNodes.at(i));
 	}
 }
 
 ModelComponent ModelUtils::loadModel(const std::string& path)
 {
-	static Assimp::Importer s_importer;
+	static std::unordered_map<std::string, ModelComponent> s_modelsLoaded;	// Stores all the models loaded so far, optimization to make sure models aren't loaded more than once.
+
+	// A model with the same filepath has already been loaded, return a copy. (optimization)
+	if (s_modelsLoaded.find(path) != s_modelsLoaded.end())
+		return s_modelsLoaded.at(path);
+
+	ModelComponent model;
+
+	Assimp::Importer s_importer;
 	const aiScene* scene = s_importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	// Check for errors
@@ -145,14 +191,20 @@ ModelComponent ModelUtils::loadModel(const std::string& path)
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
 		std::cout << "ERROR::ASSIMP:: " << s_importer.GetErrorString() << std::endl;
-		return ModelComponent();
+		return model;
 	}
-	// Retrieve the directory path of the filepath
-	std::string directory = path.substr(0, path.find_last_of('/'));
 
-	// Process ASSIMP's root node recursively
-	//this->processNode(scene->mRootNode, scene);
+	// Load each mesh in the model
+	for (GLuint i = 0; i < scene->mNumMeshes; ++i)
+		model.meshes.push_back(processMesh(scene->mMeshes[i], scene));
 
-	ModelComponent model;
-	return proccessNode(scene->mRootNode, scene, model);
+	// Load each material in the model
+	for (GLuint i = 0; i < scene->mNumMaterials; ++i)
+		model.materials.push_back(processMaterial(scene->mMaterials[i], scene));
+
+	// Recursively construct the models scene graph hierachy
+	processNode(scene->mRootNode, scene, model.rootNode);
+
+	s_modelsLoaded.insert(std::make_pair(path, model));
+	return model;
 }

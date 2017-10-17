@@ -19,7 +19,7 @@
 #include <vector>
 
 struct Mesh {
-	size_t materialIndex;
+	unsigned int materialIndex;
 	GLuint VAO;
 	GLsizei numIndices;
 };
@@ -29,6 +29,6 @@ struct Mesh {
 // The actual meshes can be access by indexing into the
 // corosponding model components mesh array using the meshID.
 struct MeshNode {
-	std::vector<size_t> meshIDs;
+	std::vector<unsigned int> meshIDs;
 	std::vector<MeshNode> childNodes;
 };
