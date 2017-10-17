@@ -23,11 +23,11 @@ Level::Level(GLFWwindow* window, int levelNum)
 		m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene);
 
 	// Create 3D entities.
-	SceneUtils::createQuad(m_scene,
+	EntityUtils::createQuad(m_scene,
 		glm::rotate(glm::mat4{}, static_cast<float>(M_PI / 2), glm::vec3{ 1, 0, 0 })
 		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 1.0f }));
 
-	SceneUtils::createPlayer(m_scene,
+	EntityUtils::createPlayer(m_scene,
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 
 	//create the number of enemy01 based on current level with some random variance.
@@ -43,12 +43,12 @@ Level::Level(GLFWwindow* window, int levelNum)
 		if (randomInt(0, 1) == 0)
 			randZ += 25;
 
-		SceneUtils::createEnemy01(m_scene,
+		EntityUtils::createEnemy01(m_scene,
 			glm::translate({}, glm::vec3{ randX, 0.0f, randZ }));
 	}
 
 	// Create the skybox
-	Entity& skybox = SceneUtils::createSkybox(m_scene, {
+	Entity& skybox = EntityUtils::createSkybox(m_scene, {
 		"Assets/Textures/Skybox/right.jpg",
 		"Assets/Textures/Skybox/left.jpg",
 		"Assets/Textures/Skybox/top.jpg",
@@ -60,7 +60,7 @@ Level::Level(GLFWwindow* window, int levelNum)
 	m_renderSystem.setEnvironmentMap(skybox);
 
 	// Setup the camera
-	Entity& cameraEntity = SceneUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
+	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
 	m_renderSystem.setCamera(&cameraEntity);
 }
 

@@ -16,7 +16,7 @@
 
 #include "Utils.h"
 #include "GLUtils.h"
-#include "SceneUtils.h"
+#include "EntityUtils.h"
 #include "InputSystem.h"
 #include "PlayerControlSystem.h"
 #include "RenderSystem.h"
