@@ -14,8 +14,8 @@
 #include "GLUtils.h"
 
 #include "InputSystem.h"
-#include "MaterialComponent.h"
-#include "MeshComponent.h"
+#include "Material.h"
+#include "Mesh.h"
 #include "PlayerControlComponent.h"
 #include "Scene.h"
 #include "ShaderHelper.h"
@@ -162,38 +162,44 @@ GLuint GLUtils::bufferVertices(const std::vector<VertexFormat>& vertices, const 
 }
 
 
-GLuint GLUtils::loadTexture(const std::string& filename)
+Texture GLUtils::loadTexture(const std::string& filename, TextureType textureType)
 {
 	// TODO: Make cached so duplicate textures aren't loaded to the GPU
+
+	Texture texture;
+	texture.target = GL_TEXTURE_2D;
+	texture.type = textureType;
 
 	int width, height, nrChannels;
 	unsigned char* textureData = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
 
-	GLuint texture;
-	glGenTextures(1, &texture);
+	glGenTextures(1, &texture.id);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(texture.target, texture.id);
 	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(texture.target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(texture.target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(texture.target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(texture.target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
-	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexImage2D(texture.target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
+	glGenerateMipmap(texture.target);
 
 	stbi_image_free(textureData);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(texture.target, 0);
 
 	return texture;
 }
 
-GLuint GLUtils::loadCubeMap(const std::vector<std::string>& faceFilenames)
+Texture GLUtils::loadCubeMap(const std::vector<std::string>& faceFilenames)
 {
-	GLuint cubeMap;
-	glGenTextures(1, &cubeMap);
+	Texture texture;
+	texture.target = GL_TEXTURE_CUBE_MAP;
+	texture.type = TEXTURE_TYPE_DIFFUSE;
+
+	glGenTextures(1, &texture.id);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
+	glBindTexture(texture.target, texture.id);
 
 	for (GLenum i = 0; i < faceFilenames.size(); ++i) {
 		int width, height, nrChannels;
@@ -205,13 +211,13 @@ GLuint GLUtils::loadCubeMap(const std::vector<std::string>& faceFilenames)
 		stbi_image_free(faceData);
 	}
 
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(texture.target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(texture.target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(texture.target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(texture.target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(texture.target, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindTexture(texture.target, 0);
 
-	return cubeMap;
+	return texture;
 }
