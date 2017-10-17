@@ -8,8 +8,9 @@
 Level::Level(GLFWwindow* window, int levelNum)
 	: m_scene{}
 	, m_renderSystem(window, m_scene)
-	, m_movementSystem(m_scene)
+	, m_playerControlSystem(m_scene)
 	, m_inputSystem(window, m_scene)
+	, m_enemy01ControlSystem(m_scene)
 {
 	m_window = window;
 	m_levelNum = levelNum;
@@ -79,9 +80,10 @@ void Level::process()
 	// Update all the entities using all the systems.
 	for (size_t i = 0; i < m_scene.entities.size(); ++i) {
 		m_inputSystem.update(m_scene.entities.at(i));
-		m_movementSystem.update(m_scene.entities.at(i));
+		m_playerControlSystem.update(m_scene.entities.at(i));
 		m_networkSystem->update(m_scene.entities.at(i));
 		m_renderSystem.update(m_scene.entities.at(i));
+		m_enemy01ControlSystem.update(m_scene.entities.at(i));
 	}
 
 	// Do operations that should happen at the end of the frame.

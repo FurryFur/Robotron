@@ -24,6 +24,7 @@
 #include "NetworkSystem.h"
 #include "NetworkServerSystem.h"
 #include "GameplayLogicSystem.h"
+#include "Enemy01ControlSystem.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
@@ -42,11 +43,13 @@ public:
 	void process();
 
 private:
+
 	Scene m_scene;
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;
-	PlayerControlSystem m_movementSystem;
+	PlayerControlSystem m_playerControlSystem;
 	InputSystem m_inputSystem;
+	Enemy01ControlSystem m_enemy01ControlSystem;
 	std::unique_ptr<NetworkSystem> m_networkSystem;
 
 	//stores the level current on. effects enemy spawn rate and spawn positioning

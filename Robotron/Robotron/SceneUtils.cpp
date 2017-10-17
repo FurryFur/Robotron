@@ -73,7 +73,7 @@ Entity& SceneUtils::createSphere(Scene& scene, const glm::mat4& _transform)
 Entity& SceneUtils::createEnemy01(Scene& scene, const glm::mat4& _transform)
 {
 	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	entity.componentMask |= COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC | COMPONENT_ENEMY01;
 
 	entity.transform = _transform;
 

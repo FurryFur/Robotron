@@ -18,7 +18,8 @@ enum ComponentMask {
 	COMPONENT_PLAYER_CONTROL = 1 << 5,
 	COMPONENT_INPUT = 1 << 6,
 	COMPONENT_INPUT_MAP = 1 << 7,
-	COMPONENT_LOGIC = 1 << 8
+	COMPONENT_LOGIC = 1 << 8,
+	COMPONENT_ENEMY01 = 1 << 9
 };
 
 struct Entity
