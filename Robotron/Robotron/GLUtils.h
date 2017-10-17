@@ -48,7 +48,7 @@ namespace GLUtils {
 
 	// Loads a texture to GPU memory.
 	// Returns a handler to the GPU texture.
-	Texture loadTexture(const std::string& filename, TextureType textureType = TEXTURE_TYPE_DIFFUSE);
+	Texture loadTexture(const std::string& filename, aiTextureType textureType = aiTextureType_DIFFUSE);
 
 	// Loads a cube map to GPU memory.
 	// Returns a handler to the GPU cube map.

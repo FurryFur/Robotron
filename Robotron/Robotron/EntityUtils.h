@@ -56,6 +56,8 @@ namespace EntityUtils {
 	// Creates a skybox.
 	// Can be used to set the environment map for the renderer.
 	Entity& createSkybox(Scene&, const std::vector<std::string>& faceFilenames);
+
+	Entity& createArena(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 	
 	// Handles boilerplate input binding
 	void setDefaultInputBindings(InputMapComponent& input);

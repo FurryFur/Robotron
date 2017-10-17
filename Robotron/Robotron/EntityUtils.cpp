@@ -6,6 +6,7 @@
 #include "GLPrimitives.h"
 #include "Scene.h"
 #include "Entity.h"
+#include "ModelUtils.h"
 
 #include <glm\gtc\matrix_transform.hpp>
 
@@ -186,6 +187,17 @@ Entity& EntityUtils::createSkybox(Scene& scene, const std::vector<std::string>& 
 	entity.model.materials.at(0).shader = GLUtils::getSkyboxShader();
 	entity.model.materials.at(0).textures.push_back(GLUtils::loadCubeMap(faceFilenames));
 	entity.model.materials.at(0).willDrawDepth = false;
+
+	return entity;
+}
+
+Entity & EntityUtils::createArena(Scene& scene, const glm::mat4& transform)
+{
+	Entity& entity = scene.createEntity();
+
+	entity.componentMask = COMPONENT_MODEL;
+
+	entity.model = ModelUtils::loadModel("Assets/Castle/Castle OBJ.obj");
 
 	return entity;
 }

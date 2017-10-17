@@ -312,7 +312,7 @@ const ModelComponent& GLPrimitives::getQuadModel()
 
 	if (!isLoaded) {
 		model.rootNode.meshIDs.push_back(0);
-		model.meshs.push_back(getQuadMesh());
+		model.meshes.push_back(getQuadMesh());
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();
@@ -348,7 +348,7 @@ const ModelComponent& GLPrimitives::getSphereModel()
 
 	if (!isLoaded) {
 		model.rootNode.meshIDs.push_back(0);
-		model.meshs.push_back(getSphereMesh());
+		model.meshes.push_back(getSphereMesh());
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();
@@ -384,7 +384,7 @@ const ModelComponent& GLPrimitives::getCylinderModel()
 
 	if (!isLoaded) {
 		model.rootNode.meshIDs.push_back(0);
-		model.meshs.push_back(getCylinderMesh());
+		model.meshes.push_back(getCylinderMesh());
 
 		Material material;
 		material.shader = GLUtils::getThresholdShader();
@@ -420,7 +420,7 @@ const ModelComponent& GLPrimitives::getPyramidModel()
 
 	if (!isLoaded) {
 		model.rootNode.meshIDs.push_back(0);
-		model.meshs.push_back(getPyramidMesh());
+		model.meshes.push_back(getPyramidMesh());
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();
@@ -456,7 +456,7 @@ const ModelComponent& GLPrimitives::getCubeModel()
 
 	if (!isLoaded) {
 		model.rootNode.meshIDs.push_back(0);
-		model.meshs.push_back(getCubeMesh());
+		model.meshes.push_back(getCubeMesh());
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();

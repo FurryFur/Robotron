@@ -162,7 +162,7 @@ GLuint GLUtils::bufferVertices(const std::vector<VertexFormat>& vertices, const 
 }
 
 
-Texture GLUtils::loadTexture(const std::string& filename, TextureType textureType)
+Texture GLUtils::loadTexture(const std::string& filename, aiTextureType textureType)
 {
 	// TODO: Make cached so duplicate textures aren't loaded to the GPU
 
@@ -195,7 +195,7 @@ Texture GLUtils::loadCubeMap(const std::vector<std::string>& faceFilenames)
 {
 	Texture texture;
 	texture.target = GL_TEXTURE_CUBE_MAP;
-	texture.type = TEXTURE_TYPE_DIFFUSE;
+	texture.type = aiTextureType_DIFFUSE;
 
 	glGenTextures(1, &texture.id);
 	glActiveTexture(GL_TEXTURE0);

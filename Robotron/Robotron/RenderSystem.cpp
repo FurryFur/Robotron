@@ -86,8 +86,8 @@ void RenderSystem::update(Entity& entity)
 
 	// Loop over all the meshes in the model
 	ModelComponent& model = entity.model;
-	for (size_t i = 0; i < model.meshs.size(); ++i) {
-		Mesh& mesh = model.meshs.at(i);
+	for (size_t i = 0; i < model.meshes.size(); ++i) {
+		Mesh& mesh = model.meshes.at(i);
 		Material& material = model.materials.at(mesh.materialIndex);
 
 		// Tell the gpu what shader to use
@@ -108,7 +108,7 @@ void RenderSystem::update(Entity& entity)
 		GLuint textureUnit = 0;
 		for (size_t j = 0; j < material.textures.size(); ++j) {
 			Texture& texture = material.textures.at(i);
-			if (texture.type == TEXTURE_TYPE_DIFFUSE) {
+			if (texture.type == aiTextureType_DIFFUSE) {
 				glActiveTexture(GL_TEXTURE0 + textureUnit);
 				glUniform1i(glGetUniformLocation(material.shader, "sampler"), 0);
 				glBindTexture(texture.target, texture.id);
