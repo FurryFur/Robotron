@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "Texture.h"
+
 #include <glad\glad.h>
 #include <glm\glm.hpp>
 
@@ -46,9 +48,9 @@ namespace GLUtils {
 
 	// Loads a texture to GPU memory.
 	// Returns a handler to the GPU texture.
-	GLuint loadTexture(const std::string& filename);
+	Texture loadTexture(const std::string& filename, TextureType textureType = TEXTURE_TYPE_DIFFUSE);
 
 	// Loads a cube map to GPU memory.
 	// Returns a handler to the GPU cube map.
-	GLuint loadCubeMap(const std::vector<std::string>& faceFilenames);
+	Texture loadCubeMap(const std::vector<std::string>& faceFilenames);
 }

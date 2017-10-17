@@ -151,7 +151,6 @@
   <ItemGroup>
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="ext\glad\src\glad.c" />
-    <ClCompile Include="GameplayLogicSystem.cpp" />
     <ClCompile Include="GLPrimitives.cpp" />
     <ClCompile Include="GLUtils.cpp" />
     <ClCompile Include="InputSystem.cpp" />
@@ -181,8 +180,9 @@
     <ClInclude Include="InputSystem.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LogicComponent.h" />
-    <ClInclude Include="MaterialComponent.h" />
-    <ClInclude Include="MeshComponent.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ModelComponent.h" />
     <ClInclude Include="NetworkClientSystem.h" />
     <ClInclude Include="NetworkServerSystem.h" />
     <ClInclude Include="Packet.h" />
@@ -197,6 +197,7 @@
     <ClInclude Include="ShaderParams.h" />
     <ClInclude Include="socket.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="UniformFormat.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VertexFormat.h" />

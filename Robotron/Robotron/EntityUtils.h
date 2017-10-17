@@ -21,7 +21,7 @@
 struct Scene;
 struct Entity;
 struct VertexFormat;
-struct MeshComponent;
+struct Mesh;
 struct InputComponent;
 struct InputMapComponent;
 

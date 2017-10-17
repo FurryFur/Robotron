@@ -3,7 +3,8 @@
 #include "GLPrimitives.h"
 
 #include "VertexFormat.h"
-#include "MeshComponent.h"
+#include "Mesh.h"
+#include "ModelComponent.h"
 #include "GLUtils.h"
 
 #include <glm\glm.hpp>
@@ -291,11 +292,12 @@ const std::vector<GLuint>& GLPrimitives::getQuadIndices()
 	return s_indices;
 }
 
-MeshComponent GLPrimitives::getQuadMesh()
+const Mesh& GLPrimitives::getQuadMesh()
 {
 	static const std::vector<VertexFormat>& vertices = getQuadVertices();
 	static const std::vector<GLuint>& indices = getQuadIndices();
-	static const MeshComponent mesh{
+	static const Mesh mesh{
+		0,
 		GLUtils::bufferVertices(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
@@ -303,11 +305,35 @@ MeshComponent GLPrimitives::getQuadMesh()
 	return mesh;
 }
 
-MeshComponent GLPrimitives::getSphereMesh()
+const ModelComponent& GLPrimitives::getQuadModel()
+{
+	static bool isLoaded = false;
+	static ModelComponent model;
+
+	if (!isLoaded) {
+		model.rootNode.meshIDs.push_back(0);
+		model.meshs.push_back(getQuadMesh());
+
+		Material material;
+		material.shader = GLUtils::getDefaultShader();
+		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
+		material.willDrawDepth = true;
+		material.shaderParams.metallicness = 1.0f;
+		material.shaderParams.glossiness = 75.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		model.materials.push_back(std::move(material));
+
+		isLoaded = true;
+	}
+
+	return model;
+}
+
+const Mesh& GLPrimitives::getSphereMesh()
 {
 	static const std::vector<VertexFormat>& vertices = getSphereVertices();
 	static const std::vector<GLuint>& indices = getSphereIndices();
-	static const MeshComponent mesh{
+	static const Mesh mesh{
+		0, // Use the first material on the model
 		GLUtils::bufferVertices(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
@@ -315,11 +341,35 @@ MeshComponent GLPrimitives::getSphereMesh()
 	return mesh;
 }
 
-MeshComponent GLPrimitives::getCylinderMesh()
+const ModelComponent& GLPrimitives::getSphereModel()
+{
+	static bool isLoaded = false;
+	static ModelComponent model;
+
+	if (!isLoaded) {
+		model.rootNode.meshIDs.push_back(0);
+		model.meshs.push_back(getSphereMesh());
+
+		Material material;
+		material.shader = GLUtils::getDefaultShader();
+		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture2.jpg"));
+		material.willDrawDepth = true;
+		material.shaderParams.metallicness = 0.3f;
+		material.shaderParams.glossiness = 2.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		model.materials.push_back(std::move(material));
+
+		isLoaded = true;
+	}
+
+	return model;
+}
+
+const Mesh& GLPrimitives::getCylinderMesh()
 {
 	static const std::vector<VertexFormat>& vertices = getCylinderVertices();
 	static const std::vector<GLuint>& indices = getCylinderIndices();
-	static const MeshComponent mesh{
+	static const Mesh mesh{
+		0, // Use the first material on the model
 		GLUtils::bufferVertices(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
@@ -327,11 +377,35 @@ MeshComponent GLPrimitives::getCylinderMesh()
 	return mesh;
 }
 
-MeshComponent GLPrimitives::getPyramidMesh()
+const ModelComponent& GLPrimitives::getCylinderModel()
+{
+	static bool isLoaded = false;
+	static ModelComponent model;
+
+	if (!isLoaded) {
+		model.rootNode.meshIDs.push_back(0);
+		model.meshs.push_back(getCylinderMesh());
+
+		Material material;
+		material.shader = GLUtils::getThresholdShader();
+		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture4.jpg"));
+		material.willDrawDepth = true;
+		material.shaderParams.metallicness = 0.75f;
+		material.shaderParams.glossiness = 40.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		model.materials.push_back(std::move(material));
+	
+		isLoaded = true;
+	}
+
+	return model;
+}
+
+const Mesh& GLPrimitives::getPyramidMesh()
 {
 	static const std::vector<VertexFormat>& vertices = getPyramidVertices();
 	static const std::vector<GLuint>& indices = getPyramidIndices();
-	static const MeshComponent mesh{
+	static const Mesh mesh{
+		0,
 		GLUtils::bufferVertices(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
@@ -339,14 +413,61 @@ MeshComponent GLPrimitives::getPyramidMesh()
 	return mesh;
 }
 
-MeshComponent GLPrimitives::getCubeMesh()
+const ModelComponent& GLPrimitives::getPyramidModel()
+{
+	static bool isLoaded = false;
+	static ModelComponent model;
+
+	if (!isLoaded) {
+		model.rootNode.meshIDs.push_back(0);
+		model.meshs.push_back(getPyramidMesh());
+
+		Material material;
+		material.shader = GLUtils::getDefaultShader();
+		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture.jpg"));
+		material.willDrawDepth = true;
+		material.shaderParams.metallicness = 0.95f;
+		material.shaderParams.glossiness = 10.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		model.materials.push_back(std::move(material));
+
+		isLoaded = true;
+	}
+
+	return model;
+}
+
+const Mesh& GLPrimitives::getCubeMesh()
 {
 	static const std::vector<VertexFormat>& vertices = getCubeVertices();
 	static const std::vector<GLuint>& indices = getCubeIndices();
-	static const MeshComponent mesh{
+	static const Mesh mesh{
+		0, // Use the first material on the model
 		GLUtils::bufferVertices(vertices, indices),
 		static_cast<GLsizei>(indices.size())
 	};
 
 	return mesh;
+}
+
+const ModelComponent& GLPrimitives::getCubeModel()
+{
+	static bool isLoaded = false;
+	static ModelComponent model;
+
+	if (!isLoaded) {
+		model.rootNode.meshIDs.push_back(0);
+		model.meshs.push_back(getCubeMesh());
+
+		Material material;
+		material.shader = GLUtils::getDefaultShader();
+		material.textures.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
+		material.willDrawDepth = true;
+		material.shaderParams.metallicness = 0.95f;
+		material.shaderParams.glossiness = 10.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		model.materials.push_back(std::move(material));
+
+		isLoaded = true;
+	}
+
+	return model;
 }

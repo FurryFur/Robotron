@@ -15,13 +15,15 @@
 #pragma once
 
 #include "ShaderParams.h"
+#include "Texture.h"
 
 #include <glad\glad.h>
 
-struct MaterialComponent {
+#include <vector>
+
+struct Material {
 	GLuint shader;
-	GLuint texture;
-	GLenum textureType;
-	bool enableDepth;
 	ShaderParams shaderParams;
+	std::vector<Texture> textures;
+	bool willDrawDepth;
 };

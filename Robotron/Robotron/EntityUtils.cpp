@@ -12,43 +12,31 @@
 Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	entity.componentMask |= COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
-	entity.material.shader = GLUtils::getDefaultShader();
-	entity.material.texture = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
-	entity.material.textureType = GL_TEXTURE_2D;
-	entity.material.enableDepth = true;
-	entity.material.shaderParams.metallicness = 1.0f;
-	entity.material.shaderParams.glossiness = 75.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+	entity.transform = transform;
+
+	entity.model = GLPrimitives::getQuadModel();
 
 	setDefaultInputBindings(entity.inputMap);
 
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.mesh = GLPrimitives::getQuadMesh();
 
 	entity.logicVars.rotationAxis = glm::vec3{ 0, 0, 1 };
 
 	return entity;
 }
 
-Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& _transform)
+Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
-	entity.transform = _transform;
+	entity.transform = transform;
 
-	entity.material.shader = GLUtils::getDefaultShader();
-	entity.material.texture = GLUtils::loadTexture("Assets/Textures/random-texture2.jpg");
-	entity.material.textureType = GL_TEXTURE_2D;
-	entity.material.enableDepth = true;
-	entity.material.shaderParams.metallicness = 0.3f;
-	entity.material.shaderParams.glossiness = 2.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
-
-	entity.mesh = GLPrimitives::getSphereMesh();
+	entity.model = GLPrimitives::getSphereModel();
 
 	setDefaultInputBindings(entity.inputMap);
 
@@ -61,21 +49,17 @@ Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& _transform)
 	return entity;
 }
 
-Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& _transform)
+Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	entity.componentMask |= COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
-	entity.transform = _transform;
+	entity.transform = transform;
 
-	entity.material.shader = GLUtils::getDefaultShader();
-	entity.material.texture = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
-	entity.material.textureType = GL_TEXTURE_2D;
-	entity.material.enableDepth = true;
-	entity.material.shaderParams.metallicness = 0.3f;
-	entity.material.shaderParams.glossiness = 2.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+	entity.model = GLPrimitives::getSphereModel();
 
-	entity.mesh = GLPrimitives::getSphereMesh();
+	// Replace default texture
+	entity.model.materials.at(0).textures.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;
@@ -86,21 +70,17 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& _transform)
 	return entity;
 }
 
-Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& _transform)
+Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL | COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	entity.componentMask |= COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL | COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
-	entity.transform = _transform;
+	entity.transform = transform;
 
-	entity.material.shader = GLUtils::getDefaultShader();
-	entity.material.texture = GLUtils::loadTexture("Assets/Textures/random-texture2.jpg");
-	entity.material.textureType = GL_TEXTURE_2D;
-	entity.material.enableDepth = true;
-	entity.material.shaderParams.metallicness = 0.3f;
-	entity.material.shaderParams.glossiness = 2.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+	entity.model = GLPrimitives::getSphereModel();
 
-	entity.mesh = GLPrimitives::getSphereMesh();
+	// Replace default texture
+	entity.model.materials.at(0).textures.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture2.jpg");
 
 	entity.inputMap = {};
 	entity.inputMap.mouseInputEnabled = false;
@@ -118,21 +98,14 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& _transform)
 	return entity;
 }
 
-Entity& EntityUtils::createCylinder(Scene& scene, float radius, float height, const glm::mat4& _transform)
+Entity& EntityUtils::createCylinder(Scene& scene, float radius, float height, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
-	entity.transform = _transform * glm::scale(glm::mat4{ 1 }, glm::vec3{ radius, height, radius });
+	entity.transform = transform * glm::scale(glm::mat4{ 1 }, glm::vec3{ radius, height, radius });
 
-	entity.material.shader = GLUtils::getThresholdShader();
-	entity.material.texture = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
-	entity.material.textureType = GL_TEXTURE_2D;
-	entity.material.enableDepth = true;
-	entity.material.shaderParams.metallicness = 0.75f;
-	entity.material.shaderParams.glossiness = 40.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
-
-	entity.mesh = GLPrimitives::getCylinderMesh();
+	entity.model = GLPrimitives::getCylinderModel();
 
 	setDefaultInputBindings(entity.inputMap);
 
@@ -145,21 +118,14 @@ Entity& EntityUtils::createCylinder(Scene& scene, float radius, float height, co
 	return entity;
 }
 
-Entity& EntityUtils::createPyramid(Scene& scene, const glm::mat4& _transform)
+Entity& EntityUtils::createPyramid(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
-	entity.transform = _transform;
+	entity.transform = transform;
 
-	entity.material.shader = GLUtils::getDefaultShader();
-	entity.material.texture = GLUtils::loadTexture("Assets/Textures/random-texture.jpg");
-	entity.material.textureType = GL_TEXTURE_2D;
-	entity.material.enableDepth = true;
-	entity.material.shaderParams.metallicness = 0.95f;
-	entity.material.shaderParams.glossiness = 10.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
-
-	entity.mesh = GLPrimitives::getPyramidMesh();
+	entity.model = GLPrimitives::getPyramidModel();
 
 	setDefaultInputBindings(entity.inputMap);
 
@@ -172,21 +138,14 @@ Entity& EntityUtils::createPyramid(Scene& scene, const glm::mat4& _transform)
 	return entity;
 }
 
-Entity& EntityUtils::createCube(Scene& scene, const glm::mat4 & _transform)
+Entity& EntityUtils::createCube(Scene& scene, const glm::mat4 & transform)
 {
 	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MESH | COMPONENT_MATERIAL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
 
-	entity.transform = _transform;
+	entity.transform = transform;
 
-	entity.material.shader = GLUtils::getDefaultShader();
-	entity.material.texture = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
-	entity.material.textureType = GL_TEXTURE_2D;
-	entity.material.enableDepth = true;
-	entity.material.shaderParams.metallicness = 0.95f;
-	entity.material.shaderParams.glossiness = 10.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
-
-	entity.mesh = GLPrimitives::getCubeMesh();
+	entity.model = GLPrimitives::getCubeModel();
 
 	setDefaultInputBindings(entity.inputMap);
 
@@ -218,15 +177,15 @@ Entity& EntityUtils::createSkybox(Scene& scene, const std::vector<std::string>& 
 {
 	Entity& entity = scene.createEntity();
 
-	entity.componentMask = COMPONENT_MATERIAL | COMPONENT_MESH;
+	entity.componentMask = COMPONENT_MODEL;
 
-	entity.material = {};
-	entity.material.shader = GLUtils::getSkyboxShader();
-	entity.material.texture = GLUtils::loadCubeMap(faceFilenames);
-	entity.material.textureType = GL_TEXTURE_CUBE_MAP;
-	entity.material.enableDepth = false;
+	entity.model = GLPrimitives::getCubeModel();
 
-	entity.mesh = GLPrimitives::getCubeMesh();
+	// Replace default material
+	entity.model.materials.at(0) = {};
+	entity.model.materials.at(0).shader = GLUtils::getSkyboxShader();
+	entity.model.materials.at(0).textures.push_back(GLUtils::loadCubeMap(faceFilenames));
+	entity.model.materials.at(0).willDrawDepth = false;
 
 	return entity;
 }
