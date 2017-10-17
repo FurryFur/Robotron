@@ -170,6 +170,7 @@
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AIUtils.h" />
     <ClInclude Include="Enemy01ControlSystem.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="GameplayLogicSystem.h" />
