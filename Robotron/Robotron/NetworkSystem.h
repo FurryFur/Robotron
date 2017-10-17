@@ -4,13 +4,14 @@
 
 struct Scene;
 struct Packet;
+struct Entity;
 
 class NetworkSystem {
 public:
 	NetworkSystem(Scene&);
 
 	virtual void beginFrame() = 0;
-	virtual void update(size_t entityID) = 0;
+	virtual void update(Entity&) = 0;
 
 protected:
 	void sendData(const Packet&, const sockaddr_in&);

@@ -20,6 +20,7 @@
 
 struct Scene;
 struct GLFWwindow;
+struct Entity;
 class IKeyObserver;
 
 class InputSystem {
@@ -27,7 +28,7 @@ public:
 	InputSystem(GLFWwindow* window, Scene&);
 
 	// Updates the entity with input
-	void update(size_t entityID);
+	void update(Entity&);
 
 	// Does per frame input system update
 	void beginFrame();

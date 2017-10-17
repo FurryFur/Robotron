@@ -20,6 +20,7 @@
 #include "GLUtils.h"
 #include "GLMUtils.h"
 #include "Scene.h"
+#include "Entity.h"
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -27,39 +28,35 @@
 
 #include <cmath>
 
-PlayerControlSystem::PlayerControlSystem(Scene & scene)
+PlayerControlSystem::PlayerControlSystem(Scene& scene)
 	: m_scene{ scene }
 {
 }
 
-void PlayerControlSystem::update(size_t entityID)
+void PlayerControlSystem::update(Entity& entity)
 {
 	// Filter movable
 	const size_t kMovableMask = COMPONENT_PLAYER_CONTROL | COMPONENT_INPUT | COMPONENT_TRANSFORM;
-	if ((m_scene.componentMasks.at(entityID) & kMovableMask) != kMovableMask)
+	if ((entity.componentMask & kMovableMask) != kMovableMask)
 		return;
 
-	glm::mat4& transform = m_scene.transformComponents.at(entityID);
-	PlayerControlComponent& movementVars = m_scene.movementComponents.at(entityID);
-	InputComponent& input = m_scene.inputComponents.at(entityID);
+	float moveSpeed = entity.controlVars.moveSpeed;
+	float orientationSensitivity = entity.controlVars.orientationSensitivity;
 
-	float moveSpeed = movementVars.moveSpeed;
-	float orientationSensitivity = movementVars.orientationSensitivity;
-
-	float deltaAzimuth = -orientationSensitivity * input.orientationDelta.x;
-	float deltaElevation = -orientationSensitivity * input.orientationDelta.y;
-	float roll = -orientationSensitivity * input.orientationDelta.z;
+	float deltaAzimuth = -orientationSensitivity * entity.input.orientationDelta.x;
+	float deltaElevation = -orientationSensitivity * entity.input.orientationDelta.y;
+	float roll = -orientationSensitivity * entity.input.orientationDelta.z;
 	glm::vec3 front = glm::vec3{ 0, 0, -1 };
-	if (!movementVars.worldSpaceMove)
-		front = transform * glm::vec4{ front, 0 }; // Convert movement to local coordinates
-	glm::vec3 pos = transform[3];
+	if (!entity.controlVars.worldSpaceMove)
+		front = entity.transform * glm::vec4{ front, 0 }; // Convert movement to local coordinates
+	glm::vec3 pos = entity.transform[3];
 	glm::vec3 up = glm::vec3{ 0, 1, 0 };
 	glm::vec3 right = glm::cross(front, up);
 	
 	// Displacement
-	glm::vec3 axis = GLMUtils::limitVec(input.axis, 1);
-	if (!movementVars.worldSpaceMove)
-		axis = transform * glm::vec4{ axis, 0 }; // Convert movement to local coordinates
+	glm::vec3 axis = GLMUtils::limitVec(entity.input.axis, 1);
+	if (!entity.controlVars.worldSpaceMove)
+		axis = entity.transform * glm::vec4{ axis, 0 }; // Convert movement to local coordinates
 	pos += moveSpeed * axis;
 
 	// Rotation
@@ -71,7 +68,7 @@ void PlayerControlSystem::update(size_t entityID)
 	glm::mat3 azimuthMat = glm::rotate(deltaAzimuth, up);
 	glm::mat3 rollMat = glm::rotate(roll, front);
 
-	transform[3] = {0, 0, 0, 1}; // Remove displacement temporarily
-	transform = glm::mat4{ rollMat * azimuthMat * elevationMat } * transform; // Rotation without displacement
-	transform[3] = glm::vec4{ pos, 1 }; // Add displacement back in
+	entity.transform[3] = {0, 0, 0, 1}; // Remove displacement temporarily
+	entity.transform = glm::mat4{ rollMat * azimuthMat * elevationMat } * entity.transform; // Rotation without displacement
+	entity.transform[3] = glm::vec4{ pos, 1 }; // Add displacement back in
 }

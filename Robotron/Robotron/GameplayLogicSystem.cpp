@@ -20,6 +20,7 @@
 #include "Scene.h"
 #include "Utils.h"
 #include "LogicComponent.h"
+#include "Entity.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
@@ -27,8 +28,8 @@
 
 GameplayLogicSystem::GameplayLogicSystem(Scene& scene, InputSystem& inputSystem)
 	: m_scene{ scene }
-	, m_oldPossessedEntity{ 0 }
-	, m_possessedEntity{ 0 }
+	, m_oldPossessedEntity{ nullptr }
+	, m_possessedEntity{ nullptr }
 	, m_oldPossessedEntityUpdated{ true }
 	, m_newPossessedEntityUpdated{ false }
 	, m_dTheta{ 0.01f }
@@ -36,49 +37,44 @@ GameplayLogicSystem::GameplayLogicSystem(Scene& scene, InputSystem& inputSystem)
 	inputSystem.registerKeyObserver(this);
 }
 
-void GameplayLogicSystem::update(size_t entityID)
+void GameplayLogicSystem::update(Entity& entity)
 {
 	// Update the currently possessed entity
-	if (!m_oldPossessedEntityUpdated && entityID == m_oldPossessedEntity) {
+	if (!m_oldPossessedEntityUpdated && (&entity == m_oldPossessedEntity)) {
 		// Update the old possessed entity so it doesn't respond to input
-		size_t& componentMask = m_scene.componentMasks.at(entityID);
-		componentMask &= ~(COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL);
+		entity.componentMask &= ~(COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL);
 		m_oldPossessedEntityUpdated = true;
 		return;
 	}
-	if (!m_newPossessedEntityUpdated && entityID == m_possessedEntity) {
+	if (!m_newPossessedEntityUpdated && (&entity == m_possessedEntity)) {
 		// Update the new possessed entity so it response to input
-		size_t& componentMask = m_scene.componentMasks.at(entityID);
-		componentMask |= (COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL);
+		entity.componentMask |= (COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL);
 		m_newPossessedEntityUpdated = true;
 		return;
 	}
 
 	const size_t kSpinnable = COMPONENT_TRANSFORM | COMPONENT_MESH | COMPONENT_LOGIC;
-	if ((m_scene.componentMasks.at(entityID) & kSpinnable) == kSpinnable) {
-		glm::mat4& transform = m_scene.transformComponents.at(entityID);
-		LogicComponent& logicVars = m_scene.logicComponents.at(entityID);
-		glm::vec3 pos = transform[3];
-		transform[3] = { 0, 0, 0, 1 }; // Remove displacement temporarily
-		transform = glm::rotate(transform, m_dTheta, logicVars.rotationAxis);
-		transform[3] = glm::vec4{ pos, 1 }; // Add displacement back in
+	if ((entity.componentMask & kSpinnable) == kSpinnable) {
+		glm::vec3 pos = entity.transform[3];
+		entity.transform[3] = { 0, 0, 0, 1 }; // Remove displacement temporarily
+		entity.transform = glm::rotate(entity.transform, m_dTheta, entity.logicVars.rotationAxis);
+		entity.transform[3] = glm::vec4{ pos, 1 }; // Add displacement back in
 	}
 
 	const size_t kModifiableGlossMask = COMPONENT_MATERIAL | COMPONENT_INPUT;
-	if ((m_scene.componentMasks.at(entityID) & kModifiableGlossMask) == kModifiableGlossMask) {
+	if ((entity.componentMask & kModifiableGlossMask) == kModifiableGlossMask) {
 		// Alter the glossiness of the possessed entity on key event
-		InputComponent& input = m_scene.inputComponents.at(entityID);
-		ShaderParams& shaderParams = m_scene.materialComponents.at(entityID).shaderParams;
-		if (input.btn1Down) {
+		ShaderParams& shaderParams = entity.material.shaderParams;
+		if (entity.input.btn1Down) {
 			shaderParams.glossiness = clamp(shaderParams.glossiness + 0.1f, 0.001f, 100.0f);
 		}
-		if (input.btn2Down) {
+		if (entity.input.btn2Down) {
 			shaderParams.glossiness = clamp(shaderParams.glossiness - 0.1f, 0.001f, 100.0f);
 		}
-		if (input.btn3Down) {
+		if (entity.input.btn3Down) {
 			shaderParams.metallicness = clamp(shaderParams.metallicness + 0.01f, 0.0f, 1.0f);
 		}
-		if (input.btn4Down) {
+		if (entity.input.btn4Down) {
 			shaderParams.metallicness = clamp(shaderParams.metallicness - 0.01f, 0.0f, 1.0f);
 		}
 	}
@@ -98,13 +94,13 @@ void GameplayLogicSystem::keyCallback(int key, int scancode, int action, int mod
 	m_oldPossessedEntity = m_possessedEntity;
 
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
-		m_possessedEntity = 0;
+		m_possessedEntity = &m_scene.entities.at(0);
 	else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
-		m_possessedEntity = 1;
+		m_possessedEntity = &m_scene.entities.at(1);
 	else if (key == GLFW_KEY_3 && action == GLFW_PRESS)
-		m_possessedEntity = 2;
+		m_possessedEntity = &m_scene.entities.at(2);
 	else if (key == GLFW_KEY_4 && action == GLFW_PRESS)
-		m_possessedEntity = 3;
+		m_possessedEntity = &m_scene.entities.at(3);
 	/*else if (key == GLFW_KEY_5 && action == GLFW_PRESS)
 		m_possessedEntity = 4;*/
 

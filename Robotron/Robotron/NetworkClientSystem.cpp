@@ -15,12 +15,12 @@ void NetworkClientSystem::beginFrame()
 	while (receiveData(packet)) {
 		if (packet.type == PACKET_TYPE_TRANSFORM) {
 			// TODO: Save snapshot somewhere to be interpolated to
-			m_scene.transformComponents.at(packet.entityNetID) = packet.transform;
+			m_scene.entities.at(packet.entityNetID).transform = packet.transform;
 		}
 	}
 }
 
-void NetworkClientSystem::update(size_t entityID)
+void NetworkClientSystem::update(Entity& entity)
 {
 	// Do interpolation with snapshots here
 }

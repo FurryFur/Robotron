@@ -36,14 +36,14 @@
 class Level
 {
 public:
-	Level(GLFWwindow* window, Scene& scene, int levelNum);
+	Level(GLFWwindow* window, int levelNum);
 	~Level();
 
 	void process();
 
 private:
+	Scene m_scene;
 	GLFWwindow* m_window;
-	Scene& m_scene;
 	RenderSystem m_renderSystem;
 	PlayerControlSystem m_movementSystem;
 	InputSystem m_inputSystem;

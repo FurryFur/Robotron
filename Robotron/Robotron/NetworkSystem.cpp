@@ -20,21 +20,6 @@ NetworkSystem::NetworkSystem(Scene& scene)
 	}
 }
 
-void NetworkSystem::beginFrame()
-{
-	// Server: Update inputs for entities
-
-	// Client: Update ghost snapshots for ghost entities
-}
-
-void NetworkSystem::update(size_t entityID) 
-{
-	// Server: Send snapshot of entity to clients
-
-	// Client: Do interpolation between current state and snapshot
-	// Client: Send inputs to server
-}
-
 void NetworkSystem::sendData(const Packet& packet, const sockaddr_in& address)
 {
 	// Send the packet

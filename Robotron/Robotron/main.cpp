@@ -21,9 +21,8 @@ int main()
 {
 	//// Init combined Window and OpenGL context.
 	GLFWwindow* window = GLUtils::initOpenGL();
-	Scene scene;
 
-	Level level(window, scene, 1);
+	Level level(window, 1);
 
 	while (!glfwWindowShouldClose(window)) {
 		level.process();

@@ -17,27 +17,27 @@ void NetworkServerSystem::beginFrame()
 	Packet packet;
 	while (receiveData(packet)) {
 		if (packet.type == PACKET_TYPE_INPUT) {
-			m_scene.inputComponents.at(packet.entityNetID) = packet.input;
+			m_scene.entities.at(packet.entityNetID).input = packet.input;
 		}
 	}
 }
 
-void NetworkServerSystem::update(size_t entityID)
+void NetworkServerSystem::update(Entity& entity)
 {
 	const size_t kNetworkedFilter = COMPONENT_TRANSFORM;
-	if ((m_scene.componentMasks.at(entityID) & kNetworkedFilter) == kNetworkedFilter) {
+	if ((entity.componentMask == kNetworkedFilter)) {
 		// TODO: Make serialize functions for the different packet types
-		Packet packet;
-		packet.serialize(entityID, m_scene.transformComponents.at(entityID));
-		
-		// Fill out address to send to (including port)
-		sockaddr_in address;
-		inet_pton(AF_INET, "127.0.0.1", &address.sin_addr);
-		address.sin_port = htons(4567);
-		address.sin_family = AF_INET;
+		//Packet packet;
+		//packet.serialize(entity.network.id, entity.transform);
+		//
+		//// Fill out address to send to (including port)
+		//sockaddr_in address;
+		//inet_pton(AF_INET, "127.0.0.1", &address.sin_addr);
+		//address.sin_port = htons(4567);
+		//address.sin_family = AF_INET;
 
-		// Send the snapshot
-		sendData(packet, address);
+		//// Send the snapshot
+		//sendData(packet, address);
 	}
 }
 

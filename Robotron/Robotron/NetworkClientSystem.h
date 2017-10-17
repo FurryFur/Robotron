@@ -8,6 +8,6 @@ public:
 	NetworkClientSystem(Scene& scene);
 
 	virtual void beginFrame() override;
-	virtual void update(size_t entityID) override;
+	virtual void update(Entity&) override;
 };
 

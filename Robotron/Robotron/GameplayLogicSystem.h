@@ -17,6 +17,7 @@
 #include "KeyObserver.h"
 
 struct Scene;
+struct Entity;
 class InputSystem;
 
 class GameplayLogicSystem : IKeyObserver {
@@ -24,15 +25,15 @@ public:
 	GameplayLogicSystem(Scene& scene, InputSystem& inputSystem);
 
 	// Runs the logic system on the specified entity
-	void update(size_t entityID);
+	void update(Entity&);
 
 	// Callback for observing key press events
 	virtual void keyCallback(int key, int scancode, int action, int mods) override;
 
 private:
 	Scene& m_scene;
-	size_t m_oldPossessedEntity;
-	size_t m_possessedEntity;
+	Entity* m_oldPossessedEntity;
+	Entity* m_possessedEntity;
 	bool m_oldPossessedEntityUpdated;
 	bool m_newPossessedEntityUpdated;
 

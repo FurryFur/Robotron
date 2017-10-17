@@ -5,11 +5,11 @@
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window, Scene& scene, int levelNum):
-	  m_renderSystem(window, scene)
-	, m_movementSystem(scene)
-	, m_inputSystem(window, scene)
-	, m_scene(scene)
+Level::Level(GLFWwindow* window, int levelNum)
+	: m_scene{}
+	, m_renderSystem(window, m_scene)
+	, m_movementSystem(m_scene)
+	, m_inputSystem(window, m_scene)
 {
 	m_window = window;
 	m_levelNum = levelNum;
@@ -18,16 +18,16 @@ Level::Level(GLFWwindow* window, Scene& scene, int levelNum):
 	std::cout << "Run in server mode: ";
 	std::cin >> strServerMode;
 	if (strServerMode == "y")
-		m_networkSystem = std::make_unique<NetworkServerSystem>(scene);
+		m_networkSystem = std::make_unique<NetworkServerSystem>(m_scene);
 	else
-		m_networkSystem = std::make_unique<NetworkClientSystem>(scene);
+		m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene);
 
 	// Create 3D entities.
-	SceneUtils::createQuad(scene,
+	SceneUtils::createQuad(m_scene,
 		glm::rotate(glm::mat4{}, static_cast<float>(M_PI / 2), glm::vec3{ 1, 0, 0 })
 		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 1.0f }));
 
-	SceneUtils::createPlayer(scene, 
+	SceneUtils::createPlayer(m_scene,
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 
 	//create the number of enemy01 based on current level with some random variance.
@@ -43,12 +43,12 @@ Level::Level(GLFWwindow* window, Scene& scene, int levelNum):
 		if (randomInt(0, 1) == 0)
 			randZ += 25;
 
-		SceneUtils::createEnemy01(scene,
+		SceneUtils::createEnemy01(m_scene,
 			glm::translate({}, glm::vec3{ randX, 0.0f, randZ }));
 	}
 
 	// Create the skybox
-	size_t skybox = SceneUtils::createSkybox(scene, {
+	Entity& skybox = SceneUtils::createSkybox(m_scene, {
 		"Assets/Textures/Skybox/right.jpg",
 		"Assets/Textures/Skybox/left.jpg",
 		"Assets/Textures/Skybox/top.jpg",
@@ -60,8 +60,8 @@ Level::Level(GLFWwindow* window, Scene& scene, int levelNum):
 	m_renderSystem.setEnvironmentMap(skybox);
 
 	// Setup the camera
-	size_t cameraEntity = SceneUtils::createCamera(scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
-	m_renderSystem.setCamera(cameraEntity);
+	Entity& cameraEntity = SceneUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
+	m_renderSystem.setCamera(&cameraEntity);
 }
 
 
@@ -77,11 +77,11 @@ void Level::process()
 	m_networkSystem->beginFrame();
 
 	// Update all the entities using all the systems.
-	for (size_t entityID = 0; entityID < SceneUtils::getEntityCount(m_scene); ++entityID) {
-		m_inputSystem.update(entityID);
-		m_movementSystem.update(entityID);
-		m_networkSystem->update(entityID);
-		m_renderSystem.update(entityID);
+	for (size_t i = 0; i < m_scene.entities.size(); ++i) {
+		m_inputSystem.update(m_scene.entities.at(i));
+		m_movementSystem.update(m_scene.entities.at(i));
+		m_networkSystem->update(m_scene.entities.at(i));
+		m_renderSystem.update(m_scene.entities.at(i));
 	}
 
 	// Do operations that should happen at the end of the frame.

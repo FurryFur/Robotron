@@ -17,6 +17,7 @@
 
 struct Scene;
 struct GLFWwindow;
+struct Entity;
 
 class RenderSystem {
 public:
@@ -29,25 +30,25 @@ public:
 	void beginRender();
 
 	// Renders an entity.
-	void update(size_t entityID);
+	void update(Entity&);
 
 	// Ends the frame.
 	void endRender();
 
 	// Sets the current camera.
-	void setCamera(size_t entityID);
+	void setCamera(const Entity*);
 
 	// Sets the environment map for reflections
-	void setEnvironmentMap(size_t entityID);
+	void setEnvironmentMap(const Entity&);
 
 private:
 	GLFWwindow* m_glContext;
 	const Scene& m_scene;
+	const Entity* m_cameraEntity;
 	GLuint m_uboUniforms;
 	GLuint m_uboShaderParams;
 	GLuint m_uniformBindingPoint;
 	GLuint m_shaderParamsBindingPoint;
-	size_t m_cameraEntity;
 
 	// Handler to a cube map on the GPU, used for reflections and environmental lighting
 	GLuint m_environmentMap;

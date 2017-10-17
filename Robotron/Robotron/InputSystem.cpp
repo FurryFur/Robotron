@@ -72,15 +72,15 @@ void InputSystem::beginFrame()
 	lastMousePos = mousePos;
 }
 
-void InputSystem::update(size_t entityID)
+void InputSystem::update(Entity& entity)
 {
 	// Filter input receivers
 	const size_t kInputReceiverMask = COMPONENT_INPUT | COMPONENT_INPUT_MAP;
-	if ((m_scene.componentMasks.at(entityID) & kInputReceiverMask) != kInputReceiverMask)
+	if ((entity.componentMask & kInputReceiverMask) != kInputReceiverMask)
 		return;
 
-	InputComponent& input = m_scene.inputComponents.at(entityID);
-	InputMapComponent& inputMap = m_scene.inputMapComponents.at(entityID);
+	InputComponent& input = entity.input;
+	InputMapComponent& inputMap = entity.inputMap;
 
 	// Update input from mouse
 	input.orientationDelta = {};

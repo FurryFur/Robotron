@@ -15,13 +15,14 @@
 #pragma once
 
 struct Scene;
+struct Entity;
 
 class PlayerControlSystem {
 public:
 	PlayerControlSystem(Scene& scene);
 
 	// Updates the entities position from input
-	void update(size_t entityID);
+	void update(Entity&);
 
 private:
 	Scene& m_scene;

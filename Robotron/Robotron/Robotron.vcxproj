@@ -149,6 +149,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="ext\glad\src\glad.c" />
     <ClCompile Include="GameplayLogicSystem.cpp" />
     <ClCompile Include="GLUtils.cpp" />
@@ -161,12 +162,14 @@
     <ClCompile Include="NetworkSystem.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneUtils.cpp" />
     <ClCompile Include="ShaderHelper.cpp" />
     <ClCompile Include="socket.cpp" />
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="GameplayLogicSystem.h" />
     <ClInclude Include="GLMUtils.h" />
     <ClInclude Include="GLUtils.h" />

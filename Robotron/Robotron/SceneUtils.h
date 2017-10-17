@@ -19,51 +19,43 @@
 #include <vector>
 
 struct Scene;
+struct Entity;
 struct VertexFormat;
 struct MeshComponent;
 struct InputComponent;
 struct InputMapComponent;
 
 namespace SceneUtils {
-	// Creates a new entity in the scene and returns its ID
-	size_t createEntity(Scene& scene);
-
-	// Destroys an entity in the scene
-	void destroyEntity(Scene& scene, size_t entityID);
-
-	// Returns the number of entities in the scene
-	size_t getEntityCount(const Scene& scene);
-
 	// Creates a unit square facing down the positive z axis with the 
 	// specified transform
-	size_t createQuad(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createQuad(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 
 	// Creates a unit sphere, centered at the origin, with the specified 
 	// transform;
-	size_t createSphere(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createSphere(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 
-	size_t createEnemy01(Scene &, const glm::mat4 & _transform = glm::mat4{ 1 });
+	Entity& createEnemy01(Scene &, const glm::mat4 & _transform = glm::mat4{ 1 });
 
 	// Creates a  Player (currently a unit sphere), centered at the origin, with the specified 
 	// transform;
-	size_t createPlayer(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createPlayer(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 
 	// Creates a cylinder with the specified radius and height.
-	size_t createCylinder(Scene&, float radius = 1, float height = 1, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createCylinder(Scene&, float radius = 1, float height = 1, const glm::mat4& transform = glm::mat4{ 1 });
 
 	// Creates a pyramid
-	size_t createPyramid(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createPyramid(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 
 	// Creates a pyramid
-	size_t createCube(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createCube(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 
 	// Creates a camera.
 	// This camera needs to be set as active on the render in order to be rendered from.
-	size_t createCamera(Scene&, const glm::vec3& pos, const glm::vec3& center, const glm::vec3& up = glm::vec3{ 0, 1, 0 });
+	Entity& createCamera(Scene&, const glm::vec3& pos, const glm::vec3& center, const glm::vec3& up = glm::vec3{ 0, 1, 0 });
 
 	// Creates a skybox.
 	// Can be used to set the environment map for the renderer.
-	size_t createSkybox(Scene&, const std::vector<std::string>& faceFilenames);
+	Entity& createSkybox(Scene&, const std::vector<std::string>& faceFilenames);
 	
 	// Handles boilerplate input binding
 	void setDefaultInputBindings(InputMapComponent& input);
