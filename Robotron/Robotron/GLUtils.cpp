@@ -177,25 +177,40 @@ Texture GLUtils::loadTexture(const std::string& path)
 	Texture texture;
 	texture.target = GL_TEXTURE_2D;
 
-	int width, height, nrChannels;
-	unsigned char* textureData = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+	int width, height, nrComponents;
+	unsigned char* textureData = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
 
-	glGenTextures(1, &texture.id);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(texture.target, texture.id);
-	
-	glTexParameteri(texture.target, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(texture.target, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(texture.target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(texture.target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	if (textureData) {
+		GLenum format;
+		if (nrComponents == 1)
+			format = GL_RED;
+		else if (nrComponents == 3)
+			format = GL_RGB;
+		else if (nrComponents == 4)
+			format = GL_RGBA;
 
-	glTexImage2D(texture.target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
-	glGenerateMipmap(texture.target);
+		glGenTextures(1, &texture.id);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(texture.target, texture.id);
+
+		glTexParameteri(texture.target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(texture.target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(texture.target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(texture.target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexImage2D(texture.target, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, textureData);
+		glGenerateMipmap(texture.target);
+
+		glBindTexture(texture.target, 0);
+
+		s_loadedTextures.insert(std::make_pair(path, texture));
+	} else {
+		// TODO: Throw excpetion here
+		std::cout << "Texture failed to load at path: " << path << std::endl;
+	}
 
 	stbi_image_free(textureData);
-	glBindTexture(texture.target, 0);
 
-	s_loadedTextures.insert(std::make_pair(path, texture));
 	return texture;
 }
 
@@ -222,11 +237,25 @@ Texture GLUtils::loadCubeMap(const std::vector<std::string>& facePaths)
 	glBindTexture(texture.target, texture.id);
 
 	for (GLenum i = 0; i < facePaths.size(); ++i) {
-		int width, height, nrChannels;
+		int width, height, nrComponents;
 		unsigned char* faceData = stbi_load(facePaths.at(i).c_str(), &width, &height, 
-		                                    &nrChannels, 0);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
-		             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, faceData);
+		                                    &nrComponents, 0);
+
+		if (faceData) {
+			GLenum format;
+			if (nrComponents == 1)
+				format = GL_RED;
+			else if (nrComponents == 3)
+				format = GL_RGB;
+			else if (nrComponents == 4)
+				format = GL_RGBA;
+
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, faceData);
+		} else {
+			// TODO: Throw excpetion here
+			std::cout << "Texture failed to load at path: " << facePaths.at(i) << std::endl;
+		}
 
 		stbi_image_free(faceData);
 	}

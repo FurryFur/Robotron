@@ -15,67 +15,67 @@
 
 // Checks all material textures of a given type and loads the textures if they're not loaded yet.
 // The required info is returned as a Texture struct.
-std::vector<Texture> loadMaterialTextures(const aiMaterial* mat, aiTextureType type)
+std::vector<Texture> loadMaterialTextures(const aiMaterial* mat, aiTextureType type, const std::string& textureDir)
 {
 	static std::unordered_map<std::string, Texture> s_texturesLoaded;	// Stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 
 	std::vector<Texture> textures;
+
 	for (GLuint i = 0; i < mat->GetTextureCount(type); i++)
 	{
 		aiString str;
 		mat->GetTexture(type, i, &str);
+
 		// Check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-		GLboolean skip = false;
-		for (GLuint j = 0; j < s_texturesLoaded.size(); j++)
-		{
-			if (s_texturesLoaded.find(str.C_Str()) != s_texturesLoaded.end())
-			{
-				textures.push_back(s_texturesLoaded.at(str.C_Str()));
-				skip = true; // A texture with the same filepath has already been loaded, continue to next one. (optimization)
-				break;
-			}
-		}
-		if (!skip)
-		{   // If texture hasn't been loaded already, load it
-			Texture texture = GLUtils::loadTexture(str.C_Str());
+		if (s_texturesLoaded.find(str.C_Str()) != s_texturesLoaded.end()) {
+			textures.push_back(s_texturesLoaded.at(str.C_Str()));
+			// A texture with the same filepath has already been loaded, continue to next one. (optimization)
+		} else {
+			// If texture hasn't been loaded already, load it
+			Texture texture = GLUtils::loadTexture(textureDir + "/" + str.C_Str());
 			s_texturesLoaded.insert(std::make_pair(str.C_Str(), texture));  // Store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
 			textures.push_back(std::move(texture));
 		}
 	}
+
 	return textures;
 }
 
-Material processMaterial(const aiMaterial* _aiMaterial, const aiScene* scene) 
+Material processMaterial(const aiMaterial* _aiMaterial, const aiScene* scene, const std::string& textureDir) 
 {
 	Material material;
 	material.willDrawDepth = true;
 
+	// TODO: Remove these and use texture maps instead
+	material.shaderParams.glossiness = 0.001f;
+	material.shaderParams.metallicness = 0.001f;
+
 	// 1. diffuse maps
-	std::vector<Texture> colorMaps = loadMaterialTextures(_aiMaterial, aiTextureType_DIFFUSE);
+	std::vector<Texture> colorMaps = loadMaterialTextures(_aiMaterial, aiTextureType_DIFFUSE, textureDir);
 	material.colorMaps.insert(material.colorMaps.end(), colorMaps.begin(), colorMaps.end());
 	// 2. specular maps
-	std::vector<Texture> metallicnessMaps = loadMaterialTextures(_aiMaterial, aiTextureType_SPECULAR);
+	std::vector<Texture> metallicnessMaps = loadMaterialTextures(_aiMaterial, aiTextureType_SPECULAR, textureDir);
 	material.metallicnessMaps.insert(material.metallicnessMaps.end(), metallicnessMaps.begin(), metallicnessMaps.end());
 	// 3. gloss map
-	std::vector<Texture> shininessMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_SHININESS);
+	std::vector<Texture> shininessMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_SHININESS, textureDir);
 	material.shininessMaps.insert(material.shininessMaps.end(), shininessMaps.begin(), shininessMaps.end());
 	// 4. normal maps
-	std::vector<Texture> normalMaps = loadMaterialTextures(_aiMaterial, aiTextureType_NORMALS);
+	std::vector<Texture> normalMaps = loadMaterialTextures(_aiMaterial, aiTextureType_NORMALS, textureDir);
 	material.normalMaps.insert(material.normalMaps.end(), normalMaps.begin(), normalMaps.end());
 	// 5. height maps
-	std::vector<Texture> heightMaps = loadMaterialTextures(_aiMaterial, aiTextureType_HEIGHT);
+	std::vector<Texture> heightMaps = loadMaterialTextures(_aiMaterial, aiTextureType_HEIGHT, textureDir);
 	material.heightMaps.insert(material.heightMaps.end(), heightMaps.begin(), heightMaps.end());
 	// 6. displacement maps
-	std::vector<Texture> displacementMaps = loadMaterialTextures(_aiMaterial, aiTextureType_DISPLACEMENT);
+	std::vector<Texture> displacementMaps = loadMaterialTextures(_aiMaterial, aiTextureType_DISPLACEMENT, textureDir);
 	material.displacementMaps.insert(material.displacementMaps.end(), displacementMaps.begin(), displacementMaps.end());
 
 	// TODO: Add more of these to the material class
-	std::vector<Texture> ambientMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_AMBIENT);
-	std::vector<Texture> emissiveMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_EMISSIVE);
-	std::vector<Texture> lightMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_LIGHTMAP);
-	std::vector<Texture> opacityMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_OPACITY);
-	std::vector<Texture> reflectionMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_REFLECTION);
-	std::vector<Texture> unknownTextureMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_UNKNOWN);
+	std::vector<Texture> ambientMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_AMBIENT, textureDir);
+	std::vector<Texture> emissiveMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_EMISSIVE, textureDir);
+	std::vector<Texture> lightMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_LIGHTMAP, textureDir);
+	std::vector<Texture> opacityMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_OPACITY, textureDir);
+	std::vector<Texture> reflectionMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_REFLECTION, textureDir);
+	std::vector<Texture> unknownTextureMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_UNKNOWN, textureDir);
 
 	// TODO: Swap shader model based on the textures we have
 	material.shader = GLUtils::getDefaultShader();
@@ -193,6 +193,7 @@ ModelComponent ModelUtils::loadModel(const std::string& path)
 		std::cout << "ERROR::ASSIMP:: " << s_importer.GetErrorString() << std::endl;
 		return model;
 	}
+	std::string textureDir = path.substr(0, path.find_last_of('/'));
 
 	// Load each mesh in the model
 	for (GLuint i = 0; i < scene->mNumMeshes; ++i)
@@ -200,7 +201,7 @@ ModelComponent ModelUtils::loadModel(const std::string& path)
 
 	// Load each material in the model
 	for (GLuint i = 0; i < scene->mNumMaterials; ++i)
-		model.materials.push_back(processMaterial(scene->mMaterials[i], scene));
+		model.materials.push_back(processMaterial(scene->mMaterials[i], scene, textureDir));
 
 	// Recursively construct the models scene graph hierachy
 	processNode(scene->mRootNode, scene, model.rootNode);

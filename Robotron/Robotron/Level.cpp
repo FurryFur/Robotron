@@ -31,9 +31,9 @@ Level::Level(GLFWwindow* window, int levelNum)
 	EntityUtils::createPlayer(m_scene,
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 
-	EntityUtils::createModel(m_scene, "Assets/Models/Cherry_Tomato/VG18_1.obj", 
+	EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
 		  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
-		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 20.0f }));
+		* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
 
 	//create the number of enemy01 based on current level with some random variance.
 	unsigned int numberOfEnemy01 = 9 + m_levelNum + randomInt(-2, 2);
