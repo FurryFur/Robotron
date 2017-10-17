@@ -163,7 +163,7 @@ Entity& EntityUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm:
 {
 	Entity& entity = scene.createEntity();
 
-	entity.componentMask = COMPONENT_INPUT_MAP | COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL | COMPONENT_CAMERA | COMPONENT_TRANSFORM;
+	entity.componentMask = COMPONENT_INPUT_MAP | COMPONENT_INPUT | COMPONENT_CAMERA | COMPONENT_TRANSFORM;
 
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.005f;
