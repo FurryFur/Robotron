@@ -37,12 +37,62 @@ Enemy01ControlSystem::Enemy01ControlSystem(Scene& scene)
 //the ai movement behavious for enemy01s
 void Enemy01ControlSystem::update(Entity& entity)
 {
+	// Check that the entity is an Enemy01 object before proceeding.
 	if ((entity.componentMask & COMPONENT_ENEMY01) != COMPONENT_ENEMY01)
 		return;
 	
-	entity.physics.velocity = seek(m_scene, entity.transform[3], entity.physics.velocity, entity.controlVars.moveSpeed);
+	// Set the target position out of scope.
+	glm::vec3 targetPosition  = glm::vec3{100, 100, 100};
+	glm::vec3 currentPosition = glm::vec3{ entity.transform[3].x,  entity.transform[3].y,  entity.transform[3].z};
+	bool targetFound = false;
 
-	glm::vec4 newVelocity = glm::vec4{ entity.physics.velocity.x, entity.physics.velocity.y, entity.physics.velocity.z, 0 };
+	// Find the closest player object to seek to.
+	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+	{
+		if ((m_scene.entities.at(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						          //its a player object
+			&& glm::length(m_scene.entities.at(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
+			&& glm::length(m_scene.entities.at(i).transform[3] - entity.transform[3]) < 15)								                  //the player is within the enemys aggro range
+		{
+			targetPosition = { m_scene.entities.at(i).transform[3].x, m_scene.entities.at(i).transform[3].y, m_scene.entities.at(i).transform[3].z};
+			targetFound = true;
+		}
+	}
+
+	glm::vec3 Acc;
+	// Apply the seek and flock AI if target aquired.
+	if (targetFound)
+	{
+		// Add a seek acceleration to the culmative acceleration.
+		Acc = seekWithArrival(targetPosition, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+
+		std::vector<Entity*> nearbyNeighbours;
+		// Find all the closest Enemy01 neighbours and store them in a vector.
+		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+		{
+			if (((m_scene.entities.at(i).componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01) &&
+				(glm::length(glm::vec2(m_scene.entities.at(i).transform[3].x - entity.transform[3].x, m_scene.entities.at(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
+			{
+				nearbyNeighbours.push_back(&m_scene.entities.at(i));
+			}
+		}
+
+		// Add a flock acceleration to the culmative acceleration.
+		if(nearbyNeighbours.size() > 0)
+			Acc += flock(nearbyNeighbours, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+	}
+	// If the seek returns 0 then wander.
+	else
+		Acc = wander(currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+
+	// Limit the steering acceleration.
+	if (glm::length(Acc) > 0.02f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.02f);
+
+	// Add the acceleration to the velocity.
+	glm::vec4 newVelocity = glm::vec4{ entity.physics.velocity.x + Acc.x, 0, entity.physics.velocity.z + Acc.z, 0 };
+	entity.physics.velocity += Acc;
+
+	// Add the velocity to the position of the enemy.
 	entity.transform[3] += newVelocity;
 	
 	return;

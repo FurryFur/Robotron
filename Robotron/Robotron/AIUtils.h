@@ -24,43 +24,184 @@
 
 #include <cmath>
 
-//seek movement ai
-glm::vec3 seek(Scene& scene, glm::vec4 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+// Returns a force to move towards the target position.
+glm::vec3 seek(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
 {
-	glm::vec4 pos = currentPosition; //set the position to the entities current positoin
-	glm::vec4 targetPosition = glm::vec4{ 100, 100, 100, 1 }; //set the target position out of scope
-	bool isSeeking = false;
 
-	//find the closest player object to move to
-	for (unsigned int i = 0; i < scene.entities.size(); ++i)
+	// Determine the desired veloctiy to reach the target.
+	glm::vec3 displacement = (targetPosition - currentPosition);
+	float displacementMag = glm::length(displacement);
+	glm::vec3 desiredVelocity;
+	desiredVelocity = displacement / displacementMag * moveSpeed;
+
+	// Determine the steering vector from the current veloctiy to the desired velocity.
+	glm::vec3 steering = desiredVelocity - currentVelocity;
+	
+	return steering;
+}
+
+// Returns a force to move towards the target position, slows down with arrival when close.
+glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+{
+	
+	// Determine the desired veloctiy to reach the target.
+	glm::vec3 displacement = (targetPosition - currentPosition);
+	float displacementMag = glm::length(displacement);
+
+	// Apply arrival behaviour as the entity gets close to the target.
+	glm::vec3 desiredVelocity;
+	if (displacementMag < 2)
+		desiredVelocity = displacement / displacementMag * moveSpeed * (displacementMag / 2);
+	else
+		desiredVelocity = displacement / displacementMag * moveSpeed;
+
+	// Determine the steering vector from the current veloctiy to the desired velocity.
+	glm::vec3 steering = desiredVelocity - currentVelocity;
+
+	return steering;
+}
+
+// Returns an acceleration to move to a random position forward from the current position.
+glm::vec3 wander(glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+{
+	// Only change wandering with a 5% chance.
+	if (randomInt(0, 50) != 1)
+		return{ 0, 0, 0 };
+
+	// Reduce the movement speed whilst wandering.
+	moveSpeed = moveSpeed / 2;
+
+	// If stationary, move in a random direction.
+	if (currentVelocity.x == 0 && currentVelocity.z == 0)
 	{
-		if ((scene.entities.at(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL //its a player object
-			&& glm::length(scene.entities.at(i).transform[3] - pos) < glm::length(targetPosition - pos) //it is the closet player to the target
-			&& glm::length(scene.entities.at(i).transform[3] - pos) < 15)								//the player is within the enemys aggro range
+		currentVelocity.x = randomReal<float>(-moveSpeed, moveSpeed);
+		currentVelocity.z = sqrt(pow(moveSpeed, 2) - pow(currentVelocity.x, 2));
+	}
+
+	float radius = 0.2f;
+	float a = randomReal<float>(0.0f, 1.0f);
+	float b = randomReal<float>(0.0f, 1.0f);
+	if (b < a)
+	{
+		float c = a;
+		a = b;
+		b = c;
+	}
+
+	float randomX = (b * radius * cos(2 * 3.14f * a / b));
+	float randomZ = (b * radius * sin(2 * 3.14f * a / b));
+
+	glm::vec3 targetPosition = { (currentPosition.x + currentVelocity.x + randomX)
+								, currentPosition.y
+								,(currentPosition.z + currentVelocity.z + randomZ)};
+
+	return seek(targetPosition, currentPosition, currentVelocity, moveSpeed);
+}
+
+glm::vec3 computeAlignment(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentVelocity)
+{
+	int neighbourCount = 0;
+	glm::vec3 cumulativeVelocity;
+
+	// Find all the closest neighbours and add their velocity to the cumulative velocity.
+	for (unsigned int i = 0; i < nearbyNeighbours.size(); ++i)
+	{
+		// Check its not looking at itself.
+		if (currentVelocity != (*nearbyNeighbours.at(i)).physics.velocity)
 		{
-			targetPosition = scene.entities.at(i).transform[3];
-			isSeeking = true;
+			++neighbourCount;
+			cumulativeVelocity += (*nearbyNeighbours.at(i)).physics.velocity;
 		}
 	}
 
-	if (!isSeeking)
-		return glm::vec3{ 0,0,0 };
-		
-	//determine the desired veloctiy to reach the target
-	float posMagnitude = glm::length(targetPosition - pos);
+	// Return 0 if no neighbours nearby
+	if (neighbourCount == 0 || cumulativeVelocity == glm::vec3{ 0,0,0 })
+		return{ 0, 0, 0 };
 
-	glm::vec3 desiredVelocity;
-	if (posMagnitude < 2)
-		desiredVelocity = (targetPosition - pos) / posMagnitude * moveSpeed * (posMagnitude / 2); //apply arrival behaviour as the entity gets close to the target
+	// Find the average of the cumlative velocity.
+	glm::vec3 averageVelocity = { cumulativeVelocity.x / neighbourCount, cumulativeVelocity.y / neighbourCount, cumulativeVelocity.z / neighbourCount };
+
+	// Return the normal of the average vector.
+	return (averageVelocity / glm::length(averageVelocity));
+}
+
+
+glm::vec3 computeCohesion(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition)
+{
+	int neighbourCount = 0;
+	glm::vec3 cumulativePosition;
+
+	// Find all the closest neighbours and add their position to a culmative position.
+	for (unsigned int i = 0; i < nearbyNeighbours.size(); ++i)
+	{
+		glm::vec3 neighbourPosition = { (*nearbyNeighbours.at(i)).transform[3].x, (*nearbyNeighbours.at(i)).transform[3].y, (*nearbyNeighbours.at(i)).transform[3].z };
+		// Check its not looking at itself.
+		if (currentPosition != neighbourPosition)
+		{
+			++neighbourCount;
+			cumulativePosition += neighbourPosition;
+		}
+	}
+
+	// Return 0 if no neighbours nearby
+	if (neighbourCount == 0 || cumulativePosition == glm::vec3{0,0,0})
+		return{ 0, 0, 0 };
+
+	// Find the average of the cumlative position to get their center position.
+	glm::vec3 averagePosition = { cumulativePosition.x / neighbourCount, cumulativePosition.y / neighbourCount, cumulativePosition.z / neighbourCount };
+
+	//Find a vector from current position to the center of neighbours
+	averagePosition = { averagePosition.x - currentPosition.x, averagePosition.y - currentPosition.y, averagePosition.z - currentPosition.z };
+
+	// Return the normal of the vector.
+	return (averagePosition / glm::length(averagePosition));
+}
+
+glm::vec3 computeSeparation(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition)
+{
+	int neighbourCount = 0;
+	glm::vec3 cumulativeDistance;
+
+	// Find all the closest neighbours and add their distance away from the current object.
+	for (unsigned int i = 0; i < nearbyNeighbours.size(); ++i)
+	{
+		glm::vec3 neighbourPosition = { (*nearbyNeighbours.at(i)).transform[3].x, (*nearbyNeighbours.at(i)).transform[3].y, (*nearbyNeighbours.at(i)).transform[3].z };
+		// Check its not looking at itself.
+		if (currentPosition != neighbourPosition)
+		{
+			++neighbourCount;
+			cumulativeDistance += neighbourPosition - currentPosition;
+		}
+	}
+	
+	// Return 0 if no neighbours nearby
+	if (neighbourCount == 0 || cumulativeDistance == glm::vec3{0,0,0})
+		return{ 0, 0, 0 };
+
+	// Find the average of the cumlative distance.
+	glm::vec3 averageVelocity = { cumulativeDistance.x / neighbourCount, cumulativeDistance.y / neighbourCount, cumulativeDistance.z / neighbourCount };
+
+	// Sets it so the current object steers away form the average position of its neighbours.
+	averageVelocity *= -1;
+
+	// Return the normal of the average vector.
+	return (averageVelocity / glm::length(averageVelocity));
+}
+
+glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+{
+	glm::vec3 alignment = computeAlignment(nearbyNeighbours, currentVelocity);
+	glm::vec3 cohesion = computeCohesion(nearbyNeighbours, currentPosition);
+	glm::vec3 separation = computeSeparation(nearbyNeighbours, currentPosition);
+
+	// Determine the steering acceleration from the current veloctiy to the desired velocity.
+	glm::vec3 flockVelocity = alignment + cohesion + glm::vec3{ separation.x * 2, separation.y * 2, separation.z * 2 };
+
+	if (flockVelocity != glm::vec3{ 0,0,0 })
+	{
+		glm::vec3 targetPosition = currentPosition + flockVelocity;
+		return seekWithArrival(targetPosition, currentPosition, currentVelocity, moveSpeed);
+	}
 	else
-		desiredVelocity = (targetPosition - pos) / posMagnitude * moveSpeed;
-
-	//determine the steering vector from the current veloctiy to the desired velocity
-	glm::vec3 steering = desiredVelocity - currentVelocity;
-
-	//determine the new velocty
-	glm::vec3 newVelocity;
-	newVelocity = currentVelocity + steering;
-
-	return newVelocity;
+		return{ 0,0,0 };
 }
