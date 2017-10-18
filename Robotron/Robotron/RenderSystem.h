@@ -14,6 +14,9 @@
 #pragma once
 
 #include <glad\glad.h>
+#include <glm\glm.hpp>
+
+#include <vector>
 
 struct Scene;
 struct GLFWwindow;
@@ -21,9 +24,19 @@ struct Entity;
 
 class RenderSystem {
 public:
-	RenderSystem(GLFWwindow* glContext, const Scene&);
+	RenderSystem(GLFWwindow* glContext, Scene&);
 	RenderSystem(const RenderSystem&) = delete;
 	RenderSystem& operator=(const RenderSystem&) = delete;
+
+	// Draws a debugging arrow
+	// This object will only be drawn once.
+	// To keep or update the arrow, drawDebugArrow must be called every frame.
+	static void drawDebugArrow(Scene&, const glm::vec3& base, const glm::vec3& tip);
+
+	// Draws a debugging arrow
+	// This object will only be drawn once.
+	// To keep or update the arrow, drawDebugArrow must be called every frame.
+	static void drawDebugArrow(Scene&, const glm::vec3& base, const glm::vec3& direction, float magnitude);
 
 	// Starts rendering the frame.
 	// Should be called before update.
@@ -43,7 +56,7 @@ public:
 
 private:
 	GLFWwindow* m_glContext;
-	const Scene& m_scene;
+	Scene& m_scene;
 	const Entity* m_cameraEntity;
 	GLuint m_uboUniforms;
 	GLuint m_uboShaderParams;

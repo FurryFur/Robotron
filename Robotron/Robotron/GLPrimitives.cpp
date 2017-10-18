@@ -387,8 +387,8 @@ const ModelComponent& GLPrimitives::getCylinderModel()
 		model.meshes.push_back(getCylinderMesh());
 
 		Material material;
-		material.shader = GLUtils::getThresholdShader();
-		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture4.jpg"));
+		material.shader = GLUtils::getDefaultShader();
+		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/doge.jpg"));
 		material.willDrawDepth = true;
 		material.shaderParams.metallicness = 0.75f;
 		material.shaderParams.glossiness = 40.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason

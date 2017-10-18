@@ -20,6 +20,7 @@
 #include "GLMUtils.h"
 #include "Scene.h"
 #include "Entity.h"
+#include "RenderSystem.h"
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -37,7 +38,7 @@ void Enemy01ControlSystem::update(Entity& entity)
 {
 	if ((entity.componentMask & COMPONENT_ENEMY01) != COMPONENT_ENEMY01)
 		return;
-		
+
 	glm::vec4 targetPosition = { 100, 100, 100, 1 };
 	glm::vec4 pos = entity.transform[3];
 	float moveSpeed = entity.controlVars.moveSpeed;
@@ -46,11 +47,11 @@ void Enemy01ControlSystem::update(Entity& entity)
 	//find the closest player object to move to
 	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
 	{
-		if ((m_scene.entities.at(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL //its a player object
-		  && glm::length(m_scene.entities.at(i).transform[3] - pos) < glm::length(targetPosition - pos)   //it is the closet player to the target
-		  && glm::length(m_scene.entities.at(i).transform[3] - pos) < 15)								  //the player is within the enemys aggro range
+		if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL //its a player object
+		  && glm::length(m_scene.entities.at(i)->transform[3] - pos) < glm::length(targetPosition - pos)   //it is the closet player to the target
+		  && glm::length(m_scene.entities.at(i)->transform[3] - pos) < 15)								  //the player is within the enemys aggro range
 		{
-			targetPosition = m_scene.entities.at(i).transform[3];
+			targetPosition = m_scene.entities.at(i)->transform[3];
 			isSeekingPlayer = true;
 		}
 	}
@@ -80,7 +81,14 @@ void Enemy01ControlSystem::update(Entity& entity)
 		//if (isSeekingPlayer)
 		//
 
+		const float kDebugScale = 100;
+		glm::vec3 position = glm::vec3(entity.transform[3]);
+		RenderSystem::drawDebugArrow(m_scene, position, position + newVelocity * kDebugScale);
+		RenderSystem::drawDebugArrow(m_scene, position + newVelocity * kDebugScale, steering, glm::length(steering) * kDebugScale);
+		RenderSystem::drawDebugArrow(m_scene, position, desiredVelocity, glm::length(desiredVelocity) * kDebugScale);
+
 		entity.transform[3] = { pos.x + newVelocity.x, pos.y, pos.z + newVelocity.z, 1 }; //update the ojbects position with the new velocity
 	}
+
 	return;
 }

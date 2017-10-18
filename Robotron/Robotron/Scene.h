@@ -17,11 +17,15 @@
 #include "Entity.h"
 
 #include <vector>
+#include <memory>
 
 struct Scene {
 public:
 	Entity& createEntity();
 	void destroyEntity(Entity&);
 
-	std::vector<Entity> entities;
+	// TODO: Change this to be a vector of 'observable' entities
+	// that can be observed robustly, even when a vector resize causes the
+	// entities to shift in memory.
+	std::vector<std::unique_ptr<Entity>> entities;
 };

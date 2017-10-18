@@ -31,11 +31,11 @@ Level::Level(GLFWwindow* window, int levelNum)
 	EntityUtils::createPlayer(m_scene,
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 
-	EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
-		  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
-		* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
+	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
+	//	  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
+	//	* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
 
-	//create the number of enemy01 based on current level with some random variance.
+	// Create the number of enemy01 based on current level with some random variance.
 	unsigned int numberOfEnemy01 = 9 + m_levelNum + randomInt(-2, 2);
 	
 	for (unsigned int i = 0; i <= numberOfEnemy01; ++i)
@@ -83,11 +83,11 @@ void Level::process()
 
 	// Update all the entities using all the systems.
 	for (size_t i = 0; i < m_scene.entities.size(); ++i) {
-		m_inputSystem.update(m_scene.entities.at(i));
-		m_playerControlSystem.update(m_scene.entities.at(i));
-		m_networkSystem->update(m_scene.entities.at(i));
-		m_renderSystem.update(m_scene.entities.at(i));
-		m_enemy01ControlSystem.update(m_scene.entities.at(i));
+		m_inputSystem.update(*m_scene.entities.at(i));
+		m_playerControlSystem.update(*m_scene.entities.at(i));
+		m_networkSystem->update(*m_scene.entities.at(i));
+		m_renderSystem.update(*m_scene.entities.at(i));
+		m_enemy01ControlSystem.update(*m_scene.entities.at(i));
 	}
 
 	// Do operations that should happen at the end of the frame.

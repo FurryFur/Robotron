@@ -19,6 +19,7 @@
 #include "Scene.h"
 #include "Entity.h"
 #include "UniformFormat.h"
+#include "EntityUtils.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\gtc\matrix_transform.hpp>
@@ -26,8 +27,9 @@
 
 using glm::mat4;
 using glm::vec3;
+using glm::vec4;
 
-RenderSystem::RenderSystem(GLFWwindow* glContext, const Scene& scene)
+RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
 	: m_glContext{ glContext }
 	, m_scene{ scene }
 	, m_uniformBindingPoint{ 0 }
@@ -44,6 +46,36 @@ RenderSystem::RenderSystem(GLFWwindow* glContext, const Scene& scene)
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(ShaderParams), nullptr, GL_DYNAMIC_DRAW);
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+}
+
+void RenderSystem::drawDebugArrow(Scene& scene, const glm::vec3& base, const glm::vec3& tip)
+{
+	vec3 direction = tip - base;
+	drawDebugArrow(scene, base, direction, glm::length(direction));
+}
+
+void RenderSystem::drawDebugArrow(Scene& scene, const glm::vec3& base, const glm::vec3& _direction, float magnitude)
+{
+	mat4 transform;
+	vec3 direction = glm::normalize(_direction);
+	transform[1] = vec4(direction, 1);
+	// Find a perpendicular vector
+	glm::vec3 tangent = vec3{ 1, 1, 1 };
+	if (direction.x != 0)
+		tangent.x = -(direction.y + direction.z) / direction.x;
+	else if (direction.y != 0)
+		tangent.y = -(direction.x + direction.z) / direction.y;
+	else
+		tangent.z = -(direction.y + direction.z) / direction.z;
+	transform[0] = vec4(glm::normalize(glm::cross(direction, tangent)), 1);
+	transform[2] = vec4(glm::normalize(glm::cross(vec3(transform[0]), direction)), 1);
+	transform[3] = vec4(base, 1);
+
+	mat4 scale = glm::scale({}, vec3(1, magnitude, 1));
+
+	Entity& entity = EntityUtils::createModel(scene, "Assets/Models/red_arrow/red_arrow.obj", transform * scale);
+	entity.componentMask |= COMPONENT_DEBUG;
+	//EntityUtils::createModel(scene, "path to debug arrow", orientation * scale);
 }
 
 void RenderSystem::beginRender()
@@ -143,6 +175,9 @@ void RenderSystem::update(Entity& entity)
 		glBindVertexArray(mesh.VAO);
 		glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
 	}
+
+	if (entity.hasAllComponents(COMPONENT_DEBUG))
+		m_scene.destroyEntity(entity);
 }
 
 void RenderSystem::setCamera(const Entity* entity)
