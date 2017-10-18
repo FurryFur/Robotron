@@ -86,8 +86,8 @@ void RenderSystem::update(Entity& entity)
 
 	// Loop over all the meshes in the model
 	ModelComponent& model = entity.model;
-	for (size_t i = 0; i < model.meshs.size(); ++i) {
-		Mesh& mesh = model.meshs.at(i);
+	for (size_t i = 0; i < model.meshes.size(); ++i) {
+		Mesh& mesh = model.meshes.at(i);
 		Material& material = model.materials.at(mesh.materialIndex);
 
 		// Tell the gpu what shader to use
@@ -106,17 +106,15 @@ void RenderSystem::update(Entity& entity)
 		// Tell the gpu what diffuse textures to use
 		// TODO: Send all textures to the GPU, not just 1
 		GLuint textureUnit = 0;
-		for (size_t j = 0; j < material.textures.size(); ++j) {
-			Texture& texture = material.textures.at(i);
-			if (texture.type == TEXTURE_TYPE_DIFFUSE) {
-				glActiveTexture(GL_TEXTURE0 + textureUnit);
-				glUniform1i(glGetUniformLocation(material.shader, "sampler"), 0);
-				glBindTexture(texture.target, texture.id);
-				++textureUnit;
+		for (size_t j = 0; j < material.colorMaps.size(); ++j) {
+			Texture& texture = material.colorMaps.at(j);
+			glActiveTexture(GL_TEXTURE0 + textureUnit);
+			glUniform1i(glGetUniformLocation(material.shader, "sampler"), 0);
+			glBindTexture(texture.target, texture.id);
+			++textureUnit;
 
-				// Just doing 1 texture currently
-				break;
-			}
+			// Just doing 1 texture currently
+			break;
 		}
 
 		// Set environment map to use on GPU
@@ -157,6 +155,6 @@ void RenderSystem::setEnvironmentMap(const Entity& entity)
 	// Take the first texture on the entity as the environment map
 	// TODO: Do some error checking here to make sure this is actually
 	// a cube map and we don't get index out of bounds.
-	m_environmentMap = entity.model.materials.at(0).textures.at(0).id;
+	m_environmentMap = entity.model.materials.at(0).colorMaps.at(0).id;
 	m_isEnvironmentMap = true;
 }

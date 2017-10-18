@@ -26,6 +26,9 @@
 #include <glm\gtc\matrix_transform.hpp>
 
 #include <iostream>
+#include <unordered_map>
+#include <string>
+#include <sstream>
 
 #define BUFFER_OFFSET(i) ((GLvoid *)(i*sizeof(float)))
 
@@ -134,7 +137,7 @@ GLuint GLUtils::getSkyboxShader()
 	return s_shader;
 }
 
-GLuint GLUtils::bufferVertices(const std::vector<VertexFormat>& vertices, const std::vector<GLuint>& indices)
+GLuint GLUtils::bufferMeshData(const std::vector<VertexFormat>& vertices, const std::vector<GLuint>& indices)
 {
 	GLuint VAO;
 	GLuint buffers[2];
@@ -162,51 +165,97 @@ GLuint GLUtils::bufferVertices(const std::vector<VertexFormat>& vertices, const 
 }
 
 
-Texture GLUtils::loadTexture(const std::string& filename, TextureType textureType)
+Texture GLUtils::loadTexture(const std::string& path)
 {
-	// TODO: Make cached so duplicate textures aren't loaded to the GPU
+	// Cached textures that have already been loaded
+	static std::unordered_map<std::string, Texture> s_loadedTextures;
+
+	// A texture with the same filepath has already been loaded, return a copy. (optimization)
+	if (s_loadedTextures.find(path) != s_loadedTextures.end())
+		return s_loadedTextures.at(path);
 
 	Texture texture;
 	texture.target = GL_TEXTURE_2D;
-	texture.type = textureType;
 
-	int width, height, nrChannels;
-	unsigned char* textureData = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+	int width, height, nrComponents;
+	unsigned char* textureData = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
 
-	glGenTextures(1, &texture.id);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(texture.target, texture.id);
-	
-	glTexParameteri(texture.target, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(texture.target, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(texture.target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(texture.target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	if (textureData) {
+		GLenum format;
+		if (nrComponents == 1)
+			format = GL_RED;
+		else if (nrComponents == 3)
+			format = GL_RGB;
+		else if (nrComponents == 4)
+			format = GL_RGBA;
 
-	glTexImage2D(texture.target, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
-	glGenerateMipmap(texture.target);
+		glGenTextures(1, &texture.id);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(texture.target, texture.id);
+
+		glTexParameteri(texture.target, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(texture.target, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(texture.target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(texture.target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexImage2D(texture.target, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, textureData);
+		glGenerateMipmap(texture.target);
+
+		glBindTexture(texture.target, 0);
+
+		s_loadedTextures.insert(std::make_pair(path, texture));
+	} else {
+		// TODO: Throw excpetion here
+		std::cout << "Texture failed to load at path: " << path << std::endl;
+	}
 
 	stbi_image_free(textureData);
-	glBindTexture(texture.target, 0);
 
 	return texture;
 }
 
-Texture GLUtils::loadCubeMap(const std::vector<std::string>& faceFilenames)
+Texture GLUtils::loadCubeMap(const std::vector<std::string>& facePaths)
 {
+	// Cached textures that have already been loaded
+	static std::unordered_map<std::string, Texture> s_loadedTextures;
+
+	// Combine filepaths to create id
+	std::ostringstream oss;
+	for (const std::string& path : facePaths)
+		oss << path;
+	std::string id = oss.str();
+
+	// A texture with the same id has already been loaded, return a copy. (optimization)
+	if (s_loadedTextures.find(id) != s_loadedTextures.end())
+		return s_loadedTextures.at(id);
+
 	Texture texture;
 	texture.target = GL_TEXTURE_CUBE_MAP;
-	texture.type = TEXTURE_TYPE_DIFFUSE;
 
 	glGenTextures(1, &texture.id);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(texture.target, texture.id);
 
-	for (GLenum i = 0; i < faceFilenames.size(); ++i) {
-		int width, height, nrChannels;
-		unsigned char* faceData = stbi_load(faceFilenames.at(i).c_str(), &width, &height, 
-		                                    &nrChannels, 0);
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
-		             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, faceData);
+	for (GLenum i = 0; i < facePaths.size(); ++i) {
+		int width, height, nrComponents;
+		unsigned char* faceData = stbi_load(facePaths.at(i).c_str(), &width, &height, 
+		                                    &nrComponents, 0);
+
+		if (faceData) {
+			GLenum format;
+			if (nrComponents == 1)
+				format = GL_RED;
+			else if (nrComponents == 3)
+				format = GL_RGB;
+			else if (nrComponents == 4)
+				format = GL_RGBA;
+
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, faceData);
+		} else {
+			// TODO: Throw excpetion here
+			std::cout << "Texture failed to load at path: " << facePaths.at(i) << std::endl;
+		}
 
 		stbi_image_free(faceData);
 	}
@@ -219,5 +268,6 @@ Texture GLUtils::loadCubeMap(const std::vector<std::string>& faceFilenames)
 
 	glBindTexture(texture.target, 0);
 
+	s_loadedTextures.insert(std::make_pair(id, texture));
 	return texture;
 }

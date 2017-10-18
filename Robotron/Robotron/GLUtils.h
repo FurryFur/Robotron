@@ -44,13 +44,13 @@ namespace GLUtils {
 
 	// Buffers vertex and index data to the GPU.
 	// Returns a handler the the VAO associated with the vertices / indices.
-	GLuint bufferVertices(const std::vector<VertexFormat>& vertices, const std::vector<GLuint>& indices);
+	GLuint bufferMeshData(const std::vector<VertexFormat>& vertices, const std::vector<GLuint>& indices);
 
 	// Loads a texture to GPU memory.
 	// Returns a handler to the GPU texture.
-	Texture loadTexture(const std::string& filename, TextureType textureType = TEXTURE_TYPE_DIFFUSE);
+	Texture loadTexture(const std::string& paths);
 
 	// Loads a cube map to GPU memory.
 	// Returns a handler to the GPU cube map.
-	Texture loadCubeMap(const std::vector<std::string>& faceFilenames);
+	Texture loadCubeMap(const std::vector<std::string>& facePaths);
 }

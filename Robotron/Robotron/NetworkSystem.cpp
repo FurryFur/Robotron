@@ -23,6 +23,7 @@ NetworkSystem::NetworkSystem(Scene& scene)
 void NetworkSystem::sendData(const Packet& packet, const sockaddr_in& address)
 {
 	// Send the packet
+	// TODO: Only send the number of bytes required for the packet type.
 	int numBytesSent = sendto(
 		m_socket.getSocketHandle(),                     // socket to send through.
 		reinterpret_cast<const char*>(&packet),         // data to send

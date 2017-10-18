@@ -9,6 +9,6 @@ struct ModelComponent {
 	// The root node of the models scene tree.
 	// Not currently used.
 	MeshNode rootNode;
-	std::vector<Mesh> meshs;
+	std::vector<Mesh> meshes;
 	std::vector<Material> materials;
 };
