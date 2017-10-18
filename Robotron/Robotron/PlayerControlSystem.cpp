@@ -40,7 +40,8 @@ void PlayerControlSystem::update(Entity& entity)
 	
 	// Filter movable
 	const size_t kMovableMask = COMPONENT_PLAYER_CONTROL | COMPONENT_INPUT | COMPONENT_TRANSFORM;
-	if ((entity.componentMask & kMovableMask) != kMovableMask)
+	const size_t kMovableCamMask = COMPONENT_CAMERA | COMPONENT_INPUT | COMPONENT_TRANSFORM;
+	if ((entity.componentMask & kMovableMask) != kMovableMask && (entity.componentMask & kMovableCamMask) != kMovableCamMask)
 		return;
 
 	float moveSpeed = entity.controlVars.moveSpeed;

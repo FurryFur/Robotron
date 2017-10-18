@@ -24,6 +24,11 @@
 struct Material {
 	GLuint shader;
 	ShaderParams shaderParams;
-	std::vector<Texture> textures;
+	std::vector<Texture> colorMaps;
+	std::vector<Texture> metallicnessMaps;
+	std::vector<Texture> shininessMaps;
+	std::vector<Texture> normalMaps;
+	std::vector<Texture> heightMaps;
+	std::vector<Texture> displacementMaps;
 	bool willDrawDepth;
 };

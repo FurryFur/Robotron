@@ -17,7 +17,7 @@ void NetworkServerSystem::beginFrame()
 	Packet packet;
 	while (receiveData(packet)) {
 		if (packet.type == PACKET_TYPE_INPUT) {
-			m_scene.entities.at(packet.entityNetID).input = packet.input;
+			m_scene.entities.at(packet.entityNetID)->input = packet.input;
 		}
 	}
 }

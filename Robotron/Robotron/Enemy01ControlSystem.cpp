@@ -22,6 +22,7 @@
 #include "AIUtils.h"
 #include "Scene.h"
 #include "Entity.h"
+#include "RenderSystem.h"
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -49,11 +50,11 @@ void Enemy01ControlSystem::update(Entity& entity)
 	// Find the closest player object to seek to.
 	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
 	{
-		if ((m_scene.entities.at(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						          //its a player object
-			&& glm::length(m_scene.entities.at(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
-			&& glm::length(m_scene.entities.at(i).transform[3] - entity.transform[3]) < 15)								                  //the player is within the enemys aggro range
+		if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						          //its a player object
+			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
+			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 15)								                  //the player is within the enemys aggro range
 		{
-			targetPosition = { m_scene.entities.at(i).transform[3].x, m_scene.entities.at(i).transform[3].y, m_scene.entities.at(i).transform[3].z};
+			targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z};
 			targetFound = true;
 		}
 	}
@@ -69,10 +70,10 @@ void Enemy01ControlSystem::update(Entity& entity)
 		// Find all the closest Enemy01 neighbours and store them in a vector.
 		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
 		{
-			if (((m_scene.entities.at(i).componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01) &&
-				(glm::length(glm::vec2(m_scene.entities.at(i).transform[3].x - entity.transform[3].x, m_scene.entities.at(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
+			if (((m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01) &&
+				(glm::length(glm::vec2(m_scene.entities.at(i)->transform[3].x - entity.transform[3].x, m_scene.entities.at(i)->transform[3].z - entity.transform[3].z))) <= 2.0f)
 			{
-				nearbyNeighbours.push_back(&m_scene.entities.at(i));
+				nearbyNeighbours.push_back(m_scene.entities.at(i).get());
 			}
 		}
 
@@ -92,8 +93,18 @@ void Enemy01ControlSystem::update(Entity& entity)
 	glm::vec4 newVelocity = glm::vec4{ entity.physics.velocity.x + Acc.x, 0, entity.physics.velocity.z + Acc.z, 0 };
 	entity.physics.velocity += Acc;
 
+	//TODO: ADD FLOCKING CODE HERE
+	//if (isSeekingPlayer)
+	//
+
+	const float kDebugScale = 100;
+	glm::vec3 position = glm::vec3(entity.transform[3]);
+	RenderSystem::drawDebugArrow(m_scene, position, position + entity.physics.velocity * kDebugScale);
+	RenderSystem::drawDebugArrow(m_scene, position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
+	//RenderSystem::drawDebugArrow(m_scene, position, desiredVelocity, glm::length(desiredVelocity) * kDebugScale);
+
 	// Add the velocity to the position of the enemy.
 	entity.transform[3] += newVelocity;
-	
+
 	return;
 }

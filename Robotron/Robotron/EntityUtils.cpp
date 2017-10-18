@@ -6,6 +6,7 @@
 #include "GLPrimitives.h"
 #include "Scene.h"
 #include "Entity.h"
+#include "ModelUtils.h"
 
 #include <glm\gtc\matrix_transform.hpp>
 
@@ -59,7 +60,7 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 	entity.model = GLPrimitives::getSphereModel();
 
 	// Replace default texture
-	entity.model.materials.at(0).textures.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;
@@ -80,7 +81,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.model = GLPrimitives::getSphereModel();
 
 	// Replace default texture
-	entity.model.materials.at(0).textures.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture2.jpg");
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture2.jpg");
 
 	entity.inputMap = {};
 	entity.inputMap.mouseInputEnabled = false;
@@ -162,13 +163,21 @@ Entity& EntityUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm:
 {
 	Entity& entity = scene.createEntity();
 
-	entity.componentMask = COMPONENT_CAMERA | COMPONENT_TRANSFORM;
+	entity.componentMask = COMPONENT_INPUT_MAP | COMPONENT_INPUT | COMPONENT_CAMERA | COMPONENT_TRANSFORM;
 
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.005f;
 	entity.controlVars.worldSpaceMove = false;
 
 	entity.transform = glm::inverse(glm::lookAt(pos, center, up));
+
+	entity.inputMap.mouseInputEnabled = true;
+	entity.inputMap.forwardBtnMap = GLFW_KEY_W;
+	entity.inputMap.leftBtnMap = GLFW_KEY_A;
+	entity.inputMap.backwardBtnMap = GLFW_KEY_S;
+	entity.inputMap.rightBtnMap = GLFW_KEY_D;
+	entity.inputMap.downBtnMap = GLFW_KEY_Q;
+	entity.inputMap.upBtnMap = GLFW_KEY_E;
 
 	return entity;
 }
@@ -184,8 +193,21 @@ Entity& EntityUtils::createSkybox(Scene& scene, const std::vector<std::string>& 
 	// Replace default material
 	entity.model.materials.at(0) = {};
 	entity.model.materials.at(0).shader = GLUtils::getSkyboxShader();
-	entity.model.materials.at(0).textures.push_back(GLUtils::loadCubeMap(faceFilenames));
+	entity.model.materials.at(0).colorMaps.push_back(GLUtils::loadCubeMap(faceFilenames));
 	entity.model.materials.at(0).willDrawDepth = false;
+
+	return entity;
+}
+
+Entity & EntityUtils::createModel(Scene& scene, const std::string& path, const glm::mat4& transform)
+{
+	Entity& entity = scene.createEntity();
+
+	entity.componentMask = COMPONENT_MODEL | COMPONENT_TRANSFORM;
+
+	entity.model = ModelUtils::loadModel(path);
+
+	entity.transform = transform;
 
 	return entity;
 }
