@@ -17,6 +17,7 @@
 #include "GLMUtils.h"
 #include "Utils.h"
 #include "Scene.h"
+#include "RenderSystem.h"
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -36,6 +37,8 @@ glm::vec3 seek(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 cu
 
 	// Determine the steering vector from the current veloctiy to the desired velocity.
 	glm::vec3 steering = desiredVelocity - currentVelocity;
+
+	RenderSystem::drawDebugArrow(currentPosition, desiredVelocity, glm::length(desiredVelocity) * 100);
 	
 	return steering;
 }
@@ -57,6 +60,8 @@ glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, g
 
 	// Determine the steering vector from the current veloctiy to the desired velocity.
 	glm::vec3 steering = desiredVelocity - currentVelocity;
+
+	RenderSystem::drawDebugArrow(currentPosition, desiredVelocity, glm::length(desiredVelocity) * 100);
 
 	return steering;
 }

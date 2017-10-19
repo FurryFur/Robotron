@@ -20,6 +20,7 @@
 #include "Entity.h"
 #include "UniformFormat.h"
 #include "EntityUtils.h"
+#include "ModelUtils.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\gtc\matrix_transform.hpp>
@@ -29,32 +30,29 @@ using glm::mat4;
 using glm::vec3;
 using glm::vec4;
 
-RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
-	: m_glContext{ glContext }
-	, m_scene{ scene }
-	, m_uniformBindingPoint{ 0 }
-	, m_shaderParamsBindingPoint{ 1 }
-{
-	// Create buffer for camera parameters
-	glGenBuffers(1, &m_uboUniforms);
-	glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBindingPoint, m_uboUniforms);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformFormat), nullptr, GL_DYNAMIC_DRAW);
+RenderState RenderSystem::s_renderState;
 
-	// Create buffer for shader parameters
-	glGenBuffers(1, &m_uboShaderParams);
-	glBindBufferBase(GL_UNIFORM_BUFFER, m_shaderParamsBindingPoint, m_uboShaderParams);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ShaderParams), nullptr, GL_DYNAMIC_DRAW);
+RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
+	: m_scene{ scene }
+{
+	m_renderState.glContext = glContext;
+	m_renderState.uniformBindingPoint = 0;
+
+	// Create buffer for uniforms
+	glGenBuffers(1, &m_renderState.uboUniforms);
+	glBindBufferBase(GL_UNIFORM_BUFFER, m_renderState.uniformBindingPoint, m_renderState.uboUniforms);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformFormat), nullptr, GL_DYNAMIC_DRAW);
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
-void RenderSystem::drawDebugArrow(Scene& scene, const glm::vec3& base, const glm::vec3& tip)
+void RenderSystem::drawDebugArrow(const glm::vec3& base, const glm::vec3& tip)
 {
 	vec3 direction = tip - base;
-	drawDebugArrow(scene, base, direction, glm::length(direction));
+	drawDebugArrow(base, direction, glm::length(direction));
 }
 
-void RenderSystem::drawDebugArrow(Scene& scene, const glm::vec3& base, const glm::vec3& _direction, float magnitude)
+void RenderSystem::drawDebugArrow(const glm::vec3& base, const glm::vec3& _direction, float magnitude)
 {
 	mat4 transform;
 	vec3 direction = glm::normalize(_direction);
@@ -71,11 +69,16 @@ void RenderSystem::drawDebugArrow(Scene& scene, const glm::vec3& base, const glm
 	transform[2] = vec4(glm::normalize(glm::cross(vec3(transform[0]), direction)), 1);
 	transform[3] = vec4(base, 1);
 
-	mat4 scale = glm::scale({}, vec3(1, magnitude, 1));
+	transform *= glm::scale({}, vec3(1, magnitude, 1));
 
-	Entity& entity = EntityUtils::createModel(scene, "Assets/Models/red_arrow/red_arrow.obj", transform * scale);
-	entity.componentMask |= COMPONENT_DEBUG;
-	//EntityUtils::createModel(scene, "path to debug arrow", orientation * scale);
+	ModelComponent& model = ModelUtils::loadModel("Assets/Models/red_arrow/red_arrow.obj");
+
+	// Can't render anything without a camera set
+	if (!s_renderState.cameraEntity) {
+		return;
+	}
+
+	renderModel(model, transform);
 }
 
 void RenderSystem::beginRender()
@@ -86,41 +89,66 @@ void RenderSystem::beginRender()
 
 void RenderSystem::endRender()
 {
-	glfwSwapBuffers(m_glContext);
+	glfwSwapBuffers(m_renderState.glContext);
 }
 
-void RenderSystem::update(Entity& entity)
+void RenderSystem::update(const Entity& entity)
 {
-	// Can't render anything without a camera set
-	if (!m_cameraEntity) {
-		return;
-	}
-
 	// Filter renderable entities
 	const size_t kRenderableMask = COMPONENT_MODEL;
 	if ((entity.componentMask & kRenderableMask) != kRenderableMask)
 		return;
 
-	const mat4& cameraTransform = m_cameraEntity->transform;
+	// Can't render anything without a camera set
+	if (!m_renderState.cameraEntity) {
+		return;
+	}
+
+	bool hasTransform = entity.hasAllComponents(COMPONENT_TRANSFORM);
+
+	// Swap the current global render state with this RenderSystems state.
+	s_renderState = m_renderState;
+
+	// Render the 
+	renderModel(entity.model, entity.transform);
+}
+
+void RenderSystem::setCamera(const Entity* entity)
+{
+	m_renderState.cameraEntity = entity;
+}
+
+void RenderSystem::setEnvironmentMap(const Entity& entity)
+{
+	// Take the first texture on the entity as the environment map
+	// TODO: Do some error checking here to make sure this is actually
+	// a cube map and we don't get index out of bounds.
+	m_renderState.environmentMap = entity.model.materials.at(0).colorMaps.at(0).id;
+	m_renderState.hasEnvironmentMap = true;
+}
+
+void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& transform)
+{
+	const mat4& cameraTransform = s_renderState.cameraEntity->transform;
 
 	// Get Aspect ratio
 	int width, height;
-	glfwGetFramebufferSize(m_glContext, &width, &height);
+	GLFWwindow* glContext = glfwGetCurrentContext();
+	glfwGetFramebufferSize(glContext, &width, &height);
 	float aspectRatio = static_cast<float>(width) / height;
 
 	// Get model, view and projection matrices
 	UniformFormat uniforms;
-	bool hasTransform = (entity.componentMask & COMPONENT_TRANSFORM) == COMPONENT_TRANSFORM;
-	uniforms.model = hasTransform ? entity.transform : glm::mat4{ 1 };
+	
+	uniforms.model = transform;
 	uniforms.view = glm::inverse(cameraTransform);
 	uniforms.projection = glm::perspective(glm::radians(60.0f), aspectRatio, 0.5f, 100.0f);
 	uniforms.cameraPos = cameraTransform[3];
 
 	// Loop over all the meshes in the model
-	ModelComponent& model = entity.model;
 	for (size_t i = 0; i < model.meshes.size(); ++i) {
-		Mesh& mesh = model.meshes.at(i);
-		Material& material = model.materials.at(mesh.materialIndex);
+		const Mesh& mesh = model.meshes.at(i);
+		const Material& material = model.materials.at(mesh.materialIndex);
 
 		// Tell the gpu what shader to use
 		glUseProgram(material.shader);
@@ -139,7 +167,7 @@ void RenderSystem::update(Entity& entity)
 		// TODO: Send all textures to the GPU, not just 1
 		GLuint textureUnit = 0;
 		for (size_t j = 0; j < material.colorMaps.size(); ++j) {
-			Texture& texture = material.colorMaps.at(j);
+			const Texture& texture = material.colorMaps.at(j);
 			glActiveTexture(GL_TEXTURE0 + textureUnit);
 			glUniform1i(glGetUniformLocation(material.shader, "sampler"), 0);
 			glBindTexture(texture.target, texture.id);
@@ -150,46 +178,25 @@ void RenderSystem::update(Entity& entity)
 		}
 
 		// Set environment map to use on GPU
-		if (m_isEnvironmentMap) {
+		if (s_renderState.hasEnvironmentMap) {
 			glActiveTexture(GL_TEXTURE0 + textureUnit);
 			glUniform1i(glGetUniformLocation(material.shader, "environmentSampler"), 1);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, m_environmentMap);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, s_renderState.environmentMap);
 		}
 
-		// Send shader parameters to gpu
+		// Set shader parameters
 		// TODO: Remove these and use texture maps instead
-		GLuint blockIndex;
-		blockIndex = glGetUniformBlockIndex(material.shader, "ShaderParams");
-		glUniformBlockBinding(material.shader, blockIndex, m_shaderParamsBindingPoint);
-		glBindBufferBase(GL_UNIFORM_BUFFER, m_shaderParamsBindingPoint, m_uboShaderParams);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ShaderParams), &material.shaderParams);
+		uniforms.metallicness = material.shaderParams.metallicness;
+		uniforms.glossiness = material.shaderParams.glossiness;
 
-		// Send the model view and projection matrices to the gpu
-		// TODO: Rename Uniforms to better represent its purpos (MVP matrices + camera position)
-		blockIndex = glGetUniformBlockIndex(material.shader, "Uniforms");
-		glUniformBlockBinding(material.shader, blockIndex, m_uniformBindingPoint);
-		glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBindingPoint, m_uboUniforms);
+		// Send uniform data to the GPU (MVP matrices, cameraPos and shaderParams)
+		GLuint blockIndex = glGetUniformBlockIndex(material.shader, "Uniforms");
+		glUniformBlockBinding(material.shader, blockIndex, s_renderState.uniformBindingPoint);
+		glBindBufferBase(GL_UNIFORM_BUFFER, s_renderState.uniformBindingPoint, s_renderState.uboUniforms);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(UniformFormat), &uniforms);
 
 		// Render the mesh
 		glBindVertexArray(mesh.VAO);
 		glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
 	}
-
-	if (entity.hasAllComponents(COMPONENT_DEBUG))
-		m_scene.destroyEntity(entity);
-}
-
-void RenderSystem::setCamera(const Entity* entity)
-{
-	m_cameraEntity = entity;
-}
-
-void RenderSystem::setEnvironmentMap(const Entity& entity)
-{
-	// Take the first texture on the entity as the environment map
-	// TODO: Do some error checking here to make sure this is actually
-	// a cube map and we don't get index out of bounds.
-	m_environmentMap = entity.model.materials.at(0).colorMaps.at(0).id;
-	m_isEnvironmentMap = true;
 }

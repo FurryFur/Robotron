@@ -4,18 +4,20 @@ layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 inNormal;
 layout (location = 2) in vec2 inTexCoord;
 
-layout (std140) uniform Uniforms {
-    mat4 model;
-    mat4 view;
-    mat4 projection;
-	vec4 cameraPos;
-} u;
-
 out VertexData {
     vec3 normal;
     vec2 texCoord;
 	vec3 viewDir;
 } o;
+
+layout (std140) uniform Uniforms {
+    mat4 model;
+    mat4 view;
+    mat4 projection;
+	vec4 cameraPos;
+	float metallicness;
+	float glossiness;
+} u;
 
 void main()
 {

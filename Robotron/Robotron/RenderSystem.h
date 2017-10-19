@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "RenderState.h"
+
 #include <glad\glad.h>
 #include <glm\glm.hpp>
 
@@ -21,6 +23,7 @@
 struct Scene;
 struct GLFWwindow;
 struct Entity;
+struct ModelComponent;
 
 class RenderSystem {
 public:
@@ -31,39 +34,35 @@ public:
 	// Draws a debugging arrow
 	// This object will only be drawn once.
 	// To keep or update the arrow, drawDebugArrow must be called every frame.
-	static void drawDebugArrow(Scene&, const glm::vec3& base, const glm::vec3& tip);
+	static void drawDebugArrow(const glm::vec3& base, const glm::vec3& tip);
 
 	// Draws a debugging arrow
 	// This object will only be drawn once.
 	// To keep or update the arrow, drawDebugArrow must be called every frame.
-	static void drawDebugArrow(Scene&, const glm::vec3& base, const glm::vec3& direction, float magnitude);
+	static void drawDebugArrow(const glm::vec3& base, const glm::vec3& direction, float magnitude);
 
 	// Starts rendering the frame.
 	// Should be called before update.
 	void beginRender();
 
 	// Renders an entity.
-	void update(Entity&);
+	void update(const Entity&);
 
 	// Ends the frame.
 	void endRender();
 
 	// Sets the current camera.
+	// Also sets the static debug camera for debug drawing.
 	void setCamera(const Entity*);
 
 	// Sets the environment map for reflections
 	void setEnvironmentMap(const Entity&);
 
 private:
-	GLFWwindow* m_glContext;
-	Scene& m_scene;
-	const Entity* m_cameraEntity;
-	GLuint m_uboUniforms;
-	GLuint m_uboShaderParams;
-	GLuint m_uniformBindingPoint;
-	GLuint m_shaderParamsBindingPoint;
+	static void renderModel(const ModelComponent&, const glm::mat4& transform);
 
-	// Handler to a cube map on the GPU, used for reflections and environmental lighting
-	GLuint m_environmentMap;
-	bool m_isEnvironmentMap;
+	static RenderState s_renderState;
+	RenderState m_renderState;
+
+	Scene& m_scene;
 };
