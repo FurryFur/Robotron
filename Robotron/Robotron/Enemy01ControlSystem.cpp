@@ -90,11 +90,11 @@ void Enemy01ControlSystem::update(Entity& entity)
 		Acc = wander(entity);
 
 	// Limit the steering acceleration.
-	if (glm::length(Acc) > 0.02f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.02f);
+	if (glm::length(Acc) > 0.002f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.002f);
 
 	// Add the acceleration to the velocity.
-	glm::vec4 newVelocity = glm::vec4{ entity.physics.velocity.x + Acc.x, 0, entity.physics.velocity.z + Acc.z, 0 };
+	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x, 0, entity.physics.velocity.z + Acc.z};
 	entity.physics.velocity += Acc;
 
 	//TODO: ADD FLOCKING CODE HERE
@@ -107,7 +107,7 @@ void Enemy01ControlSystem::update(Entity& entity)
 	RenderSystem::drawDebugArrow(position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
 	//RenderSystem::drawDebugArrow(m_scene, position, desiredVelocity, glm::length(desiredVelocity) * kDebugScale);
 
-	glm::vec4 newPosition = entity.transform[3] + newVelocity;
+	glm::vec4 newPosition = entity.transform[3] + glm::vec4{ newVelocity, 0 };
 	if (newPosition.x > 20.0f || newPosition.x < -20.0f)
 	{
 		newVelocity.x *= -1;
@@ -116,12 +116,13 @@ void Enemy01ControlSystem::update(Entity& entity)
 
 	if (newPosition.z > 20.0f || newPosition.z < -20.0f)
 	{
-		newVelocity.z = -newVelocity.z;
+		newVelocity.z *= -1;
 		entity.physics.wanderPosition.z *= -1;
 	}
 
 	// Add the velocity to the position of the enemy.
-	entity.transform[3] += newVelocity;
+	entity.physics.velocity = newVelocity;
+	entity.transform[3] += glm::vec4{ entity.physics.velocity, 0 };
 
 	return;
 }

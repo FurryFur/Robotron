@@ -222,7 +222,7 @@ glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition
 	glm::vec3 separation = computeSeparation(nearbyNeighbours, currentPosition);
 
 	// Determine the steering acceleration from the current veloctiy to the desired velocity.
-	glm::vec3 flockVelocity = alignment + cohesion + glm::vec3{ separation.x * 2, separation.y * 2, separation.z * 2 };
+	glm::vec3 flockVelocity = alignment + (cohesion * 0.5f) + separation;
 
 	// Seek to the flock position only if that position is not current position.
 	if (flockVelocity != glm::vec3{ 0,0,0 })
