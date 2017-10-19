@@ -61,7 +61,8 @@ void PlayerControlSystem::update(Entity& entity)
 	glm::vec3 axis = GLMUtils::limitVec(entity.input.axis, 1);
 	if (!entity.controlVars.worldSpaceMove)
 		axis = entity.transform * glm::vec4{ axis, 0 }; // Convert movement to local coordinates
-	pos += moveSpeed * axis;
+	entity.physics.velocity = moveSpeed * axis;
+	pos += entity.physics.velocity;
 
 	// Rotation
 	// Prevent elevation going past 90 degrees
