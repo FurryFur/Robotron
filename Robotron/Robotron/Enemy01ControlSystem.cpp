@@ -24,15 +24,12 @@
 #include "Entity.h"
 #include "RenderSystem.h"
 
-#include <glm\glm.hpp>
-#include <glm\gtc\matrix_transform.hpp>
-#include <glm\gtx\rotate_vector.hpp>
-
 #include <cmath>
 
 Enemy01ControlSystem::Enemy01ControlSystem(Scene& scene)
 	: m_scene{ scene }
 {
+
 }
 
 //the ai movement behavious for enemy01s
@@ -90,7 +87,7 @@ void Enemy01ControlSystem::update(Entity& entity)
 	}
 	// If the seek returns 0 then wander.
 	else
-		Acc = wander(currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+		Acc = wander(entity);
 
 	// Limit the steering acceleration.
 	if (glm::length(Acc) > 0.02f)
@@ -109,6 +106,19 @@ void Enemy01ControlSystem::update(Entity& entity)
 	RenderSystem::drawDebugArrow(position, position + entity.physics.velocity * kDebugScale);
 	RenderSystem::drawDebugArrow(position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
 	//RenderSystem::drawDebugArrow(m_scene, position, desiredVelocity, glm::length(desiredVelocity) * kDebugScale);
+
+	glm::vec4 newPosition = entity.transform[3] + newVelocity;
+	if (newPosition.x > 20.0f || newPosition.x < -20.0f)
+	{
+		newVelocity.x *= -1;
+		entity.physics.wanderPosition.x *= -1;
+	}
+
+	if (newPosition.z > 20.0f || newPosition.z < -20.0f)
+	{
+		newVelocity.z = -newVelocity.z;
+		entity.physics.wanderPosition.z *= -1;
+	}
 
 	// Add the velocity to the position of the enemy.
 	entity.transform[3] += newVelocity;

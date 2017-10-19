@@ -78,40 +78,48 @@ glm::vec3 pursue(glm::vec3 targetPosition, glm::vec3 targetVelocity, float trage
 }
 
 // Returns an acceleration to move to a random position forward from the current position.
-glm::vec3 wander(glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+glm::vec3 wander(Entity& entity)
 {
-	// Only change wandering with a 5% chance.
-	if (randomInt(0, 50) != 1)
-		return{ 0, 0, 0 };
+	glm::vec3 currentPosition = entity.transform[3];
+	glm::vec3 currentVelocity = entity.physics.velocity;
+	float moveSpeed = entity.controlVars.moveSpeed / 2;
 
-	// Reduce the movement speed whilst wandering.
-	moveSpeed = moveSpeed / 2;
+	glm::vec3 targetPosition = entity.physics.wanderPosition;
 
 	// If stationary, move in a random direction.
 	if (currentVelocity.x == 0 && currentVelocity.z == 0)
 	{
 		currentVelocity.x = randomReal<float>(-moveSpeed, moveSpeed);
 		currentVelocity.z = sqrt(pow(moveSpeed, 2) - pow(currentVelocity.x, 2));
+		targetPosition = glm::vec3{ (currentPosition.x + currentVelocity.x), currentPosition.y
+			                      , (currentPosition.z + currentVelocity.z)};
 	}
-
-	float radius = 0.2f;
-	float a = randomReal<float>(0.0f, 1.0f);
-	float b = randomReal<float>(0.0f, 1.0f);
-	if (b < a)
+	// 1/50 chance to create a new position to wander to.
+	if (randomInt(0, 50) == 1 || (glm::length(targetPosition - currentPosition) <= 2))
 	{
-		float c = a;
-		a = b;
-		b = c;
+		float radius = 4.0f;
+		float a = randomReal<float>(0.0f, 1.0f);
+		float b = randomReal<float>(0.0f, 1.0f);
+		if (b < a)
+		{
+			float c = a;
+			a = b;
+			b = c;
+		}
+
+		float randomX = (b * radius * cos(2 * 3.14f * a / b));
+		float randomZ = (b * radius * sin(2 * 3.14f * a / b));
+
+		glm::vec3 newMaximumVelocity = (currentVelocity / glm::length(currentVelocity)) * moveSpeed * 100.0f;
+
+		targetPosition = { (currentPosition.x + newMaximumVelocity.x + randomX)
+									, currentPosition.y
+									,(currentPosition.z + newMaximumVelocity.z + randomZ) };
+
+		entity.physics.wanderPosition = targetPosition;
 	}
 
-	float randomX = (b * radius * cos(2 * 3.14f * a / b));
-	float randomZ = (b * radius * sin(2 * 3.14f * a / b));
-
-	glm::vec3 targetPosition = { (currentPosition.x + currentVelocity.x + randomX)
-								, currentPosition.y
-								,(currentPosition.z + currentVelocity.z + randomZ)};
-
-	return seek(targetPosition, currentPosition, currentVelocity, moveSpeed);
+	return seekWithArrival(targetPosition, currentPosition, currentVelocity, moveSpeed);
 }
 
 // Compute the alignment section of flocking
