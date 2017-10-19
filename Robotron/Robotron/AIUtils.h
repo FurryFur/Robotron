@@ -114,6 +114,7 @@ glm::vec3 wander(glm::vec3 currentPosition, glm::vec3 currentVelocity, float mov
 	return seek(targetPosition, currentPosition, currentVelocity, moveSpeed);
 }
 
+// Compute the alignment section of flocking
 glm::vec3 computeAlignment(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentVelocity)
 {
 	int neighbourCount = 0;
@@ -141,7 +142,7 @@ glm::vec3 computeAlignment(std::vector<Entity*> nearbyNeighbours, glm::vec3 curr
 	return (averageVelocity / glm::length(averageVelocity));
 }
 
-
+// Compute the seperation cohesion of flocking
 glm::vec3 computeCohesion(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition)
 {
 	int neighbourCount = 0;
@@ -173,6 +174,7 @@ glm::vec3 computeCohesion(std::vector<Entity*> nearbyNeighbours, glm::vec3 curre
 	return (averagePosition / glm::length(averagePosition));
 }
 
+// Compute the seperation section of flocking
 glm::vec3 computeSeparation(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition)
 {
 	int neighbourCount = 0;
@@ -204,6 +206,7 @@ glm::vec3 computeSeparation(std::vector<Entity*> nearbyNeighbours, glm::vec3 cur
 	return (averageVelocity / glm::length(averageVelocity));
 }
 
+//Returns an acceleration that allows the ojbect to flock with its nearest neighbours
 glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
 {
 	glm::vec3 alignment = computeAlignment(nearbyNeighbours, currentVelocity);
@@ -213,6 +216,7 @@ glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition
 	// Determine the steering acceleration from the current veloctiy to the desired velocity.
 	glm::vec3 flockVelocity = alignment + cohesion + glm::vec3{ separation.x * 2, separation.y * 2, separation.z * 2 };
 
+	// Seek to the flock position only if that position is not current position.
 	if (flockVelocity != glm::vec3{ 0,0,0 })
 	{
 		glm::vec3 targetPosition = currentPosition + flockVelocity;
@@ -220,4 +224,21 @@ glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition
 	}
 	else
 		return{ 0,0,0 };
+}
+
+glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::vec3 targetPreviousVelocity, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+{
+	// Generate a vector in the opposite direction the target is heading.
+	glm::vec2 tv;
+	if (targetVelocity != glm::vec3{ 0,0,0 })
+		tv = glm::vec2{ targetVelocity.x * -1.0f , targetVelocity.z * -1.0f };
+	else
+		tv = glm::vec2{ targetPreviousVelocity.x * -1.0f , targetPreviousVelocity.z * -1.0f };
+	// Change its length to be equal to the desired follow distance.
+	tv = (tv / glm::length(tv)) * 2.0f;
+	// Find the position to follow.
+	glm::vec3 followPosition = glm::vec3{ targetPosition.x + tv.x, targetPosition.y, targetPosition.z + tv.y };
+
+	//Seek to that point
+	return seekWithArrival(followPosition, currentPosition, currentVelocity, moveSpeed);
 }

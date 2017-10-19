@@ -45,6 +45,7 @@ void Enemy01ControlSystem::update(Entity& entity)
 	// Set the target position out of scope.
 	glm::vec3 targetPosition  = glm::vec3{100, 100, 100};
 	glm::vec3 targetVelocity;
+	glm::vec3 targetPreviousVelocity;
 	float targetMoveSpeed;
 	glm::vec3 currentPosition = glm::vec3{ entity.transform[3].x,  entity.transform[3].y,  entity.transform[3].z};
 	bool targetFound = false;
@@ -58,6 +59,7 @@ void Enemy01ControlSystem::update(Entity& entity)
 		{
 			targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z};
 			targetVelocity = m_scene.entities.at(i)->physics.velocity;
+			targetPreviousVelocity = m_scene.entities.at(i)->physics.previousVelocity;
 			targetMoveSpeed = m_scene.entities.at(i)->controlVars.moveSpeed;
 			targetFound = true;
 		}
@@ -67,9 +69,9 @@ void Enemy01ControlSystem::update(Entity& entity)
 	// Apply the seek and flock AI if target aquired.
 	if (targetFound)
 	{
-		// Add a seek acceleration to the culmative acceleration.
-		//Acc = seekWithArrival(targetPosition, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+		// Add a pursue acceleration to the culmative acceleration.
 		Acc = pursue(targetPosition, targetVelocity, targetMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+		//Acc = followLeader(targetPosition, targetVelocity, targetPreviousVelocity, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
 		// Find all the closest Enemy01 neighbours and store them in a vector.
