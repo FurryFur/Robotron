@@ -2,16 +2,18 @@
 
 layout (location = 0) in vec3 inPosition;
 
+out VertexData {
+    vec3 textureDir;
+} o;
+
 layout (std140) uniform Uniforms {
     mat4 model;
     mat4 view;
     mat4 projection;
 	vec4 cameraPos;
+	float metallicness;
+	float glossiness;
 } u;
-
-out VertexData {
-    vec3 textureDir;
-} o;
 
 void main()
 {

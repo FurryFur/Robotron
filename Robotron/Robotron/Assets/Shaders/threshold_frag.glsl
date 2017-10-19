@@ -6,12 +6,16 @@ in VertexData {
 	vec3 viewDir;
 } i;
 
-layout (std140) uniform ShaderParams {
+out vec4 outColor;
+
+layout (std140) uniform Uniforms {
+    mat4 model;
+    mat4 view;
+    mat4 projection;
+	vec4 cameraPos;
 	float metallicness;
 	float glossiness;
-} p;
-
-out vec4 outColor;
+} u;
 
 uniform sampler2D sampler;
 uniform samplerCube environmentSampler;
@@ -46,11 +50,11 @@ void main(void)
 	
 	//vec3 LiRefl = texture(environmentSampler, LiReflDir).rgb;
 	
-	float specPow = p.glossiness;
+	float specPow = u.glossiness;
 	float specNorm = (specPow + 4) * (specPow + 2) / (8 * PI * (specPow + pow(2, -specPow / 2)));
-	vec3 BRDFdiff = (1 - p.metallicness) * kDiffNorm * color;
-	vec3 BRDFspec = p.metallicness * specNorm * color * pow(ndoth, specPow);
-	// vec3 BRDFrefl = p.metallicness * specNorm * color; // n dot hrefl is always 1
+	vec3 BRDFdiff = (1 - u.metallicness) * kDiffNorm * color;
+	vec3 BRDFspec = u.metallicness * specNorm * color * pow(ndoth, specPow);
+	// vec3 BRDFrefl = u.metallicness * specNorm * color; // n dot hrefl is always 1
 	vec3 BRDFdirect = BRDFdiff + BRDFspec;
 
 	//vec3 LrRefl = LiRefl * BRDFrefl * ndotRl;

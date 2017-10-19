@@ -204,7 +204,6 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /sy</Comm
     <ClInclude Include="Scene.h" />
     <ClInclude Include="EntityUtils.h" />
     <ClInclude Include="ShaderHelper.h" />
-    <ClInclude Include="ShaderParams.h" />
     <ClInclude Include="socket.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />

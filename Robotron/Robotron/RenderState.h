@@ -11,7 +11,5 @@ struct RenderState {
 	GLuint environmentMap;
 	bool hasEnvironmentMap;
 	GLuint uboUniforms;
-	GLuint uboShaderParams;
 	GLuint uniformBindingPoint;
-	GLuint shaderParamsBindingPoint;
 };

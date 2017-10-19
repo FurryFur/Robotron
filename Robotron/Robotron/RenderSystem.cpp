@@ -37,17 +37,11 @@ RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
 {
 	m_renderState.glContext = glContext;
 	m_renderState.uniformBindingPoint = 0;
-	m_renderState.shaderParamsBindingPoint = 1;
 
-	// Create buffer for camera parameters
+	// Create buffer for uniforms
 	glGenBuffers(1, &m_renderState.uboUniforms);
 	glBindBufferBase(GL_UNIFORM_BUFFER, m_renderState.uniformBindingPoint, m_renderState.uboUniforms);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformFormat), nullptr, GL_DYNAMIC_DRAW);
-
-	// Create buffer for shader parameters
-	glGenBuffers(1, &m_renderState.uboShaderParams);
-	glBindBufferBase(GL_UNIFORM_BUFFER, m_renderState.shaderParamsBindingPoint, m_renderState.uboShaderParams);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ShaderParams), nullptr, GL_DYNAMIC_DRAW);
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
@@ -190,17 +184,13 @@ void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& tra
 			glBindTexture(GL_TEXTURE_CUBE_MAP, s_renderState.environmentMap);
 		}
 
-		// Send shader parameters to gpu
+		// Set shader parameters
 		// TODO: Remove these and use texture maps instead
-		GLuint blockIndex;
-		blockIndex = glGetUniformBlockIndex(material.shader, "ShaderParams");
-		glUniformBlockBinding(material.shader, blockIndex, s_renderState.shaderParamsBindingPoint);
-		glBindBufferBase(GL_UNIFORM_BUFFER, s_renderState.shaderParamsBindingPoint, s_renderState.uboShaderParams);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ShaderParams), &material.shaderParams);
+		uniforms.metallicness = material.shaderParams.metallicness;
+		uniforms.glossiness = material.shaderParams.glossiness;
 
-		// Send the model view and projection matrices to the gpu
-		// TODO: Rename Uniforms to better represent its purpos (MVP matrices + camera position)
-		blockIndex = glGetUniformBlockIndex(material.shader, "Uniforms");
+		// Send uniform data to the GPU (MVP matrices, cameraPos and shaderParams)
+		GLuint blockIndex = glGetUniformBlockIndex(material.shader, "Uniforms");
 		glUniformBlockBinding(material.shader, blockIndex, s_renderState.uniformBindingPoint);
 		glBindBufferBase(GL_UNIFORM_BUFFER, s_renderState.uniformBindingPoint, s_renderState.uboUniforms);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(UniformFormat), &uniforms);
