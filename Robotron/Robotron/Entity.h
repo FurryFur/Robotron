@@ -17,8 +17,7 @@ enum ComponentMask {
 	COMPONENT_INPUT = 1 << 5,
 	COMPONENT_INPUT_MAP = 1 << 6,
 	COMPONENT_LOGIC = 1 << 7,
-	COMPONENT_ENEMY01 = 1 << 8,
-	COMPONENT_DEBUG = 1 << 9
+	COMPONENT_ENEMY01 = 1 << 8
 };
 
 struct Entity
@@ -37,14 +36,14 @@ struct Entity
 	Entity(const Entity&) = delete;
 
 	// Overload equality to check identity equivalence
-	bool operator==(const Entity& rhs);
+	bool operator==(const Entity& rhs) const;
 
 	// Returns true if ALL the components in the supplied component 
 	// mask are present in the entity.
-	bool hasAllComponents(size_t componentMask);
+	bool hasAllComponents(size_t componentMask) const;
 
 	// Returns true if ANY of the components in the supplied component
 	// mask are presnet in the entity.
-	bool hasAnyComponent(size_t componentMaks);
+	bool hasAnyComponent(size_t componentMaks) const;
 };
 

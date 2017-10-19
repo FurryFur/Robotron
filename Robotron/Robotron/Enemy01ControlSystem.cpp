@@ -99,8 +99,8 @@ void Enemy01ControlSystem::update(Entity& entity)
 
 	const float kDebugScale = 100;
 	glm::vec3 position = glm::vec3(entity.transform[3]);
-	RenderSystem::drawDebugArrow(m_scene, position, position + entity.physics.velocity * kDebugScale);
-	RenderSystem::drawDebugArrow(m_scene, position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
+	RenderSystem::drawDebugArrow(position, position + entity.physics.velocity * kDebugScale);
+	RenderSystem::drawDebugArrow(position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
 	//RenderSystem::drawDebugArrow(m_scene, position, desiredVelocity, glm::length(desiredVelocity) * kDebugScale);
 
 	// Add the velocity to the position of the enemy.
