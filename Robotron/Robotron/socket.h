@@ -25,7 +25,7 @@ namespace std {
 	struct hash<sockaddr_in> {
 		size_t operator()(const sockaddr_in& address) const
 		{
-			unsigned long long key = address.sin_addr.S_un.S_addr << sizeof(address.sin_port);
+			unsigned long long key = address.sin_addr.S_un.S_addr << sizeof(address.sin_port) * 8;
 			key |= address.sin_port;
 			return std::hash<unsigned long long>{}(key);
 		}
