@@ -2,6 +2,8 @@
 
 #include "socket.h"
 
+#include <vector>
+
 struct Scene;
 struct Packet;
 struct Entity;
@@ -18,6 +20,6 @@ protected:
 	bool receiveData(Packet&);
 
 	CSocket m_socket;
-	//CSocket m_socket2; // TODO: Remove temporary receive socket
 	Scene& m_scene;
+	std::vector<Entity*> m_netEntities;
 };

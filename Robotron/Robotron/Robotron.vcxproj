@@ -193,6 +193,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /sy</Comm
     <ClInclude Include="ModelComponent.h" />
     <ClInclude Include="ModelUtils.h" />
     <ClInclude Include="NetworkClientSystem.h" />
+    <ClInclude Include="NetworkComponent.h" />
     <ClInclude Include="NetworkServerSystem.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PhysicsComponent.h" />

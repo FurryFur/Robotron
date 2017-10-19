@@ -21,7 +21,7 @@
 
 struct Scene {
 public:
-	Entity& createEntity();
+	Entity& createEntity(size_t componentMask);
 	void destroyEntity(Entity&);
 
 	// TODO: Change this to be a vector of 'observable' entities
