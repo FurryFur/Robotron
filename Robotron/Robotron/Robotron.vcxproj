@@ -212,6 +212,8 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /sy</Comm
     <ClInclude Include="VertexFormat.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\debug_frag.glsl" />
+    <None Include="Assets\Shaders\debug_vert.glsl" />
     <None Include="Assets\Shaders\default_frag.glsl" />
     <None Include="Assets\Shaders\default_vert.glsl" />
     <None Include="Assets\Shaders\skybox_frag.glsl" />

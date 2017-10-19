@@ -18,6 +18,7 @@
 #include "Texture.h"
 
 #include <glad\glad.h>
+#include <glm\glm.hpp>
 
 #include <vector>
 
@@ -31,4 +32,5 @@ struct Material {
 	std::vector<Texture> heightMaps;
 	std::vector<Texture> displacementMaps;
 	bool willDrawDepth;
+	glm::vec3 debugColor;
 };

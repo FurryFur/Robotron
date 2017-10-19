@@ -46,13 +46,15 @@ RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
-void RenderSystem::drawDebugArrow(const glm::vec3& base, const glm::vec3& tip)
+void RenderSystem::drawDebugArrow(const glm::vec3& base, const glm::vec3& tip,
+	const glm::vec3& color)
 {
 	vec3 direction = tip - base;
 	drawDebugArrow(base, direction, glm::length(direction));
 }
 
-void RenderSystem::drawDebugArrow(const glm::vec3& base, const glm::vec3& _direction, float magnitude)
+void RenderSystem::drawDebugArrow(const glm::vec3& base, const glm::vec3& _direction, 
+	float magnitude, const glm::vec3& color)
 {
 	mat4 transform;
 	vec3 direction = glm::normalize(_direction);
@@ -72,6 +74,10 @@ void RenderSystem::drawDebugArrow(const glm::vec3& base, const glm::vec3& _direc
 	transform *= glm::scale({}, vec3(1, magnitude, 1));
 
 	ModelComponent& model = ModelUtils::loadModel("Assets/Models/red_arrow/red_arrow.obj");
+	for (size_t i = 0; i < model.materials.size(); ++i) {
+		model.materials.at(i).shader = GLUtils::getDebugShader();
+		model.materials.at(i).debugColor = color;
+	}
 
 	// Can't render anything without a camera set
 	if (!s_renderState.cameraEntity) {
@@ -194,6 +200,10 @@ void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& tra
 		glUniformBlockBinding(material.shader, blockIndex, s_renderState.uniformBindingPoint);
 		glBindBufferBase(GL_UNIFORM_BUFFER, s_renderState.uniformBindingPoint, s_renderState.uboUniforms);
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(UniformFormat), &uniforms);
+		if (material.shader == GLUtils::getDebugShader()) {
+			const glm::vec3& debugColor = material.debugColor;
+			glUniform3f(glGetUniformLocation(material.shader, "debugColor"), debugColor.r, debugColor.g, debugColor.b);
+		}
 
 		// Render the mesh
 		glBindVertexArray(mesh.VAO);

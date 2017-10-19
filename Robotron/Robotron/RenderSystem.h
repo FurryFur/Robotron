@@ -34,12 +34,14 @@ public:
 	// Draws a debugging arrow
 	// This object will only be drawn once.
 	// To keep or update the arrow, drawDebugArrow must be called every frame.
-	static void drawDebugArrow(const glm::vec3& base, const glm::vec3& tip);
+	static void drawDebugArrow(const glm::vec3& base, const glm::vec3& tip,
+		const glm::vec3& color = glm::vec3(1, 0, 0));
 
 	// Draws a debugging arrow
 	// This object will only be drawn once.
 	// To keep or update the arrow, drawDebugArrow must be called every frame.
-	static void drawDebugArrow(const glm::vec3& base, const glm::vec3& direction, float magnitude);
+	static void drawDebugArrow(const glm::vec3& base, const glm::vec3& direction, 
+		float magnitude, const glm::vec3& color = glm::vec3(1, 0, 0));
 
 	// Starts rendering the frame.
 	// Should be called before update.
