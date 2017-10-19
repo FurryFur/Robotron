@@ -38,10 +38,9 @@ void NetworkServerSystem::beginFrame()
 void NetworkServerSystem::update(Entity& entity)
 {
 	// Detect object deletion
-	size_t id = entity.network.id;
+	int& id = entity.network.id;
 	bool isNewEntity = entity.network.isNewEntity;
-	bool existsInNetwork = id < m_netEntities.size() && m_netEntities.at(id);
-	if (entity.componentMask == COMPONENT_NONE || (isNewEntity && existsInNetwork)) {
+	if (entity.componentMask == COMPONENT_NONE) {
 		// Notify clients of deletion
 		// TODO: Add redundancy here, so that missed packets don't cause an
 		// object to NOT be removed on the client side.
@@ -55,16 +54,22 @@ void NetworkServerSystem::update(Entity& entity)
 
 	// Detect new entities
 	if (entity.hasAllComponents(COMPONENT_NETWORK) && isNewEntity) {
-		// Check for a free id
-		auto freeIt = std::find(m_netEntities.begin(), m_netEntities.end(), nullptr);
-		if (freeIt != m_netEntities.end()) {
-			// Assign the new entity a free id if found
-			entity.network.id = std::distance(m_netEntities.begin(), freeIt);
-			*freeIt = &entity;
-		} else {
-			// Otherwise assign the new entity a brand new id
-			entity.network.id = m_netEntities.size();
-			m_netEntities.push_back(&entity);
+		// Check if we can reuse the entities current id
+		if (0 <= id && id < m_netEntities.size())
+			// Reuse existing id from old entity
+			m_netEntities.at(id) = &entity;
+		else {
+			// Check for a free id
+			auto freeIt = std::find(m_netEntities.begin(), m_netEntities.end(), nullptr);
+			if (freeIt != m_netEntities.end()) {
+				// Assign the new entity a free id if found
+				entity.network.id = std::distance(m_netEntities.begin(), freeIt);
+				*freeIt = &entity;
+			} else {
+				// Otherwise assign the new entity a brand new id
+				entity.network.id = m_netEntities.size();
+				m_netEntities.push_back(&entity);
+			}
 		}
 
 		// Update state to reflect that this entity has been seen by the
@@ -74,6 +79,7 @@ void NetworkServerSystem::update(Entity& entity)
 		// Broadcast ghost entity creation command to clients
 		Packet packet;
 		packet.serialize(PACKET_TYPE_CREATE_GHOST, id, entity.transform);
+		broadcastToClients(packet);
 	}
 
 	if (entity.hasAllComponents(COMPONENT_NETWORK | COMPONENT_TRANSFORM)) {

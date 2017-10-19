@@ -23,13 +23,14 @@ void NetworkClientSystem::beginFrame()
 			Entity& entity = EntityUtils::createSphere(m_scene, packet.transform);
 
 			// Add entity to list of networked entities
-			if (packet.entityNetID > m_netEntities.size())
+			if (packet.entityNetID >= m_netEntities.size())
 				m_netEntities.resize(packet.entityNetID + 1);
 			m_netEntities.at(packet.entityNetID) = &entity;
 		}
 		if (packet.type == PACKET_TYPE_TRANSFORM) {
 			// TODO: Save snapshot somewhere to be interpolated to
-			m_netEntities.at(packet.entityNetID)->transform = packet.transform;
+			if (packet.entityNetID < m_netEntities.size() && m_netEntities.at(packet.entityNetID))
+				m_netEntities.at(packet.entityNetID)->transform = packet.transform;
 		}
 		if (packet.type == PACKET_TYPE_DESTROY) {
 			destroyIfExists(packet.entityNetID);

@@ -18,12 +18,12 @@ Entity& Scene::createEntity(size_t componentMask)
 		// Allocate memory for new entity
 		entities.push_back(std::make_unique<Entity>());
 		newEntity = entities.back().get();
+		newEntity->network.id = -1;
 	}
 
 	newEntity->componentMask = componentMask;
 
-	if (newEntity->hasAllComponents(COMPONENT_NETWORK))
-		newEntity->network.isNewEntity = true;
+	newEntity->network.isNewEntity = true;
 
 	return *newEntity;
 }

@@ -18,6 +18,25 @@
 #include <WS2tcpip.h>
 
 #include <string>
+#include <functional>
+
+namespace std {
+	template <>
+	struct hash<sockaddr_in> {
+		size_t operator()(const sockaddr_in& address) const
+		{
+			unsigned long long key = address.sin_addr.S_un.S_addr << sizeof(address.sin_port);
+			key |= address.sin_port;
+			return std::hash<unsigned long long>{}(key);
+		}
+	};
+}
+
+inline bool operator==(const sockaddr_in& lhs, const sockaddr_in& rhs)
+{
+	return lhs.sin_addr.S_un.S_addr == rhs.sin_addr.S_un.S_addr
+		&& lhs.sin_port == rhs.sin_port;
+}
 
 class CSocket
 {
