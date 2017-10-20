@@ -27,6 +27,11 @@ const vec3 lightDir = vec3(1, 1, -1);
 const vec3 LiDirect = vec3(0.64, 0.39, 0.31) * 4;
 const float kDiffNorm = 1 / PI;
 
+vec3 fresnel(vec3 specColor, vec3 lightDir, vec3 halfVector)
+{
+	return specColor + (1.0f - specColor) * pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5);
+}
+
 void main(void)
 {
 	vec3 normal;
@@ -47,21 +52,27 @@ void main(void)
 	vec3 LiReflDir = normalize(reflect(-viewDir, normal)); // The light direction that reflects directly into the camera
 	vec3 LiRefl = texture(reflectionSampler, LiReflDir).rgb;
 	float ndotRl = clamp(dot(LiReflDir, normal), 0, 1);
-	// vec3 LiReflHalfVec = normalize(LiReflDir + viewDir);
+	// vec3 LiReflHalfVec = normalize(LiReflDir + viewDir); // Same as normal
 	// float ndotRh = clamp(dot(normal, LiReflHalfVec), 0, 1);
 	float specPow = u.glossiness;
 	float specNorm = (specPow + 4) * (specPow + 2) / (8 * PI * (specPow + pow(2, -specPow / 2)));
 
 	vec3 metallicness = u.metallicness + texture(metallicnessSampler, i.texCoord).rgb;
-	vec3 BRDFdiff = (1 - metallicness) * kDiffNorm * color;
-	vec3 BRDFglob = (1 - metallicness) * color; // CubeMapGen already applies normalization for irradiance maps
-	vec3 BRDFspec = metallicness * specNorm * color * pow(ndoth, specPow);
-	vec3 BRDFreflSpec = metallicness * specNorm * color; // pow(ndotRh, specPow) is always 1 becuase the reflected half angle is always aligned with the normal
+	vec3 Cspec = metallicness * color;
+	vec3 Cdiff = (1 - metallicness) * color;
+	vec3 Fdirect = fresnel(Cspec, lightDir, halfVector);
+	vec3 Frefl = fresnel(Cspec, LiReflDir, normal);
+	vec3 CdiffDirect = Cdiff * (1 - Fdirect) / (1 - Cspec);
+	vec3 CdiffAmb = Cdiff * (1 - Frefl) / (1 - Cspec);
+	vec3 BRDFdiff = kDiffNorm * CdiffDirect;
+	vec3 BRDFglob = CdiffAmb; // CubeMapGen already applies normalization for irradiance maps
+	vec3 BRDFspec =  specNorm * Fdirect * pow(ndoth, specPow);
+	vec3 BRDFreflSpec = specNorm * Frefl; // pow(ndotRh, specPow) is always 1 becuase the reflected half angle is always aligned with the normal
 	vec3 BRDFdirect = BRDFdiff + BRDFspec;
 
 	vec3 LrDirect = LiDirect * BRDFdirect * ndotl;
 	vec3 LrGlobal = texture(irradianceSampler, normal).rgb * BRDFglob; // Assume ndotl has already been integrated in irradiance map
 	vec3 LrReflSpec = LiRefl * BRDFreflSpec * ndotRl;
 
-	outColor = vec4(LrDirect + LrGlobal + LrReflSpec, 1);
+	outColor = vec4(LrDirect + LrReflSpec + LrGlobal, 1);
 }
