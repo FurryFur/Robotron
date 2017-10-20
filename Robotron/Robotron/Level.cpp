@@ -1,5 +1,6 @@
 #include "Level.h"
 
+#include "Clock.h"
 #include "NetworkClientSystem.h"
 
 #include <iostream>
@@ -11,7 +12,11 @@ Level::Level(GLFWwindow* window, int levelNum)
 	, m_playerControlSystem(m_scene)
 	, m_inputSystem(window, m_scene)
 	, m_enemy01ControlSystem(m_scene)
+	, m_enemy02ControlSystem(m_scene)
 {
+
+	m_pClock.Process();
+
 	m_window = window;
 	m_levelNum = levelNum;
 
@@ -52,6 +57,21 @@ Level::Level(GLFWwindow* window, int levelNum)
 			glm::translate({}, glm::vec3{ randX, 0.0f, randZ }));
 	}
 
+	// Create enemy02s
+	for (unsigned int i = 0; i <= 10; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randX += 25;
+
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randZ += 25;
+
+		EntityUtils::createEnemy02(m_scene,
+			glm::translate({}, glm::vec3{ randX, 0.0f, randZ }), i);
+	}
+
 	// Create the skybox
 	Entity& skybox = EntityUtils::createSkybox(m_scene, {
 		"Assets/Textures/Skybox/right.jpg",
@@ -74,7 +94,18 @@ Level::~Level()
 {
 }
 
-void Level::process()
+void Level::executeOneFrame()
+{
+	float fDT = m_pClock.GetDeltaTick();
+	
+	process(fDT);
+
+	m_pClock.Process();
+
+	Sleep(1);
+}
+
+void Level::process(float deltaTick)
 {
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
@@ -87,7 +118,8 @@ void Level::process()
 		m_playerControlSystem.update(*m_scene.entities.at(i));
 		m_networkSystem->update(*m_scene.entities.at(i));
 		m_renderSystem.update(*m_scene.entities.at(i));
-		m_enemy01ControlSystem.update(*m_scene.entities.at(i));
+		m_enemy01ControlSystem.update(*m_scene.entities.at(i), deltaTick);
+		m_enemy02ControlSystem.update(*m_scene.entities.at(i), deltaTick);
 	}
 
 	// Do operations that should happen at the end of the frame.

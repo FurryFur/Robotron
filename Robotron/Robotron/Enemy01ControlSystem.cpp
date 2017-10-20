@@ -6,10 +6,13 @@
 //
 // (c) 2017 Media Design School
 //
-// Description  : A system which handles movement based on an
-//                entities input state.
-// Author       : Lance Chaney
-// Mail         : lance.cha7337@mediadesign.school.nz
+// Description  : A system which handles movement ai
+//                for Enemy01 enemy types. They
+//				  around the arena and pursue with
+//				  flocking the closest player in their
+//				  aggro range.
+// Author       : Jack Mair
+// Mail         : jack.mai7246@mediadesign.school.nz
 //
 
 #define _USE_MATH_DEFINES
@@ -24,6 +27,10 @@
 #include "Entity.h"
 #include "RenderSystem.h"
 
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm\gtx\rotate_vector.hpp>
+
 #include <cmath>
 
 Enemy01ControlSystem::Enemy01ControlSystem(Scene& scene)
@@ -33,7 +40,7 @@ Enemy01ControlSystem::Enemy01ControlSystem(Scene& scene)
 }
 
 //the ai movement behavious for enemy01s
-void Enemy01ControlSystem::update(Entity& entity)
+void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 {
 	// Check that the entity is an Enemy01 object before proceeding.
 	if ((entity.componentMask & COMPONENT_ENEMY01) != COMPONENT_ENEMY01)
@@ -107,7 +114,7 @@ void Enemy01ControlSystem::update(Entity& entity)
 	RenderSystem::drawDebugArrow(position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
 	//RenderSystem::drawDebugArrow(m_scene, position, desiredVelocity, glm::length(desiredVelocity) * kDebugScale);
 
-	glm::vec4 newPosition = entity.transform[3] + glm::vec4{ newVelocity, 0 };
+	glm::vec4 newPosition = entity.transform[3] + glm::vec4{ newVelocity, 0 } * deltaTick;
 	if (newPosition.x > 20.0f || newPosition.x < -20.0f)
 	{
 		newVelocity.x *= -1;

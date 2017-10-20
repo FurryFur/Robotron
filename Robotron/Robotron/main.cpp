@@ -17,6 +17,9 @@
 
 #include <GLFW\glfw3.h>
 
+double oldTime = 0.0;
+double newTime = 0.0;
+
 int main()
 {
 	//// Init combined Window and OpenGL context.
@@ -24,8 +27,8 @@ int main()
 
 	Level level(window, 1);
 
-	while (!glfwWindowShouldClose(window)) {
-		level.process();
+	while (!glfwWindowShouldClose(window)) {		
+		level.executeOneFrame();
 	}
 
 	glfwDestroyWindow(window);

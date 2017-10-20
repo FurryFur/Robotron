@@ -153,7 +153,10 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /sy</Comm
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AIUtils.cpp" />
+    <ClCompile Include="Clock.cpp" />
     <ClCompile Include="Enemy01ControlSystem.cpp" />
+    <ClCompile Include="Enemy02ControlSystem.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="ext\glad\src\glad.c" />
     <ClCompile Include="GLPrimitives.cpp" />
@@ -176,7 +179,9 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /sy</Comm
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIUtils.h" />
+    <ClInclude Include="Clock.h" />
     <ClInclude Include="Enemy01ControlSystem.h" />
+    <ClInclude Include="Enemy02ControlSystem.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="GameplayLogicSystem.h" />
     <ClInclude Include="GLMUtils.h" />

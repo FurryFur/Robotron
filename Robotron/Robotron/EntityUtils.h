@@ -35,7 +35,11 @@ namespace EntityUtils {
 	// transform;
 	Entity& createSphere(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 
+	//Creates the enemy01 enemy type
 	Entity& createEnemy01(Scene &, const glm::mat4 & _transform = glm::mat4{ 1 });
+
+	//Creates the enemy02 enemy type
+	Entity& createEnemy02(Scene& scene, const glm::mat4& transform, int positionInQueue);
 
 	// Creates a  Player (currently a unit sphere), centered at the origin, with the specified 
 	// transform;
