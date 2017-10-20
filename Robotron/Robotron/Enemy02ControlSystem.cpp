@@ -89,12 +89,20 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 	{
 		newVelocity.x *= -1;
 		entity.physics.wanderPosition.x *= -1;
+		if (newPosition.x > 20.0f)
+			entity.transform[3].x = 20.0f;
+		else
+			entity.transform[3].x = -20.0f;
 	}
 
 	if (newPosition.z > 20.0f || newPosition.z < -20.0f)
 	{
 		newVelocity.z *= -1;
 		entity.physics.wanderPosition.z *= -1;
+		if (newPosition.z > 20.0f)
+			entity.transform[3].z = 20.0f;
+		else
+			entity.transform[3].z = -20.0f;
 	}
 
 	// Add the velocity to the position of the enemy.

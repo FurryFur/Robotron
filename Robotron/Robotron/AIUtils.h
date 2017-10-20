@@ -31,8 +31,11 @@ glm::vec3 seek(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 cu
 // Returns a force to move towards the target position, slows down with arrival when close.
 glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed);
 
-// Returns an acceleration to move to a move to pursue a target
+// Returns an acceleration to move to pursue a target
 glm::vec3 pursue(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed);
+
+// Returns an acceleration to move to evade a target
+glm::vec3 evade(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed);
 
 // Returns an acceleration to move to a random position forward from the current position.
 glm::vec3 wander(Entity& entity);

@@ -70,12 +70,23 @@ glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, g
 // Returns an acceleration to move to a move to pursue a target
 glm::vec3 pursue(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
 {
+	//float T = glm::length(glm::vec2{ targetPosition.x - currentPosition.x, targetPosition.z - currentPosition.z }) / tragetMoveSpeed;
+	//glm::vec3 futurePosition = targetPosition + targetVelocity * T;
+	//
+	//futurePosition.y = currentPosition.y;
+
+	return seekWithArrival(targetPosition, currentPosition, currentVelocity, moveSpeed);
+}
+
+// Returns an acceleration to move to a move to pursue a target
+glm::vec3 evade(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+{
 	float T = glm::length(glm::vec2{ targetPosition.x - currentPosition.x, targetPosition.z - currentPosition.z }) / tragetMoveSpeed;
-	glm::vec3 futurePosition = targetPosition + targetVelocity * T;
+	glm::vec3 futurePosition = targetPosition + targetVelocity * (T/2.0f);
 
 	futurePosition.y = currentPosition.y;
 
-	return seekWithArrival(futurePosition, currentPosition, currentVelocity, moveSpeed);
+	return -seekWithArrival(futurePosition, currentPosition, currentVelocity, moveSpeed);
 }
 
 // Returns an acceleration to move to a random position forward from the current position.

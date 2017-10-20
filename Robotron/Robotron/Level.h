@@ -28,6 +28,7 @@
 #include "GameplayLogicSystem.h"
 #include "Enemy01ControlSystem.h"
 #include "Enemy02ControlSystem.h"
+#include "Enemy03ControlSystem.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
@@ -57,6 +58,7 @@ private:
 	InputSystem m_inputSystem;
 	Enemy01ControlSystem m_enemy01ControlSystem;
 	Enemy02ControlSystem m_enemy02ControlSystem;
+	Enemy03ControlSystem m_enemy03ControlSystem;
 	std::unique_ptr<NetworkSystem> m_networkSystem;
 
 	//stores the level current on. effects enemy spawn rate and spawn positioning
