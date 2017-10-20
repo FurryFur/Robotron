@@ -38,7 +38,7 @@ RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
 	m_renderState.glContext = glContext;
 	m_renderState.uniformBindingPoint = 0;
 	m_renderState.hasIrradianceMap = false;
-	m_renderState.hasEnvironmentMap = false;
+	m_renderState.hasReflectionMap = false;
 
 	// Create buffer for uniforms
 	glGenBuffers(1, &m_renderState.uboUniforms);
@@ -129,7 +129,7 @@ void RenderSystem::setCamera(const Entity* entity)
 void RenderSystem::setReflectionMap(GLuint reflectionMap)
 {
 	m_renderState.reflectionMap = reflectionMap;
-	m_renderState.hasEnvironmentMap = true;
+	m_renderState.hasReflectionMap = true;
 }
 
 void RenderSystem::setIrradianceMap(GLuint irradianceMap)
@@ -189,7 +189,7 @@ void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& tra
 		}
 
 		// Set environment map to use on GPU
-		if (s_renderState.hasEnvironmentMap) {
+		if (s_renderState.hasReflectionMap) {
 			glActiveTexture(GL_TEXTURE0 + textureUnit);
 			glUniform1i(glGetUniformLocation(material.shader, "reflectionSampler"), textureUnit);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, s_renderState.reflectionMap);
@@ -198,7 +198,7 @@ void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& tra
 		if (s_renderState.hasIrradianceMap) {
 			glActiveTexture(GL_TEXTURE0 + textureUnit);
 			glUniform1i(glGetUniformLocation(material.shader, "irradianceSampler"), textureUnit);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, s_renderState.reflectionMap);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, s_renderState.irradianceMap);
 			++textureUnit;
 		}
 

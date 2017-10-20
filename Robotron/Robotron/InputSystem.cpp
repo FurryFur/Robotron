@@ -17,6 +17,7 @@
 
 #include "KeyObserver.h"
 #include "Scene.h"
+#include "Utils.h"
 
 #include <GLFW\glfw3.h>
 
@@ -74,6 +75,30 @@ void InputSystem::beginFrame()
 
 void InputSystem::update(Entity& entity)
 {
+	// DEBUG!!!
+	if (entity.hasAllComponents(COMPONENT_MODEL)) {
+		if (glfwGetKey(m_window, GLFW_KEY_KP_MULTIPLY) == GLFW_PRESS) {
+			for (size_t i = 0; i < entity.model.materials.size(); ++i) {
+				entity.model.materials.at(i).shaderParams.metallicness = clamp(entity.model.materials.at(i).shaderParams.metallicness + 0.01f, 0.001f, 1.0f);
+			}
+		}
+		if (glfwGetKey(m_window, GLFW_KEY_KP_DIVIDE) == GLFW_PRESS) {
+			for (size_t i = 0; i < entity.model.materials.size(); ++i) {
+				entity.model.materials.at(i).shaderParams.metallicness = clamp(entity.model.materials.at(i).shaderParams.metallicness - 0.01f, 0.001f, 1.0f);
+			}
+		}
+		if (glfwGetKey(m_window, GLFW_KEY_KP_ADD) == GLFW_PRESS) {
+			for (size_t i = 0; i < entity.model.materials.size(); ++i) {
+				entity.model.materials.at(i).shaderParams.glossiness = clamp(entity.model.materials.at(i).shaderParams.glossiness + 0.1f, 0.001f, 1000.0f);
+			}
+		}
+		if (glfwGetKey(m_window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS) {
+			for (size_t i = 0; i < entity.model.materials.size(); ++i) {
+				entity.model.materials.at(i).shaderParams.glossiness = clamp(entity.model.materials.at(i).shaderParams.glossiness - 0.1f, 0.001f, 1000.0f);
+			}
+		}
+	}
+
 	// Filter input receivers
 	const size_t kInputReceiverMask = COMPONENT_INPUT | COMPONENT_INPUT_MAP;
 	if ((entity.componentMask & kInputReceiverMask) != kInputReceiverMask)
