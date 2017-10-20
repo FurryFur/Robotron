@@ -45,21 +45,20 @@ void main(void)
 	// Reflection variables
 	vec3 LiReflDir = normalize(reflect(-viewDir, normal)); // The light direction that reflects directly into the camera
 	vec3 LiRefl = texture(reflectionSampler, LiReflDir).rgb;
-	// float ndotRl = clamp(dot(LiReflDir, normal), 0, 1);
+	float ndotRl = clamp(dot(LiReflDir, normal), 0, 1);
 	// vec3 LiReflHalfVec = normalize(LiReflDir + viewDir);
 	// float ndotRh = clamp(dot(normal, LiReflHalfVec), 0, 1);
 	float specPow = u.glossiness;
 	float specNorm = (specPow + 4) * (specPow + 2) / (8 * PI * (specPow + pow(2, -specPow / 2)));
 
 	vec3 BRDFdiff = (1 - u.metallicness) * kDiffNorm * color;
-	vec3 BRDFglob = (1 - u.metallicness) * color; // Assume irradiance has already been normalized
 	vec3 BRDFspec = u.metallicness * specNorm * color * pow(ndoth, specPow);
-	vec3 BRDFreflSpec = u.metallicness * color; // Assume perfect mirror reflection
+	vec3 BRDFreflSpec = u.metallicness * specNorm * color; // pow(ndotRh, specPow) is always 1 becuase the reflected half angle is always aligned with the normal
 	vec3 BRDFdirect = BRDFdiff + BRDFspec;
 
 	vec3 LrDirect = LiDirect * BRDFdirect * ndotl;
-	vec3 LrGlobal = texture(irradianceSampler, normal).rgb * BRDFglob; // Assume ndotl has already been integrated in irradiance map
-	vec3 LrReflSpec = LiRefl * BRDFreflSpec;
+	vec3 LrGlobal = texture(irradianceSampler, normal).rgb * BRDFdiff; // Assume ndotl has already been integrated in irradiance map
+	vec3 LrReflSpec = LiRefl * BRDFreflSpec * ndotRl;
 
 	outColor = vec4(LrDirect + LrGlobal + LrReflSpec, 1);
 }
