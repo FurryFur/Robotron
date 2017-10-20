@@ -105,6 +105,22 @@ GLuint GLUtils::getDefaultShader()
 	return s_shader;
 }
 
+GLuint GLUtils::getMetalShader()
+{
+	static GLuint s_shader;
+	static bool s_shaderBuilt = false;
+
+	if (!s_shaderBuilt) {
+		compileAndLinkShaders(
+			"Assets/Shaders/default_vert.glsl",
+			"Assets/Shaders/metal_frag.glsl",
+			s_shader);
+		s_shaderBuilt = true;
+	}
+
+	return s_shader;
+}
+
 GLuint GLUtils::getDebugShader()
 {
 	static GLuint s_shader;

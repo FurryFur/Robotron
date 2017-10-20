@@ -70,15 +70,18 @@ Material processMaterial(const aiMaterial* _aiMaterial, const aiScene* scene, co
 	material.displacementMaps.insert(material.displacementMaps.end(), displacementMaps.begin(), displacementMaps.end());
 
 	// TODO: Add more of these to the material class
-	std::vector<Texture> ambientMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_AMBIENT, textureDir);
-	std::vector<Texture> emissiveMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_EMISSIVE, textureDir);
-	std::vector<Texture> lightMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_LIGHTMAP, textureDir);
-	std::vector<Texture> opacityMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_OPACITY, textureDir);
-	std::vector<Texture> reflectionMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_REFLECTION, textureDir);
-	std::vector<Texture> unknownTextureMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_UNKNOWN, textureDir);
+	//std::vector<Texture> ambientMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_AMBIENT, textureDir);
+	//std::vector<Texture> emissiveMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_EMISSIVE, textureDir);
+	//std::vector<Texture> lightMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_LIGHTMAP, textureDir);
+	//std::vector<Texture> opacityMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_OPACITY, textureDir);
+	//std::vector<Texture> reflectionMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_REFLECTION, textureDir);
+	//std::vector<Texture> unknownTextureMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_UNKNOWN, textureDir);
 
 	// TODO: Swap shader model based on the textures we have
-	material.shader = GLUtils::getDefaultShader();
+	if (metallicnessMaps.size() > 0)
+		material.shader = GLUtils::getMetalShader();
+	else
+		material.shader = GLUtils::getDefaultShader();
 
 	return material;
 }

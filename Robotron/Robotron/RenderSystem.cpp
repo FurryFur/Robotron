@@ -184,7 +184,18 @@ void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& tra
 			glBindTexture(texture.target, texture.id);
 			++textureUnit;
 
-			// Just doing 1 texture currently
+			// Just doing 1 diffuse texture currently
+			break;
+		}
+
+		for (size_t j = 0; j < material.metallicnessMaps.size(); ++j) {
+			const Texture& texture = material.metallicnessMaps.at(j);
+			glActiveTexture(GL_TEXTURE0 + textureUnit);
+			glUniform1i(glGetUniformLocation(material.shader, "metallicnessSampler"), textureUnit);
+			glBindTexture(texture.target, texture.id);
+			++textureUnit;
+
+			// Just doing 1 specular texture currently
 			break;
 		}
 
