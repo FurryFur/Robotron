@@ -54,12 +54,13 @@ void main(void)
 
 	vec3 metallicness = u.metallicness + texture(metallicnessSampler, i.texCoord).rgb;
 	vec3 BRDFdiff = (1 - metallicness) * kDiffNorm * color;
+	vec3 BRDFglob = (1 - metallicness) * color; // CubeMapGen already applies normalization for irradiance maps
 	vec3 BRDFspec = metallicness * specNorm * color * pow(ndoth, specPow);
 	vec3 BRDFreflSpec = metallicness * specNorm * color; // pow(ndotRh, specPow) is always 1 becuase the reflected half angle is always aligned with the normal
 	vec3 BRDFdirect = BRDFdiff + BRDFspec;
 
 	vec3 LrDirect = LiDirect * BRDFdirect * ndotl;
-	vec3 LrGlobal = texture(irradianceSampler, normal).rgb * BRDFdiff; // Assume ndotl has already been integrated in irradiance map
+	vec3 LrGlobal = texture(irradianceSampler, normal).rgb * BRDFglob; // Assume ndotl has already been integrated in irradiance map
 	vec3 LrReflSpec = LiRefl * BRDFreflSpec * ndotRl;
 
 	outColor = vec4(LrDirect + LrGlobal + LrReflSpec, 1);
