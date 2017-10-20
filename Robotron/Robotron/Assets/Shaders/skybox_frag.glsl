@@ -15,9 +15,9 @@ layout (std140) uniform Uniforms {
 	float glossiness;
 } u;
 
-uniform samplerCube skybox;
+uniform samplerCube colorSampler;
 
 void main(void)
 {
-    outColor = texture(skybox, i.textureDir);
+    outColor = texture(colorSampler, i.textureDir);
 }

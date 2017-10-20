@@ -32,9 +32,9 @@ Level::Level(GLFWwindow* window, int levelNum)
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 	player.componentMask |= COMPONENT_NETWORK;
 
-	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
-	//	  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
-	//	* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
+	EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
+		  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
+		* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
 
 	// Create the number of enemy01 based on current level with some random variance.
 	unsigned int numberOfEnemy01 = 9 + m_levelNum + randomInt(-2, 2);
@@ -56,15 +56,27 @@ Level::Level(GLFWwindow* window, int levelNum)
 
 	// Create the skybox
 	Entity& skybox = EntityUtils::createSkybox(m_scene, {
-		"Assets/Textures/Skybox/right.jpg",
-		"Assets/Textures/Skybox/left.jpg",
-		"Assets/Textures/Skybox/top.jpg",
-		"Assets/Textures/Skybox/bottom.jpg",
-		"Assets/Textures/Skybox/back.jpg",
-		"Assets/Textures/Skybox/front.jpg",
+		"Assets/Textures/envmap_violentdays/violentdays_rt.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_lf.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_up.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_dn.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_bk.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_ft.tga",
 	});
+
+	Texture irradianceMap = GLUtils::loadCubeMap({
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c00.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c01.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c02.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c03.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c04.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c05.bmp",
+	});
+
 	// Set skybox as environment map for reflections
-	m_renderSystem.setEnvironmentMap(skybox);
+	// The skybox only has one colormap texture so use this as the reflection map.
+	m_renderSystem.setReflectionMap(skybox.model.materials.at(0).colorMaps.at(0).id);
+	m_renderSystem.setIrradianceMap(irradianceMap.id);
 
 	// Setup the camera
 	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });

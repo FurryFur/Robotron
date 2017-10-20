@@ -193,6 +193,7 @@ Texture GLUtils::loadTexture(const std::string& path)
 	Texture texture;
 	texture.target = GL_TEXTURE_2D;
 
+	//stbi_set_flip_vertically_on_load(true);
 	int width, height, nrComponents;
 	unsigned char* textureData = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
 
@@ -253,6 +254,7 @@ Texture GLUtils::loadCubeMap(const std::vector<std::string>& facePaths)
 	glBindTexture(texture.target, texture.id);
 
 	for (GLenum i = 0; i < facePaths.size(); ++i) {
+		//stbi_set_flip_vertically_on_load(true);
 		int width, height, nrComponents;
 		unsigned char* faceData = stbi_load(facePaths.at(i).c_str(), &width, &height, 
 		                                    &nrComponents, 0);
@@ -267,7 +269,7 @@ Texture GLUtils::loadCubeMap(const std::vector<std::string>& facePaths)
 				format = GL_RGBA;
 
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, faceData);
+				0, format, width, height, 0, format, GL_UNSIGNED_BYTE, faceData);
 		} else {
 			// TODO: Throw excpetion here
 			std::cout << "Texture failed to load at path: " << facePaths.at(i) << std::endl;
