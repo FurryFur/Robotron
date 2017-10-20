@@ -14,6 +14,8 @@
 
 #define _USE_MATH_DEFINES
 
+// Local Includes
+#include "clock.h"
 #include "Utils.h"
 #include "GLUtils.h"
 #include "EntityUtils.h"
@@ -25,6 +27,8 @@
 #include "NetworkServerSystem.h"
 #include "GameplayLogicSystem.h"
 #include "Enemy01ControlSystem.h"
+#include "Enemy02ControlSystem.h"
+#include "Enemy03ControlSystem.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
@@ -40,16 +44,21 @@ public:
 	Level(GLFWwindow* window, int levelNum);
 	~Level();
 
-	void process();
+	void executeOneFrame();
+
+	void process(float _fDeltaTick);
 
 private:
 
+	Clock m_pClock;
 	Scene m_scene;
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;
 	PlayerControlSystem m_playerControlSystem;
 	InputSystem m_inputSystem;
 	Enemy01ControlSystem m_enemy01ControlSystem;
+	Enemy02ControlSystem m_enemy02ControlSystem;
+	Enemy03ControlSystem m_enemy03ControlSystem;
 	std::unique_ptr<NetworkSystem> m_networkSystem;
 
 	//stores the level current on. effects enemy spawn rate and spawn positioning
