@@ -91,6 +91,34 @@ Iter selectRandomly(Iter start, Iter end)
 	return selectRandomly(start, end, getRandomGenerator());
 }
 
+// Returns a random permutation of the collection
+template<typename CollectionT>
+CollectionT getRandomPermutation(const CollectionT& collection) {
+	CollectionT randomPermutation = collection;
+	for (size_t i = 0; i < collection.size(); ++i) {
+		size_t selectedIdx = randomInt(static_cast<size_t>(i), collection.size() - 1);
+		std::swap(randomPermutation.at(i), randomPermutation.at(selectedIdx));
+	}
+
+	return randomPermutation;
+}
+
+// Checks if the specified element exists in the range [start, end) exclusive
+template<typename Iter, typename T>
+bool in(Iter start, Iter end, T val) {
+	auto resultIt = std::find(start, end, val);
+	if (resultIt != end)
+		return true;
+	else
+		return false;
+}
+
+// Checks if the specified element does not exists in the range [start, end) exclusive
+template<typename Iter, typename T>
+bool notIn(Iter start, Iter end, T val) {
+	return !in(start, end, val);
+}
+
 // Converts a number to a string with the specified number of decimal places
 template <typename T>
 std::string toString(const T value, const int decimalPlaces = 2)
@@ -100,7 +128,6 @@ std::string toString(const T value, const int decimalPlaces = 2)
 	out << std::setprecision(decimalPlaces) << value;
 	return out.str();
 }
-
 
 template <typename Arg>
 struct InvokeType : std::add_lvalue_reference<Arg> { };

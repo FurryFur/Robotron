@@ -28,8 +28,9 @@ Level::Level(GLFWwindow* window, int levelNum)
 		  glm::rotate(glm::mat4{}, static_cast<float>(M_PI / 2), glm::vec3{ 1, 0, 0 })
 		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 1.0f }));
 
-	EntityUtils::createPlayer(m_scene,
+	Entity& player = EntityUtils::createPlayer(m_scene,
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
+	player.componentMask |= COMPONENT_NETWORK;
 
 	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
 	//	  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
@@ -48,8 +49,9 @@ Level::Level(GLFWwindow* window, int levelNum)
 		if (randomInt(0, 1) == 0)
 			randZ += 25;
 
-		EntityUtils::createEnemy01(m_scene,
+		Entity& enemy = EntityUtils::createEnemy01(m_scene,
 			glm::translate({}, glm::vec3{ randX, 0.0f, randZ }));
+		enemy.componentMask |= COMPONENT_NETWORK;
 	}
 
 	// Create the skybox

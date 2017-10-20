@@ -12,8 +12,8 @@
 
 Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
+	                                  | COMPONENT_LOGIC);
 
 	entity.transform = transform;
 
@@ -32,8 +32,8 @@ Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
 
 Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_MODEL 
+	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
 
 	entity.transform = transform;
 
@@ -52,8 +52,8 @@ Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& transform)
 
 Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC | COMPONENT_ENEMY01;
+	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
+	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY01);
 
 	entity.transform = transform;
 
@@ -73,8 +73,9 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 
 Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL | COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	Entity& entity = scene.createEntity(COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL 
+	                                  | COMPONENT_INPUT_MAP | COMPONENT_MODEL
+	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
 
 	entity.transform = transform;
 
@@ -101,8 +102,8 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 
 Entity& EntityUtils::createCylinder(Scene& scene, float radius, float height, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_MODEL 
+	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
 
 	entity.transform = transform * glm::scale(glm::mat4{ 1 }, glm::vec3{ radius, height, radius });
 
@@ -121,8 +122,8 @@ Entity& EntityUtils::createCylinder(Scene& scene, float radius, float height, co
 
 Entity& EntityUtils::createPyramid(Scene& scene, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_MODEL 
+	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
 
 	entity.transform = transform;
 
@@ -141,8 +142,8 @@ Entity& EntityUtils::createPyramid(Scene& scene, const glm::mat4& transform)
 
 Entity& EntityUtils::createCube(Scene& scene, const glm::mat4 & transform)
 {
-	Entity& entity = scene.createEntity();
-	entity.componentMask |= COMPONENT_INPUT_MAP | COMPONENT_MODEL | COMPONENT_TRANSFORM | COMPONENT_LOGIC;
+	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_MODEL 
+	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
 
 	entity.transform = transform;
 
@@ -161,9 +162,8 @@ Entity& EntityUtils::createCube(Scene& scene, const glm::mat4 & transform)
 
 Entity& EntityUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm::vec3& center, const glm::vec3& up)
 {
-	Entity& entity = scene.createEntity();
-
-	entity.componentMask = COMPONENT_INPUT_MAP | COMPONENT_INPUT | COMPONENT_CAMERA | COMPONENT_TRANSFORM;
+	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_INPUT 
+	                                  | COMPONENT_CAMERA | COMPONENT_TRANSFORM);
 
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.005f;
@@ -184,9 +184,7 @@ Entity& EntityUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm:
 
 Entity& EntityUtils::createSkybox(Scene& scene, const std::vector<std::string>& faceFilenames)
 {
-	Entity& entity = scene.createEntity();
-
-	entity.componentMask = COMPONENT_MODEL;
+	Entity& entity = scene.createEntity(COMPONENT_MODEL);
 
 	entity.model = GLPrimitives::getCubeModel();
 
@@ -201,9 +199,7 @@ Entity& EntityUtils::createSkybox(Scene& scene, const std::vector<std::string>& 
 
 Entity & EntityUtils::createModel(Scene& scene, const std::string& path, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity();
-
-	entity.componentMask = COMPONENT_MODEL | COMPONENT_TRANSFORM;
+	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM);
 
 	entity.model = ModelUtils::loadModel(path);
 

@@ -70,7 +70,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(ProjectDir)ext\glm;$(ProjectDir)ext\assimp\include;$(ProjectDir)ext\glad\include;$(ProjectDir)ext\glfw-3.2.1.bin.WIN32\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)ext\assimp\lib_64;$(ProjectDir)ext\glfw-3.2.1.bin.WIN32\lib-vc2015;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)ext\assimp\lib_64_debug;$(ProjectDir)ext\glfw-3.2.1.bin.WIN32\lib-vc2015;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(ProjectDir)ext\glm;$(ProjectDir)ext\assimp\include;$(ProjectDir)ext\glad\include;$(ProjectDir)ext\glfw-3.2.1.bin.WIN32\include;$(IncludePath)</IncludePath>
@@ -78,7 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)ext\glm;$(ProjectDir)ext\assimp\include;$(ProjectDir)ext\glad\include;$(ProjectDir)ext\glfw-3.2.1.bin.WIN64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)ext\assimp\lib_64;$(ProjectDir)ext\glfw-3.2.1.bin.WIN64\lib-vc2015;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)ext\assimp\lib_64_debug;$(ProjectDir)ext\glfw-3.2.1.bin.WIN64\lib-vc2015;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)ext\glm;$(ProjectDir)ext\assimp\include;$(ProjectDir)ext\glad\include;$(ProjectDir)ext\glfw-3.2.1.bin.WIN64\include;$(IncludePath)</IncludePath>
@@ -92,11 +92,11 @@
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glfw3.lib;Ws2_32.lib;assimp-vc140-mt_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;Ws2_32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets\" /sy
-copy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt_d.dll" "$(OutDir)assimp-vc140-mt.dll"</Command>
+      <Command>xcopy "$(ProjectDir)Assets"  "$(OutDir)Assets\" /dsy
+xcopy "$(ProjectDir)ext\assimp\lib_64_debug\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -107,11 +107,11 @@ copy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt_d.dll" "$(OutDir)assimp-vc1
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glfw3.lib;Ws2_32.lib;assimp-vc140-mt_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;Ws2_32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets\" /sy
-copy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt_d.dll" "$(OutDir)assimp-vc140-mt.dll"</Command>
+      <Command>xcopy "$(ProjectDir)Assets"  "$(OutDir)Assets\" /dsy
+xcopy "$(ProjectDir)ext\assimp\lib_64_debug\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,8 +129,8 @@ copy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt_d.dll" "$(OutDir)assimp-vc1
       <AdditionalDependencies>glfw3.lib;Ws2_32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets\" /sy
-xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /sy</Command>
+      <Command>xcopy "$(ProjectDir)Assets"  "$(OutDir)Assets\" /dsy
+xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -148,8 +148,8 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /sy</Comm
       <AdditionalDependencies>glfw3.lib;Ws2_32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)Assets" "$(OutDir)Assets\" /sy
-xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /sy</Command>
+      <Command>xcopy "$(ProjectDir)Assets"  "$(OutDir)Assets\" /dsy
+xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -193,6 +193,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /sy</Comm
     <ClInclude Include="ModelComponent.h" />
     <ClInclude Include="ModelUtils.h" />
     <ClInclude Include="NetworkClientSystem.h" />
+    <ClInclude Include="NetworkComponent.h" />
     <ClInclude Include="NetworkServerSystem.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PhysicsComponent.h" />
