@@ -22,7 +22,7 @@ uniform samplerCube radianceSampler;
 uniform samplerCube irradianceSampler;
 
 const float PI = 3.1415926535897932384626433832795;
-const vec3 lightDir = vec3(1, 1, -1);
+vec3 lightDir = vec3(1, 1, -1);
 const vec3 LiDirect = vec3(0.64, 0.39, 0.31) * 4;
 const float kDiffNorm = 1 / PI;
 const int pmremMipCount = 11;
@@ -49,8 +49,9 @@ void main(void)
 
 	// Direct Lighting variables
 	vec3 viewDir = normalize(i.viewDir);
-	vec3 halfVector = normalize(normalize(lightDir) + viewDir);
-	float ndotl = clamp(dot(normalize(lightDir), normal), 0, 1);
+	lightDir = normalize(lightDir);
+	vec3 halfVector = normalize(lightDir + viewDir);
+	float ndotl = clamp(dot(lightDir, normal), 0, 1);
 	float ndoth = clamp(dot(normal, halfVector), 0, 1);
 
 	// Reflection variables
