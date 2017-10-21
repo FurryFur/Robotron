@@ -65,12 +65,12 @@ void main(void)
 	vec3 BRDFdiff = kDiffNorm * CdiffDirect;
 	vec3 BRDFglob = CdiffAmb; // CubeMapGen already applies normalization for irradiance maps
 	vec3 BRDFspec =  specNorm * Fdirect * pow(ndoth, specPow);
-	vec3 BRDFreflSpec = specNorm * Frefl; // pow(ndotRh, specPow) is always 1 becuase the reflected half angle is always aligned with the normal
+	vec3 BRDFreflSpec = Frefl; // Assume perfect mirror for now. TODO: Replace with PMREM
 	vec3 BRDFdirect = BRDFdiff + BRDFspec;
 
 	vec3 LrDirect = LiDirect * BRDFdirect * ndotl;
 	vec3 LrGlobal = texture(irradianceSampler, normal).rgb * BRDFglob; // Assume ndotl has already been integrated in irradiance map
 	vec3 LrReflSpec = LiRefl * BRDFreflSpec * ndotRl;
 
-	outColor = vec4(LrDirect + LrReflSpec + LrGlobal, 1);
+	outColor = vec4(LrDirect + LrGlobal + LrReflSpec, 1);
 }

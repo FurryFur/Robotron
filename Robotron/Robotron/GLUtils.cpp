@@ -137,22 +137,6 @@ GLuint GLUtils::getDebugShader()
 	return s_shader;
 }
 
-GLuint GLUtils::getThresholdShader()
-{
-	static GLuint s_shader;
-	static bool s_shaderBuilt = false;
-
-	if (!s_shaderBuilt) {
-		compileAndLinkShaders(
-			"Assets/Shaders/default_vert.glsl",
-			"Assets/Shaders/threshold_frag.glsl",
-			s_shader);
-		s_shaderBuilt = true;
-	}
-
-	return s_shader;
-}
-
 GLuint GLUtils::getSkyboxShader()
 {
 	static GLuint s_shader;

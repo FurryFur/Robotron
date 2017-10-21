@@ -44,10 +44,6 @@ namespace GLUtils {
 	// This function will build the shader if it is not already built.
 	GLuint getDebugShader();
 
-	// Returns a handler to the threshold shader.
-	// This function will build the shader if it is not already built.
-	GLuint getThresholdShader();
-
 	// Returns a hander to the skybox shader.
 	// This function will build the sahder if it is not already built.
 	GLuint getSkyboxShader();
