@@ -89,12 +89,12 @@ void InputSystem::update(Entity& entity)
 		}
 		if (glfwGetKey(m_window, GLFW_KEY_KP_ADD) == GLFW_PRESS) {
 			for (size_t i = 0; i < entity.model.materials.size(); ++i) {
-				entity.model.materials.at(i).shaderParams.glossiness = clamp(entity.model.materials.at(i).shaderParams.glossiness + 0.1f, 0.001f, 1000.0f);
+				entity.model.materials.at(i).shaderParams.glossiness = clamp(entity.model.materials.at(i).shaderParams.glossiness + 0.01f, 0.0001f, 1.0f);
 			}
 		}
 		if (glfwGetKey(m_window, GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS) {
 			for (size_t i = 0; i < entity.model.materials.size(); ++i) {
-				entity.model.materials.at(i).shaderParams.glossiness = clamp(entity.model.materials.at(i).shaderParams.glossiness - 0.1f, 0.001f, 1000.0f);
+				entity.model.materials.at(i).shaderParams.glossiness = clamp(entity.model.materials.at(i).shaderParams.glossiness - 0.01f, 0.0001f, 1.0f);
 			}
 		}
 	}

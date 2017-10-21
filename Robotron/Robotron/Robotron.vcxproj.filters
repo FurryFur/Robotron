@@ -253,9 +253,6 @@
     <None Include="Assets\Shaders\default_vert.glsl">
       <Filter>Assets\Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\threshold_frag.glsl">
-      <Filter>Assets\Shaders</Filter>
-    </None>
     <None Include="Assets\Shaders\skybox_frag.glsl">
       <Filter>Assets\Shaders</Filter>
     </None>

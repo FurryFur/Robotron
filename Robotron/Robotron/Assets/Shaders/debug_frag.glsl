@@ -20,17 +20,23 @@ layout (std140) uniform Uniforms {
 uniform vec3 debugColor;
 
 uniform sampler2D colorSampler;
-uniform samplerCube reflectionSampler;
+uniform samplerCube radianceSampler;
 uniform samplerCube irradianceSampler;
 
 const float PI = 3.1415926535897932384626433832795;
 const vec3 lightDir = vec3(1, 1, -1);
 const vec3 LiDirect = vec3(0.64, 0.39, 0.31) * 4;
 const float kDiffNorm = 1 / PI;
+const int pmremMipCount = 11;
 
 vec3 fresnel(vec3 specColor, vec3 lightDir, vec3 halfVector)
 {
 	return specColor + (1.0f - specColor) * pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5);
+}
+
+vec3 fresnelWithGloss(vec3 specColor, vec3 lightDir, vec3 halfVector, float gloss)
+{
+	return specColor + (max(vec3(gloss, gloss, gloss), specColor) - specColor) * pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5);
 }
 
 void main(void)
@@ -50,29 +56,27 @@ void main(void)
 	float ndoth = clamp(dot(normal, halfVector), 0, 1);
 
 	// Reflection variables
-	vec3 LiReflDir = normalize(reflect(-viewDir, normal)); // The light direction that reflects directly into the camera
-	vec3 LiRefl = texture(reflectionSampler, LiReflDir).rgb;
-	float ndotRl = clamp(dot(LiReflDir, normal), 0, 1);
-	// vec3 LiReflHalfVec = normalize(LiReflDir + viewDir); // Same as normal
-	// float ndotRh = clamp(dot(normal, LiReflHalfVec), 0, 1);
-	float specPow = u.glossiness;
+	float specPow = exp2(10 * u.glossiness + 1);
 	float specNorm = (specPow + 4) * (specPow + 2) / (8 * PI * (specPow + pow(2, -specPow / 2)));
+	float mipmapIndex = (1 - u.glossiness) * (pmremMipCount - 1); 
+	vec3 LiReflDir = normalize(reflect(-viewDir, normal)); // The light direction that reflects directly into the camera
+	vec3 LiRefl = textureLod(radianceSampler, LiReflDir, mipmapIndex).rgb;
+	vec3 LiIrr = texture(irradianceSampler, normal).rgb;
 
 	vec3 Cspec = u.metallicness * color;
 	vec3 Cdiff = (1 - u.metallicness) * color;
 	vec3 Fdirect = fresnel(Cspec, lightDir, halfVector);
-	vec3 Frefl = fresnel(Cspec, LiReflDir, normal);
+	vec3 Frefl = fresnelWithGloss(Cspec, LiReflDir, normal, u.glossiness);
 	vec3 CdiffDirect = Cdiff * (1 - Fdirect) / (1 - Cspec);
 	vec3 CdiffAmb = Cdiff * (1 - Frefl) / (1 - Cspec);
+
 	vec3 BRDFdiff = kDiffNorm * CdiffDirect;
-	vec3 BRDFglob = CdiffAmb; // CubeMapGen already applies normalization for irradiance maps
-	vec3 BRDFspec =  specNorm * Fdirect * pow(ndoth, specPow);
-	vec3 BRDFreflSpec = Frefl; // Assume perfect mirror for now. TODO: Replace with PMREM
+	vec3 BRDFspec =  Fdirect * specNorm * pow(ndoth, specPow);
 	vec3 BRDFdirect = BRDFdiff + BRDFspec;
 
 	vec3 LrDirect = LiDirect * BRDFdirect * ndotl;
-	vec3 LrGlobal = texture(irradianceSampler, normal).rgb * BRDFglob; // Assume ndotl has already been integrated in irradiance map
-	vec3 LrReflSpec = LiRefl * BRDFreflSpec * ndotRl;
+	vec3 LrAmbDiff= LiIrr * CdiffAmb;
+	vec3 LrAmbSpec = LiRefl * Frefl;
 
-	outColor = vec4(LrDirect + LrGlobal + LrReflSpec, 1);
+	outColor = vec4(LrDirect + LrAmbDiff + LrAmbSpec, 1);
 }

@@ -53,10 +53,15 @@ namespace GLUtils {
 	GLuint bufferMeshData(const std::vector<VertexFormat>& vertices, const std::vector<GLuint>& indices);
 
 	// Loads a texture to GPU memory.
-	// Returns a handler to the GPU texture.
+	// Returns a texture object with GPU handler and texture target.
 	Texture loadTexture(const std::string& paths);
 
 	// Loads a cube map to GPU memory.
-	// Returns a handler to the GPU cube map.
-	Texture loadCubeMap(const std::vector<std::string>& facePaths);
+	// Returns a texture object with GPU handler and texture target.
+	Texture loadCubeMapFaces(const std::vector<std::string>& facePaths);
+
+	// Loads a texture in DDS format to to GPU memory.
+	// Filename can be KTX or DDS files.
+	// Returns a texture object with GPU handler and texture target.
+	Texture loadDDSTexture(const std::string& path);
 }

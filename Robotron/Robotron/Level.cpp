@@ -99,7 +99,7 @@ Level::Level(GLFWwindow* window, int levelNum)
 		"Assets/Textures/envmap_violentdays/violentdays_ft.tga",
 	});
 
-	Texture irradianceMap = GLUtils::loadCubeMap({
+	Texture irradianceMap = GLUtils::loadCubeMapFaces({
 		"Assets/Textures/envmap_violentdays/violentdays_irr_c00.bmp",
 		"Assets/Textures/envmap_violentdays/violentdays_irr_c01.bmp",
 		"Assets/Textures/envmap_violentdays/violentdays_irr_c02.bmp",
@@ -108,9 +108,11 @@ Level::Level(GLFWwindow* window, int levelNum)
 		"Assets/Textures/envmap_violentdays/violentdays_irr_c05.bmp",
 	});
 
+	Texture radianceMap = GLUtils::loadDDSTexture("Assets/Textures/envmap_violentdays/violentdays_pmrem.dds");
+
 	// Set skybox as environment map for reflections
 	// The skybox only has one colormap texture so use this as the reflection map.
-	m_renderSystem.setReflectionMap(skybox.model.materials.at(0).colorMaps.at(0).id);
+	m_renderSystem.setRadianceMap(radianceMap.id);
 	m_renderSystem.setIrradianceMap(irradianceMap.id);
 
 	// Setup the camera

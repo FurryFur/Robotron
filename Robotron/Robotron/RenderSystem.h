@@ -57,8 +57,8 @@ public:
 	// Also sets the static debug camera for debug drawing.
 	void setCamera(const Entity*);
 
-	// Sets the reflection map for reflections
-	void setReflectionMap(GLuint reflectionMap);
+	// Sets the radiance map for reflections
+	void setRadianceMap(GLuint radianceMap);
 
 	// Sets the irradiance map for image based lighting
 	void setIrradianceMap(GLuint irradianceMap);

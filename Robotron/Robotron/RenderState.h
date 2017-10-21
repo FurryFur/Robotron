@@ -8,8 +8,8 @@ struct Entity;
 struct RenderState {
 	GLFWwindow* glContext;
 	const Entity* cameraEntity;
-	GLuint reflectionMap;
-	bool hasReflectionMap;
+	GLuint radianceMap;
+	bool hasRadianceMap;
 	GLuint irradianceMap;
 	bool hasIrradianceMap;
 	GLuint uboUniforms;
