@@ -7,6 +7,7 @@
 #include "InputMapComponent.h"
 #include "PhysicsComponent.h"
 #include "NetworkComponent.h"
+#include "AIComponent.h"
 
 enum ComponentMask {
 	COMPONENT_NONE = 0,
@@ -21,7 +22,9 @@ enum ComponentMask {
 	COMPONENT_ENEMY01 = 1 << 8,
 	COMPONENT_ENEMY02 = 1 << 9,
 	COMPONENT_ENEMY03 = 1 << 10,
-	COMPONENT_NETWORK = 1 << 11
+	COMPONENT_NETWORK = 1 << 11,
+	COMPONENT_SCOREPICKUP = 1 << 12,
+	COMPONENT_PLAYERBULLET = 1 << 13
 };
 
 struct Entity
@@ -35,6 +38,7 @@ struct Entity
 	InputMapComponent inputMap;
 	LogicComponent logicVars;
 	NetworkComponent network;
+	AIComponent aiVariables;
 
 	Entity() = default;
 	Entity(Entity&&) = default;

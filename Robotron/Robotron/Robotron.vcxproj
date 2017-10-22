@@ -167,6 +167,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModelUtils.cpp" />
     <ClCompile Include="NetworkClientSystem.cpp" />
+    <ClCompile Include="PlayerBulletSystem.cpp" />
     <ClCompile Include="PlayerControlSystem.cpp" />
     <ClCompile Include="NetworkServerSystem.cpp" />
     <ClCompile Include="NetworkSystem.cpp" />
@@ -174,11 +175,13 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="EntityUtils.cpp" />
+    <ClCompile Include="ScorePickUpSystem.cpp" />
     <ClCompile Include="ShaderHelper.cpp" />
     <ClCompile Include="socket.cpp" />
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AIComponent.h" />
     <ClInclude Include="AIUtils.h" />
     <ClInclude Include="Clock.h" />
     <ClInclude Include="Enemy01ControlSystem.h" />
@@ -204,6 +207,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="NetworkServerSystem.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PhysicsComponent.h" />
+    <ClInclude Include="PlayerBulletSystem.h" />
     <ClInclude Include="PlayerControlComponent.h" />
     <ClInclude Include="PlayerControlSystem.h" />
     <ClInclude Include="NetworkSystem.h" />
@@ -213,6 +217,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="RPC.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="EntityUtils.h" />
+    <ClInclude Include="ScorePickUpSystem.h" />
     <ClInclude Include="ShaderHelper.h" />
     <ClInclude Include="socket.h" />
     <ClInclude Include="stb_image.h" />

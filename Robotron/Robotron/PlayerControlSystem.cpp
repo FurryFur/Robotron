@@ -63,7 +63,7 @@ void PlayerControlSystem::update(Entity& entity)
 		axis = entity.transform * glm::vec4{ axis, 0 }; // Convert movement to local coordinates
 	entity.physics.velocity = moveSpeed * axis;
 	if (axis != glm::vec3{ 0,0,0 })
-		entity.physics.previousVelocity = entity.physics.velocity;
+		entity.aiVariables.previousVelocity = entity.physics.velocity;
 	pos += entity.physics.velocity;
 
 	// Rotation

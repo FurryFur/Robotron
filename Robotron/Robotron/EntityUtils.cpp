@@ -76,7 +76,7 @@ Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY02);
 
-	entity.physics.positionInQueue = positionInQueue;
+	entity.aiVariables.positionInQueue = positionInQueue;
 
 	entity.transform = transform;
 
@@ -115,6 +115,28 @@ Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 	return entity;
 }
 
+Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transform)
+{
+	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
+		| COMPONENT_LOGIC | COMPONENT_SCOREPICKUP);
+
+	entity.transform = transform;
+
+	entity.model = GLPrimitives::getSphereModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+
+	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.worldSpaceMove = true;
+
+	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
+
+	return entity;
+}
+
+
 Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL 
@@ -134,6 +156,27 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.inputMap.rightBtnMap = GLFW_KEY_D;
 	entity.inputMap.forwardBtnMap = GLFW_KEY_W;
 	entity.inputMap.backwardBtnMap = GLFW_KEY_S;
+
+	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.worldSpaceMove = true;
+
+	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
+
+	return entity;
+}
+
+Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform)
+{
+	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
+		| COMPONENT_LOGIC | COMPONENT_PLAYERBULLET);
+
+	entity.transform = transform;
+
+	entity.model = GLPrimitives::getSphereModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;

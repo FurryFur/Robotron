@@ -7,17 +7,16 @@
 // (c) 2017 Media Design School
 //
 // Description  : A system which handles movement ai
-//                for Enemy01 enemy types. They
-//				  around the arena and pursue with
-//				  flocking the closest player in their
-//				  aggro range.
+//				  for score pickups entity types. They
+//				  follow a player who gets close to them do
+//			      only stop following if they die.
 // Author       : Jack Mair
 // Mail         : jack.mai7246@mediadesign.school.nz
 //
 
 #define _USE_MATH_DEFINES
 
-#include "Enemy01ControlSystem.h"
+#include "ScorePickUpSystem.h"
 
 #include "GLUtils.h"
 #include "GLMUtils.h"
@@ -33,52 +32,52 @@
 
 #include <cmath>
 
-Enemy01ControlSystem::Enemy01ControlSystem(Scene& scene)
+ScorePickUpSystem::ScorePickUpSystem(Scene& scene)
 	: m_scene{ scene }
 {
 
 }
 
 //the ai movement behavious for enemy01s
-void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
+void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 {
 	// Check that the entity is an Enemy01 object before proceeding.
-	if ((entity.componentMask & COMPONENT_ENEMY01) != COMPONENT_ENEMY01)
+	if ((entity.componentMask & COMPONENT_SCOREPICKUP) != COMPONENT_SCOREPICKUP)
 		return;
-	
-	// Set the target position out of scope.
-	glm::vec3 targetPosition  = glm::vec3{100, 100, 100};
-	glm::vec3 targetVelocity;
-	float targetMoveSpeed;
-	glm::vec3 currentPosition = glm::vec3{ entity.transform[3].x,  entity.transform[3].y,  entity.transform[3].z};
-	bool targetFound = false;
 
-	// Find the closest player object to seek to.
-	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+	// If Ai does not already have a player to follow, search for the nearest player within aggro range to follow
+	if (entity.aiVariables.followEntity == NULL)
 	{
-		if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						          //its a player object
-			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
-			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 15)								                  //the player is within the enemys aggro range
+		// Set the target position out of scope.
+		glm::vec3 targetPosition = glm::vec3{ 100, 100, 100 };
+
+		// Find the closest player object to follow.
+		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
 		{
-			targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z};
-			targetVelocity = m_scene.entities.at(i)->physics.velocity;
-			targetMoveSpeed = m_scene.entities.at(i)->controlVars.moveSpeed;
-			targetFound = true;
+			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						           //its a player object
+				&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < glm::length(targetPosition - glm::vec3(entity.transform[3]))     //it is the closet player to the target
+				&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 5)							                       //the player is within the enemys aggro range
+			{
+				targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z };
+				entity.aiVariables.followEntity = m_scene.entities.at(i).get();
+				// Increase the movement speed once a target is found
+				entity.controlVars.moveSpeed = 0.18f;
+			}
 		}
 	}
 
 	glm::vec3 Acc;
 	// Apply the seek and flock AI if target aquired.
-	if (targetFound)
+	if (entity.aiVariables.followEntity != NULL)
 	{
 		// Add a pursue acceleration to the culmative acceleration.
-		Acc = pursue(targetPosition, targetVelocity, targetMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+		Acc = followLeader(glm::vec3(entity.aiVariables.followEntity->transform[3]), entity.aiVariables.followEntity->physics.velocity, entity.aiVariables.followEntity->aiVariables.previousVelocity, glm::vec3(entity.transform[3]), entity.physics.velocity, entity.controlVars.moveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
 		// Find all the closest Enemy01 neighbours and store them in a vector.
 		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
 		{
-			if (((m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01) &&
+			if (((m_scene.entities.at(i)->componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP) &&
 				(glm::length(glm::vec2(m_scene.entities.at(i)->transform[3].x - entity.transform[3].x, m_scene.entities.at(i)->transform[3].z - entity.transform[3].z))) <= 2.0f)
 			{
 				nearbyNeighbours.push_back(m_scene.entities.at(i).get());
@@ -86,16 +85,16 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 		}
 
 		// Add a flock acceleration to the culmative acceleration.
-		if(nearbyNeighbours.size() > 0)
-			Acc += flock(nearbyNeighbours, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+		if (nearbyNeighbours.size() > 0 && entity.aiVariables.followEntity->physics.velocity != glm::vec3{ 0,0,0 })
+			Acc += flock(nearbyNeighbours, glm::vec3(entity.transform[3]), entity.physics.velocity, entity.controlVars.moveSpeed);
 	}
-	// If the seek returns 0 then wander.
+	// If no player to follow, just wander.
 	else
 		Acc = wander(entity);
 
 	// Limit the steering acceleration.
-	if (glm::length(Acc) > 0.002f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.002f);
+	if (glm::length(Acc) > 0.01f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.01f);
 
 	// Add the acceleration to the velocity.
 	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x, 0, entity.physics.velocity.z + Acc.z };
