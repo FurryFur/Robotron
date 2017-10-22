@@ -62,8 +62,8 @@ void main(void)
 	vec3 LiRefl = textureLod(radianceSampler, LiReflDir, mipmapIndex).rgb;
 	vec3 LiIrr = texture(irradianceSampler, normal).rgb;
 
-	vec3 Cspec = u.metallicness * color;
-	vec3 Cdiff = (1 - u.metallicness) * color;
+	vec3 Cspec = mix(vec3(0.04, 0.04, 0.04), color, u.metallicness);
+	vec3 Cdiff = mix(vec3(0, 0, 0), color, 1 - u.metallicness);
 	vec3 Fdirect = fresnel(Cspec, lightDir, halfVector);
 	vec3 Frefl = fresnelWithGloss(Cspec, LiReflDir, normal, u.glossiness);
 	vec3 FdiffDirect = Cdiff * (1 - Cspec);
