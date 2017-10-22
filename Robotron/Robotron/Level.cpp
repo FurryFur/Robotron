@@ -79,12 +79,6 @@ Level::Level(GLFWwindow* window, int levelNum)
 			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
 	}
 
-	Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
-		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f })
-		* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
-
-	bullet.physics.velocity = { 0.0f, 0.0f, 0.0f };
-
 	// Create enemy02s
 	//for (unsigned int i = 0; i <= 10; ++i)
 	//{

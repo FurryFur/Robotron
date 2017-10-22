@@ -18,8 +18,10 @@
 #include "KeyObserver.h"
 #include "Scene.h"
 #include "Utils.h"
+#include "EntityUtils.h"
 
 #include <GLFW\glfw3.h>
+#include <glm\gtc\matrix_transform.hpp>
 
 InputSystem::InputSystem(GLFWwindow* window, Scene& scene)
 	: m_window{ window }
@@ -45,6 +47,46 @@ void InputSystem::keyCallback(int key, int scancode, int action, int mods)
 	// Close window on exit
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(m_window, GLFW_TRUE);
+		return;
+	}
+
+	// Create a bullet on the player shooting right
+	if (key == GLFW_KEY_J && action == GLFW_PRESS) {
+		Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
+			glm::translate({}, glm::vec3(m_scene.entities.at(1)->transform[3]))
+			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+		bullet.physics.velocity = glm::vec3{ -0.4f, 0.0f, 0.0f };
+		bullet.physics.velocity.z += m_scene.entities.at(1)->physics.velocity.z;
+		return;
+	}
+
+	// Create a bullet on the player shooting left
+	if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+		Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
+			glm::translate({}, glm::vec3(m_scene.entities.at(1)->transform[3]))
+			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+		bullet.physics.velocity = glm::vec3{ 0.4f, 0.0f, 0.0f };
+		bullet.physics.velocity.z += m_scene.entities.at(1)->physics.velocity.z;
+		return;
+	}
+
+	// Create a bullet on the player shooting down
+	if (key == GLFW_KEY_I && action == GLFW_PRESS) {
+		Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
+			glm::translate({}, glm::vec3(m_scene.entities.at(1)->transform[3]))
+			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+		bullet.physics.velocity = glm::vec3{ 0.0f, 0.0f, -0.4f };
+		bullet.physics.velocity.x += m_scene.entities.at(1)->physics.velocity.x;
+		return;
+	}
+
+	// Create a bullet on the player shooting up
+	if (key == GLFW_KEY_K && action == GLFW_PRESS) {
+		Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
+			glm::translate({}, glm::vec3(m_scene.entities.at(1)->transform[3]))
+			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+		bullet.physics.velocity = glm::vec3{ 0.0f, 0.0f, 0.4f };
+		bullet.physics.velocity.x += m_scene.entities.at(1)->physics.velocity.x;
 		return;
 	}
 
