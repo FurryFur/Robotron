@@ -66,15 +66,15 @@ void main(void)
 	vec3 Cdiff = (1 - u.metallicness) * color;
 	vec3 Fdirect = fresnel(Cspec, lightDir, halfVector);
 	vec3 Frefl = fresnelWithGloss(Cspec, LiReflDir, normal, u.glossiness);
-	vec3 CdiffDirect = Cdiff * (1 - Fdirect) / (1 - Cspec);
-	vec3 CdiffAmb = Cdiff * (1 - Frefl) / (1 - Cspec);
+	vec3 FdiffDirect = Cdiff * (1 - Cspec);
+	vec3 FdiffAmb = Cdiff * (1 - Cspec);
 
-	vec3 BRDFdiff = kDiffNorm * CdiffDirect;
-	vec3 BRDFspec =  Fdirect * specNorm * pow(ndoth, specPow);
+	vec3 BRDFdiff = kDiffNorm * FdiffDirect;
+	vec3 BRDFspec =  specNorm * Fdirect * pow(ndoth, specPow);
 	vec3 BRDFdirect = BRDFdiff + BRDFspec;
 
 	vec3 LrDirect = LiDirect * BRDFdirect * ndotl;
-	vec3 LrAmbDiff= LiIrr * CdiffAmb;
+	vec3 LrAmbDiff= LiIrr * FdiffAmb;
 	vec3 LrAmbSpec = LiRefl * Frefl;
 
 	outColor = vec4(LrDirect + LrAmbDiff + LrAmbSpec, 1);
