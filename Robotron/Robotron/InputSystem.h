@@ -39,6 +39,12 @@ public:
 private:
 	// Handles keyboard events
 	void keyCallback(int key, int scancode, int action, int mods);
+	
+	// Allows the player to shoot diagonally with 2 key inputs
+	bool shootUp;
+	bool shootDown;
+	bool shootLeft;
+	bool shootRight;
 
 	Scene& m_scene;
 	GLFWwindow* m_window;
