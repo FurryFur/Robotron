@@ -7,7 +7,7 @@
 // (c) 2017 Media Design School
 //
 // Description  : A collection of functions used to create new entities.
-// Author       : Lance Chaney
+// Author       : Lance Chaney, Jack Mair
 // Mail         : lance.cha7337@mediadesign.school.nz
 //
 
@@ -44,9 +44,16 @@ namespace EntityUtils {
 	//Creates the enemy03 enemy type
 	Entity& createEnemy03(Scene& scene, const glm::mat4& transform);
 
+	//Creates the score pickup01 entity type
+	Entity& createScorePickUp01(Scene& scene, const glm::mat4& transform);
+
 	// Creates a  Player (currently a unit sphere), centered at the origin, with the specified 
 	// transform;
 	Entity& createPlayer(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+
+	// Creates a  Player Bullet (currently a unit sphere), centered at the origin, with the specified 
+	// transform;
+	Entity& createPlayerBullet(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 
 	// Creates a cylinder with the specified radius and height.
 	Entity& createCylinder(Scene&, float radius = 1, float height = 1, const glm::mat4& transform = glm::mat4{ 1 });

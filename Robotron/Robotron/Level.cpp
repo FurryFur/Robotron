@@ -13,6 +13,8 @@ Level::Level(GLFWwindow* window, int levelNum)
 	, m_enemy01ControlSystem(m_scene)
 	, m_enemy02ControlSystem(m_scene)
 	, m_enemy03ControlSystem(m_scene)
+	, m_scorePickUpSystem(m_scene)
+	, m_playerbulletsystem(m_scene)
 {
 
 	m_pClock.Process();
@@ -37,9 +39,9 @@ Level::Level(GLFWwindow* window, int levelNum)
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 	player.componentMask |= COMPONENT_NETWORK;
 
-	EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
-		  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
-		* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
+	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
+	//	  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
+	//	* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
 
 	// Create the number of enemy01 based on current level with some random variance.
 	unsigned int numberOfEnemy01 = 2 + m_levelNum + randomInt(-2, 2);
@@ -55,9 +57,33 @@ Level::Level(GLFWwindow* window, int levelNum)
 			randZ += 25;
 
 		Entity& enemy = EntityUtils::createEnemy01(m_scene,
-			glm::translate({}, glm::vec3{ randX, 0.0f, randZ }));
+			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
 		enemy.componentMask |= COMPONENT_NETWORK;
 	}
+
+	//CreateScorePickups
+	unsigned int numberOfScorePickups01 = 2 + m_levelNum + randomInt(-2, 2);
+
+	for (unsigned int i = 0; i <= numberOfScorePickups01; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randX += 25;
+
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randZ += 25;
+
+		Entity& enemy = EntityUtils::createScorePickUp01(m_scene,
+			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
+			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+	}
+
+	Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
+		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f })
+		* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+
+	bullet.physics.velocity = { 0.0f, 0.0f, 0.0f };
 
 	// Create enemy02s
 	//for (unsigned int i = 0; i <= 10; ++i)
@@ -71,7 +97,7 @@ Level::Level(GLFWwindow* window, int levelNum)
 	//		randZ += 25;
 	//
 	//	EntityUtils::createEnemy02(m_scene,
-	//		glm::translate({}, glm::vec3{ randX, 0.0f, randZ }), i);
+	//		glm::translate({}, glm::vec3{ randX, 1.0f, randZ }), i);
 	//}
 
 	// Create enemy03s
@@ -86,7 +112,7 @@ Level::Level(GLFWwindow* window, int levelNum)
 	//		randZ += 25;
 	//
 	//	EntityUtils::createEnemy03(m_scene,
-	//		glm::translate({}, glm::vec3{ randX, 0.0f, randZ }));
+	//		glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
 	//}
 
 	// Create the skybox
@@ -152,6 +178,8 @@ void Level::process(float deltaTick)
 		m_enemy01ControlSystem.update(*m_scene.entities.at(i), deltaTick);
 		m_enemy02ControlSystem.update(*m_scene.entities.at(i), deltaTick);
 		m_enemy03ControlSystem.update(*m_scene.entities.at(i), deltaTick);
+		m_scorePickUpSystem.update(*m_scene.entities.at(i), deltaTick);
+		m_playerbulletsystem.update(*m_scene.entities.at(i), deltaTick);
 	}
 
 	// Do operations that should happen at the end of the frame.

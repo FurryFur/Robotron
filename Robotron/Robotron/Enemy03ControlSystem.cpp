@@ -61,7 +61,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 		{
 			targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z };
 			targetVelocity = m_scene.entities.at(i)->physics.velocity;
-			targetPreviousVelocity = m_scene.entities.at(i)->physics.previousVelocity;
+			targetPreviousVelocity = m_scene.entities.at(i)->aiVariables.previousVelocity;
 			targetMoveSpeed = m_scene.entities.at(i)->controlVars.moveSpeed;
 			targetFound = true;
 		}
@@ -109,18 +109,18 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 	//if (isSeekingPlayer)
 	//
 
-	const float kDebugScale = 100;
-	glm::vec3 position = glm::vec3(entity.transform[3]);
-	RenderSystem::drawDebugArrow(position, position + entity.physics.velocity * kDebugScale);
-	RenderSystem::drawDebugArrow(position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
+	//const float kDebugScale = 100;
+	//glm::vec3 position = glm::vec3(entity.transform[3]);
+	//RenderSystem::drawDebugArrow(position, position + entity.physics.velocity * kDebugScale);
+	//RenderSystem::drawDebugArrow(position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
 	//RenderSystem::drawDebugArrow(m_scene, position, desiredVelocity, glm::length(desiredVelocity) * kDebugScale);
 
-	glm::vec4 newPosition = entity.transform[3] + glm::vec4{ newVelocity, 0 } *deltaTick;
+	glm::vec4 newPosition = entity.transform[3] + glm::vec4{ newVelocity, 0 };
 	// Bounce of the boundraies of the walls
 	if (newPosition.x > 20.0f || newPosition.x < -20.0f)
 	{
 		newVelocity.x *= -1;
-		entity.physics.wanderPosition.x *= -1;
+		entity.aiVariables.wanderPosition.x *= -1;
 		if (newPosition.x > 20.0f)
 			entity.transform[3].x = 20.0f;
 		else
@@ -130,7 +130,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 	if (newPosition.z > 20.0f || newPosition.z < -20.0f)
 	{
 		newVelocity.z *= -1;
-		entity.physics.wanderPosition.z *= -1;
+		entity.aiVariables.wanderPosition.z *= -1;
 		if (newPosition.z > 20.0f)
 			entity.transform[3].z = 20.0f;
 		else

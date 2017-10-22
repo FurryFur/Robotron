@@ -40,7 +40,7 @@ void NetworkServerSystem::update(Entity& entity)
 	// Detect object deletion
 	int& id = entity.network.id;
 	bool isNewEntity = entity.network.isNewEntity;
-	if (entity.componentMask == COMPONENT_NONE) {
+	if (entity.componentMask == COMPONENT_NONE && id > -1) {
 		// Notify clients of deletion
 		// TODO: Add redundancy here, so that missed packets don't cause an
 		// object to NOT be removed on the client side.
