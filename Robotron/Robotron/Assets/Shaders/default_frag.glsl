@@ -30,10 +30,9 @@ vec3 fresnel(vec3 specColor, vec3 lightDir, vec3 halfVector)
 	return specColor + (1.0f - specColor) * pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5);
 }
 
-float fresnelDiff(vec3 lightDir, vec3 halfVector)
+vec3 fresnelWithGloss(vec3 specColor, vec3 lightDir, vec3 halfVector, float gloss)
 {
-	float FdiffSqrt = (1 - (pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5)));
-	return FdiffSqrt;
+    return specColor + (max(vec3(gloss, gloss, gloss), specColor) - specColor) * pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5);
 }
 
 void main(void)
@@ -64,9 +63,9 @@ void main(void)
 	vec3 Cspec = mix(vec3(0.04, 0.04, 0.04), color, u.metallicness);
 	vec3 Cdiff = mix(vec3(0, 0, 0), color, 1 - u.metallicness);
 	vec3 Fspec = fresnel(Cspec, lightDir, halfVector);
-	vec3 Fdiff = Cdiff * fresnelDiff(lightDir, halfVector);
-	vec3 FspecRefl = fresnel(Cspec, LiReflDir, normal);
-	vec3 FdiffRefl = Cdiff * fresnelDiff(LiReflDir, normal);
+	vec3 Fdiff = Cdiff * (1 - Fspec) / (1.0000001 - Cspec);
+	vec3 FspecRefl = fresnelWithGloss(Cspec, LiReflDir, normal, u.glossiness);
+	vec3 FdiffRefl = Cdiff * (1 - FspecRefl) / (1.0000001 - Cspec);
 
 	vec3 BRDFspec = specNorm * Fspec * pow(ndoth, specPow);
 

@@ -354,8 +354,8 @@ const ModelComponent& GLPrimitives::getSphereModel()
 		material.shader = GLUtils::getDefaultShader();
 		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture2.jpg"));
 		material.willDrawDepth = true;
-		material.shaderParams.metallicness = 0.3f;
-		material.shaderParams.glossiness = 0.1f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		material.shaderParams.metallicness = 0;
+		material.shaderParams.glossiness = 0; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
 		model.materials.push_back(std::move(material));
 
 		isLoaded = true;
@@ -390,7 +390,7 @@ const ModelComponent& GLPrimitives::getCylinderModel()
 		material.shader = GLUtils::getDefaultShader();
 		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/doge.jpg"));
 		material.willDrawDepth = true;
-		material.shaderParams.metallicness = 0.75f;
+		material.shaderParams.metallicness = 1;
 		material.shaderParams.glossiness = 1.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
 		model.materials.push_back(std::move(material));
 	
@@ -426,7 +426,7 @@ const ModelComponent& GLPrimitives::getPyramidModel()
 		material.shader = GLUtils::getDefaultShader();
 		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture.jpg"));
 		material.willDrawDepth = true;
-		material.shaderParams.metallicness = 0.95f;
+		material.shaderParams.metallicness = 1;
 		material.shaderParams.glossiness = 1.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
 		model.materials.push_back(std::move(material));
 
@@ -462,7 +462,7 @@ const ModelComponent& GLPrimitives::getCubeModel()
 		material.shader = GLUtils::getDefaultShader();
 		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
 		material.willDrawDepth = true;
-		material.shaderParams.metallicness = 0.95f;
+		material.shaderParams.metallicness = 1;
 		material.shaderParams.glossiness = 1.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
 		model.materials.push_back(std::move(material));
 
