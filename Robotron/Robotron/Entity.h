@@ -3,6 +3,7 @@
 #include "InputComponent.h"
 #include "ModelComponent.h"
 #include "PlayerControlComponent.h"
+#include "PlayerStatsComponent.h"
 #include "LogicComponent.h"
 #include "InputMapComponent.h"
 #include "PhysicsComponent.h"
@@ -34,6 +35,7 @@ struct Entity
 	PhysicsComponent physics;
 	ModelComponent model;
 	PlayerControlComponent controlVars;
+	PlayerStatsComponent playerStats;
 	InputComponent input;
 	InputMapComponent inputMap;
 	LogicComponent logicVars;

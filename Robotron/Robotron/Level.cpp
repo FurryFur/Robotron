@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window, int levelNum)
+Level::Level(GLFWwindow* window)
 	: m_scene{}
 	, m_renderSystem(window, m_scene)
 	, m_playerControlSystem(m_scene)
@@ -20,7 +20,7 @@ Level::Level(GLFWwindow* window, int levelNum)
 	m_pClock.Process();
 
 	m_window = window;
-	m_levelNum = levelNum;
+	m_levelNum = 0;
 
 	std::string strServerMode;
 	std::cout << "Run in server mode: ";
@@ -38,76 +38,6 @@ Level::Level(GLFWwindow* window, int levelNum)
 	Entity& player = EntityUtils::createPlayer(m_scene,
 		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 	player.componentMask |= COMPONENT_NETWORK;
-
-	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
-	//	  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
-	//	* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
-
-	// Create the number of enemy01 based on current level with some random variance.
-	unsigned int numberOfEnemy01 = 2 + m_levelNum + randomInt(-2, 2);
-	
-	for (unsigned int i = 0; i <= numberOfEnemy01; ++i)
-	{
-		float randX = randomReal<float>(-20.0f, -5.0f);
-		if (randomInt(0, 1) == 0)
-			randX += 25;
-	
-		float randZ = randomReal<float>(-20.0f, -5.0f);
-		if (randomInt(0, 1) == 0)
-			randZ += 25;
-
-		Entity& enemy = EntityUtils::createEnemy01(m_scene,
-			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
-		enemy.componentMask |= COMPONENT_NETWORK;
-	}
-
-	//CreateScorePickups
-	unsigned int numberOfScorePickups01 = 2 + m_levelNum + randomInt(-2, 2);
-
-	for (unsigned int i = 0; i <= numberOfScorePickups01; ++i)
-	{
-		float randX = randomReal<float>(-20.0f, -5.0f);
-		if (randomInt(0, 1) == 0)
-			randX += 25;
-
-		float randZ = randomReal<float>(-20.0f, -5.0f);
-		if (randomInt(0, 1) == 0)
-			randZ += 25;
-
-		Entity& enemy = EntityUtils::createScorePickUp01(m_scene,
-			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
-			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
-	}
-
-	// Create enemy02s
-	//for (unsigned int i = 0; i <= 10; ++i)
-	//{
-	//	float randX = randomReal<float>(-20.0f, -5.0f);
-	//	if (randomInt(0, 1) == 0)
-	//		randX += 25;
-	//
-	//	float randZ = randomReal<float>(-20.0f, -5.0f);
-	//	if (randomInt(0, 1) == 0)
-	//		randZ += 25;
-	//
-	//	EntityUtils::createEnemy02(m_scene,
-	//		glm::translate({}, glm::vec3{ randX, 1.0f, randZ }), i);
-	//}
-
-	// Create enemy03s
-	//for (unsigned int i = 0; i <= 5; ++i)
-	//{
-	//	float randX = randomReal<float>(-20.0f, -5.0f);
-	//	if (randomInt(0, 1) == 0)
-	//		randX += 25;
-	//
-	//	float randZ = randomReal<float>(-20.0f, -5.0f);
-	//	if (randomInt(0, 1) == 0)
-	//		randZ += 25;
-	//
-	//	EntityUtils::createEnemy03(m_scene,
-	//		glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
-	//}
 
 	// Create the skybox
 	Entity& skybox = EntityUtils::createSkybox(m_scene, {
@@ -143,6 +73,161 @@ Level::Level(GLFWwindow* window, int levelNum)
 
 Level::~Level()
 {
+}
+
+void Level::spawnEnemies(int levelType)
+{
+	// Different combinations of enemies are spawned based on the level type.
+	// The number of enemies increases as the level number increases.
+	
+	int zombieCount = 0;
+	int snakePartsCount = 0;
+	int shooterCount = 0;
+
+	// Spawn Zombies level type
+	if (levelType == 0)
+	{
+		zombieCount = 2 + m_levelNum + randomInt(0, 2);
+	}
+	// Spawn mixed level type
+	else if (levelType == 1)
+	{
+		zombieCount = m_levelNum + randomInt(1, 2);
+		shooterCount = m_levelNum + randomInt(-4, -2);
+	}
+	// Spawn shooter level type
+	else if (levelType == 2)
+	{
+		shooterCount = 2 + m_levelNum + randomInt(0, 2);
+	}
+	// Spawn snake level type
+	else if (levelType == 3)
+	{
+		snakePartsCount = 2 + m_levelNum + randomInt(0, 2);
+	}
+	// Spawn bonus level type
+	else if (levelType == 4)
+	{
+		zombieCount = randomInt(1, 3);
+	}
+
+	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
+	//	  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
+	//	* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
+
+	// Create all the zombie enemy types in the scene.
+	for (int i = 0; i < zombieCount; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randX += 25;
+
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randZ += 25;
+
+		Entity& enemy = EntityUtils::createEnemy01(m_scene,
+			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
+		enemy.componentMask |= COMPONENT_NETWORK;
+	}
+
+	// Create all the snake enemy types in the scene.
+	for (int i = 0; i < snakePartsCount; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randX += 25;
+	
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randZ += 25;
+	
+		EntityUtils::createEnemy02(m_scene,
+			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }), i);
+	}
+
+	// Create all the shooter enemy types in the scene.
+	for (int i = 0; i < shooterCount; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randX += 25;
+	
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randZ += 25;
+	
+		EntityUtils::createEnemy03(m_scene,
+			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
+	}
+
+	//CreateScorePickups
+	unsigned int numberOfScorePickups01 = 2 + m_levelNum + randomInt(-2, 2);
+	
+	for (int i = 0; i <= numberOfScorePickups01; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randX += 25;
+	
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randZ += 25;
+	
+		Entity& enemy = EntityUtils::createScorePickUp01(m_scene,
+			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
+			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+	}
+}
+
+void Level::initalizeNextLevel()
+{
+	++m_levelNum;
+	
+	int randomNum;
+	
+	// Only spawn zombies or mixed below level 5.
+	if (m_levelNum < 5)
+		randomNum = randomInt(0, 1);
+	
+	// Spawn all enemy types above level 5.
+	else if (m_levelNum % 5 != 0)
+		randomNum = randomInt(0, 3);
+	
+	// A bonus level occurs every 5 levels.
+	else
+		randomNum = 4;
+
+	// Delete all score pickups and update the players score.
+	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+	{
+		if ((m_scene.entities.at(i)->componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP)
+		{
+			// Increase the player's score value.
+			if (m_scene.entities.at(i)->aiVariables.followEntity != NULL)
+			{
+				m_scene.entities.at(i)->aiVariables.followEntity->playerStats.score += 10;
+			}
+			m_scene.destroyEntity(*m_scene.entities.at(i));
+		}
+	}
+
+	spawnEnemies(randomNum);
+}
+
+bool Level::checkEnemiesAlive()
+{
+	// Cycle through all the entites in the scene.
+	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+	{
+		// Return true when the first entity is found with an enemy tag.
+		if ((m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01
+		 || (m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY02) == COMPONENT_ENEMY02
+		 || (m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY03) == COMPONENT_ENEMY03)
+			return true;
+	}
+
+	return false;
 }
 
 void Level::executeOneFrame()

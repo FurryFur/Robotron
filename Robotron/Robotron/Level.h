@@ -43,14 +43,19 @@
 class Level
 {
 public:
-	Level(GLFWwindow* window, int levelNum);
+	Level(GLFWwindow* window);
 	~Level();
 
+	// Increases the level count of the game and spawns the next enemies.
+	void initalizeNextLevel();
+	// Returns true if there are still alive enemies in the level.
+	bool checkEnemiesAlive();
 	void executeOneFrame();
 
-	void process(float _fDeltaTick);
-
 private:
+
+	void spawnEnemies(int levelType);
+	void process(float _fDeltaTick);
 
 	Clock m_pClock;
 	Scene m_scene;

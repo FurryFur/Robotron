@@ -212,6 +212,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="PlayerControlSystem.h" />
     <ClInclude Include="NetworkSystem.h" />
     <ClInclude Include="PlayerInfo.h" />
+    <ClInclude Include="PlayerStatsComponent.h" />
     <ClInclude Include="RenderState.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="RPC.h" />

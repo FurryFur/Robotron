@@ -55,6 +55,10 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY01);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();
@@ -76,6 +80,10 @@ Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY02);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+	
 	entity.aiVariables.positionInQueue = positionInQueue;
 
 	entity.transform = transform;
@@ -99,6 +107,10 @@ Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY03);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();
@@ -120,6 +132,10 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 		| COMPONENT_LOGIC | COMPONENT_SCOREPICKUP);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+	
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();
@@ -143,6 +159,12 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_INPUT_MAP | COMPONENT_MODEL
 	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+
+	entity.playerStats.lives = 3;
+	entity.playerStats.score = 0;
+	
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();
@@ -171,6 +193,10 @@ Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 		| COMPONENT_LOGIC | COMPONENT_PLAYERBULLET);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+	
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();
