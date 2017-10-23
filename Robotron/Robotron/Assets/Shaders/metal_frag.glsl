@@ -22,10 +22,8 @@ uniform sampler2D metallicnessSampler;
 uniform samplerCube radianceSampler;
 uniform samplerCube irradianceSampler;
 
-const float PI = 3.1415926535897932384626433832795;
 vec3 lightDir = vec3(1, 1, -1);
-const vec3 LiDirect = vec3(0.64, 0.39, 0.31) * 4;
-const float kDiffNorm = 1 / PI;
+const vec3 LiDirect = vec3(0.64, 0.39, 0.31);
 const int pmremMipCount = 11;
 
 vec3 fresnel(vec3 specColor, vec3 lightDir, vec3 halfVector)
@@ -33,9 +31,10 @@ vec3 fresnel(vec3 specColor, vec3 lightDir, vec3 halfVector)
 	return specColor + (1.0f - specColor) * pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5);
 }
 
-vec3 fresnelWithGloss(vec3 specColor, vec3 lightDir, vec3 halfVector, float gloss)
+float fresnelDiff(vec3 lightDir, vec3 halfVector)
 {
-	return specColor + (max(vec3(gloss, gloss, gloss), specColor) - specColor) * pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5);
+	float FdiffSqrt = (1 - (pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5)));
+	return FdiffSqrt;
 }
 
 void main(void)
@@ -57,7 +56,7 @@ void main(void)
 
 	// Reflection variables
 	float specPow = exp2(10 * u.glossiness + 1);
-	float specNorm = (specPow + 4) * (specPow + 2) / (8 * PI * (specPow + pow(2, -specPow / 2)));
+	float specNorm = (specPow + 8) / (8 * PI);
 	float mipmapIndex = (1 - u.glossiness) * (pmremMipCount - 1); 
 	vec3 LiReflDir = normalize(reflect(-viewDir, normal)); // The light direction that reflects directly into the camera
 	vec3 LiRefl = textureLod(radianceSampler, LiReflDir, mipmapIndex).rgb;
@@ -66,18 +65,16 @@ void main(void)
 	vec3 metallicness = u.metallicness + texture(metallicnessSampler, i.texCoord).rgb;
 	vec3 Cspec = mix(vec3(0.04, 0.04, 0.04), color, metallicness);
 	vec3 Cdiff = mix(vec3(0, 0, 0), color, 1 - metallicness);
-	vec3 Fdirect = fresnel(Cspec, lightDir, halfVector);
-	vec3 Frefl = fresnelWithGloss(Cspec, LiReflDir, normal, u.glossiness);
-	vec3 FdiffDirect = Cdiff * (1 - Cspec);
-	vec3 FdiffAmb = Cdiff * (1 - Cspec);
+	vec3 Fspec = fresnel(Cspec, lightDir, halfVector);
+	vec3 Fdiff = Cdiff * fresnelDiff(lightDir, halfVector);
+	vec3 FspecRefl = fresnel(Cspec, LiReflDir, normal);
+	vec3 FdiffRefl = Cdiff * fresnelDiff(LiReflDir, normal);
 
-	vec3 BRDFdiff = kDiffNorm * FdiffDirect;
-	vec3 BRDFspec =  specNorm * Fdirect * pow(ndoth, specPow);
-	vec3 BRDFdirect = BRDFdiff + BRDFspec;
+	vec3 BRDFspec = specNorm * Fspec * pow(ndoth, specPow);
 
-	vec3 LrDirect = LiDirect * BRDFdirect * ndotl;
-	vec3 LrAmbDiff= LiIrr * FdiffAmb;
-	vec3 LrAmbSpec = LiRefl * Frefl;
+	vec3 LrDirect = LiDirect * (Fdiff + BRDFspec) * ndotl;
+	vec3 LrAmbDiff= LiIrr * FdiffRefl;
+	vec3 LrAmbSpec = LiRefl * FspecRefl;
 
 	outColor = vec4(LrDirect + LrAmbDiff + LrAmbSpec, 1);
 }

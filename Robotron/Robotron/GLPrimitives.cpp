@@ -11,9 +11,9 @@
 
 #include <cmath>
 
-const size_t g_kSphereThetaSegments = 16; // Number of segments from top to bottom of sphere
-const size_t g_kSpherePhiSegments = 16; // Number of segments going around the sphere
-const size_t g_kCylinderThetaSegments = 16; // Number of segments going around the cylinder
+const size_t g_kSphereThetaSegments = 32; // Number of segments from top to bottom of sphere
+const size_t g_kSpherePhiSegments = 32; // Number of segments going around the sphere
+const size_t g_kCylinderThetaSegments = 32; // Number of segments going around the cylinder
 const float g_kDThetaSphere = static_cast<float>(M_PI / g_kSphereThetaSegments);
 const float g_kDPhiSphere = static_cast<float>(2 * M_PI / g_kSpherePhiSegments);
 const float g_kDThetaCylinder = static_cast<float>(2 * M_PI / g_kCylinderThetaSegments);
