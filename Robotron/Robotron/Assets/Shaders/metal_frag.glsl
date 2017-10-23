@@ -55,13 +55,13 @@ void main(void)
 
 	// Reflection variables
 	float specPow = exp2(10 * u.glossiness + 1);
-	float specNorm = (specPow + 8) / (8 * PI);
+	float specNorm = (specPow + 8) / 8;
 	float mipmapIndex = (1 - u.glossiness) * (pmremMipCount - 1); 
 	vec3 LiReflDir = normalize(reflect(-viewDir, normal)); // The light direction that reflects directly into the camera
 	vec3 LiRefl = textureLod(radianceSampler, LiReflDir, mipmapIndex).rgb;
 	vec3 LiIrr = texture(irradianceSampler, normal).rgb;
 
-	vec3 metallicness = u.metallicness + texture(metallicnessSampler, i.texCoord).rgb;
+	vec3 metallicness = clamp(u.metallicness + texture(metallicnessSampler, i.texCoord).rgb, vec3(0, 0, 0), vec3(1, 1, 1));
 	vec3 Cspec = mix(vec3(0.04, 0.04, 0.04), color, metallicness);
 	vec3 Cdiff = mix(vec3(0, 0, 0), color, 1 - metallicness);
 	vec3 Fspec = fresnel(Cspec, lightDir, halfVector);
