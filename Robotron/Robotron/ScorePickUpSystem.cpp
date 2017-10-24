@@ -44,6 +44,14 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 	// Check that the entity is an Enemy01 object before proceeding.
 	if ((entity.componentMask & COMPONENT_SCOREPICKUP) != COMPONENT_SCOREPICKUP)
 		return;
+	
+	// If the player dies. Stop following them.
+	if (entity.aiVariables.followEntity != NULL
+     && entity.aiVariables.followEntity->playerStats.isRespawning == true)
+	{
+		entity.aiVariables.followEntity = NULL;
+	}
+
 
 	// If Ai does not already have a player to follow, search for the nearest player within aggro range to follow
 	if (entity.aiVariables.followEntity == NULL)
@@ -54,9 +62,9 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 		// Find the closest player object to follow.
 		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
 		{
-			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						           //its a player object
+			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						                          //its a player object
 				&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < glm::length(targetPosition - glm::vec3(entity.transform[3]))     //it is the closet player to the target
-				&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 5)							                       //the player is within the enemys aggro range
+				&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 5)							                                      //the player is within the enemys aggro range
 			{
 				targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z };
 				entity.aiVariables.followEntity = m_scene.entities.at(i).get();
@@ -93,8 +101,8 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 		Acc = wander(entity);
 
 	// Limit the steering acceleration.
-	if (glm::length(Acc) > 2.0f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 2.0f);
+	if (glm::length(Acc) > 3.0f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 3.0f);
 
 	// Add the acceleration to the velocity.
 	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick, 0, entity.physics.velocity.z + Acc.z * deltaTick };

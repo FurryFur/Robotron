@@ -255,7 +255,7 @@ glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::
 	else
 		tv = glm::vec2{ targetPreviousVelocity.x * -1.0f , targetPreviousVelocity.z * -1.0f };
 	// Change its length to be equal to the desired follow distance.
-	tv = (tv / glm::length(tv)) * 0.8f;
+	tv = (tv / glm::length(tv)) * 2.0f;
 	// Find the position to follow.
 	glm::vec3 followPosition = glm::vec3{ targetPosition.x + tv.x, targetPosition.y, targetPosition.z + tv.y };
 

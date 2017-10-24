@@ -41,6 +41,22 @@ Level::Level(GLFWwindow* window)
 		glm::translate({}, glm::vec3{ 0.0f, 50.0f, 0.0f }));
 	player.componentMask |= COMPONENT_NETWORK;
 
+	// Create all the snake enemy types in the scene.
+	for (int i = 0; i < 6; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randX += 25;
+
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randZ += 25;
+
+		EntityUtils::createEnemy02(m_scene,
+			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }), i);
+	}
+
+
 	spawnEnemies(0);
 
 	// Create the skybox

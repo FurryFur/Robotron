@@ -61,14 +61,17 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 	glm::vec3 Acc;
 	//Wander around the map if the first in the queue
 	if (followNumber == entity.aiVariables.positionInQueue)
+	{
+		entity.controlVars.moveSpeed = 0.1f;
 		Acc = wander(entity);
+	}
 	else {
 		Acc = seekWithArrival(followPosition, glm::vec3{ entity.transform[3] }, entity.physics.velocity, entity.controlVars.moveSpeed);
 	}
 
 	// Limit the steering acceleration.
-	if (glm::length(Acc) > 0.1f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.1f);
+	if (glm::length(Acc) > 0.2f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.2f);
 
 	// Add the acceleration to the velocity.
 	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick , 0, entity.physics.velocity.z + Acc.z * deltaTick };
