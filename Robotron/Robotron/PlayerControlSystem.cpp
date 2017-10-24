@@ -21,6 +21,7 @@
 #include "GLMUtils.h"
 #include "Scene.h"
 #include "Entity.h"
+#include "Clock.h"
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -33,9 +34,9 @@ PlayerControlSystem::PlayerControlSystem(Scene& scene)
 {
 }
 
-void PlayerControlSystem::update(Entity& entity)
+void PlayerControlSystem::update(Entity& entity, Clock& clock)
 {
-	if ((entity.componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01)
+	if ((entity.componentMask & COMPONENT_PLAYER_CONTROL) != COMPONENT_PLAYER_CONTROL)
 		return;
 	
 	// Filter movable
@@ -78,4 +79,22 @@ void PlayerControlSystem::update(Entity& entity)
 	entity.transform[3] = {0, 0, 0, 1}; // Remove displacement temporarily
 	entity.transform = glm::mat4{ rollMat * azimuthMat * elevationMat } * entity.transform; // Rotation without displacement
 	entity.transform[3] = glm::vec4{ pos, 1 }; // Add displacement back in
+
+
+	//Check if an enemy or enemy bullet is touching the player.
+	//If so damage them and respawn them.
+	// Find the closest player object to seek to.
+	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+	{
+		if (((m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01		//its an enemy object
+		  || (m_scene.entities.at(i)->componentMask &  COMPONENT_ENEMY02) == COMPONENT_ENEMY02
+		  || (m_scene.entities.at(i)->componentMask &  COMPONENT_ENEMY03) == COMPONENT_ENEMY03)
+			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 1)		    //the player is within range to be damaged by it
+		{
+			entity.playerStats.deathTime = clock.GetCurTime();
+			--entity.playerStats.lives;
+			entity.playerStats.isRespawning = true;
+			entity.transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
+		}
+	}
 }

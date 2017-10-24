@@ -287,6 +287,9 @@
     <ClInclude Include="StreamableQueue.h">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerStatsComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\default_frag.glsl">

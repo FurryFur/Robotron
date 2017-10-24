@@ -55,6 +55,13 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY01);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+
+	entity.aiVariables.score = 10;
+	entity.aiVariables.lives = 3;
+
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();
@@ -62,7 +69,7 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.moveSpeed = 0.12f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -76,7 +83,14 @@ Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY02);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+	
 	entity.aiVariables.positionInQueue = positionInQueue;
+
+	entity.aiVariables.score = 10;
+	entity.aiVariables.lives = 3;
 
 	entity.transform = transform;
 
@@ -85,7 +99,7 @@ Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.moveSpeed = 0.15f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -99,8 +113,40 @@ Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY03);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+
 	entity.transform = transform;
 
+	entity.aiVariables.score = 10;
+	entity.aiVariables.lives = 3;
+	entity.model = GLPrimitives::getSphereModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+
+	entity.controlVars.moveSpeed = 0.12f;
+	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.worldSpaceMove = true;
+
+	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
+
+	return entity;
+}
+
+Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transform)
+{
+	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
+		| COMPONENT_LOGIC | COMPONENT_SCOREPICKUP);
+
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+	
+	entity.transform = transform;
+
+	entity.aiVariables.lifePickUp = 10;
 	entity.model = GLPrimitives::getSphereModel();
 
 	// Replace default texture
@@ -115,14 +161,45 @@ Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 	return entity;
 }
 
-Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 		| COMPONENT_LOGIC | COMPONENT_SCOREPICKUP);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+
+	entity.aiVariables.lifePickUp = 20;
 	entity.transform = transform;
 
-	entity.model = GLPrimitives::getSphereModel();
+	entity.model = GLPrimitives::getPyramidModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+
+	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.worldSpaceMove = true;
+
+	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
+
+	return entity;
+}
+
+Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform)
+{
+	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
+		| COMPONENT_LOGIC | COMPONENT_SCOREPICKUP);
+
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+
+	entity.aiVariables.lifePickUp = true;
+	entity.transform = transform;
+
+	entity.model = GLPrimitives::getCubeModel();
 
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
@@ -143,6 +220,12 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_INPUT_MAP | COMPONENT_MODEL
 	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+
+	entity.playerStats.lives = 3;
+	entity.playerStats.score = 0;
+	
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();
@@ -171,6 +254,10 @@ Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 		| COMPONENT_LOGIC | COMPONENT_PLAYERBULLET);
 
+	entity.physics = {};
+	entity.aiVariables = {};
+	entity.playerStats = {};
+	
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();

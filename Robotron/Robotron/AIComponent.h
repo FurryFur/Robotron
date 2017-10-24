@@ -27,4 +27,13 @@ struct AIComponent {
 	glm::vec3 wanderPosition;
 	// Used for enemy02s to track the entities position in the snake 'train'.
 	int positionInQueue;
+
+	// Used by score pick ups to check whether it gives the player a life when recieved
+	bool lifePickUp;
+
+	// Used by score pickups and enemies to determine how many points they are worth
+	int score;
+	// Used by enemies to determine how many lives they have
+	int lives;
+
 };

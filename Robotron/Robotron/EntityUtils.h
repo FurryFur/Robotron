@@ -47,6 +47,12 @@ namespace EntityUtils {
 	//Creates the score pickup01 entity type
 	Entity& createScorePickUp01(Scene& scene, const glm::mat4& transform);
 
+	//Creates the score pickup01 entity type
+	Entity& createScorePickUp02(Scene& scene, const glm::mat4& transform);
+
+	//Creates the score pickup01 entity type
+	Entity& createHealthPickUp(Scene& scene, const glm::mat4& transform);
+
 	// Creates a  Player (currently a unit sphere), centered at the origin, with the specified 
 	// transform;
 	Entity& createPlayer(Scene&, const glm::mat4& transform = glm::mat4{ 1 });

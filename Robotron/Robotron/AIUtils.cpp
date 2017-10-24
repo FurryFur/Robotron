@@ -40,7 +40,7 @@ glm::vec3 seek(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 cu
 	// Determine the steering vector from the current veloctiy to the desired velocity.
 	glm::vec3 steering = desiredVelocity - currentVelocity;
 
-	RenderSystem::drawDebugArrow(currentPosition, desiredVelocity, glm::length(desiredVelocity) * 100, { 0, 0, 1 });
+	//RenderSystem::drawDebugArrow(currentPosition, desiredVelocity, glm::length(desiredVelocity) * 100, { 0, 0, 1 });
 
 	return steering;
 }
@@ -255,7 +255,7 @@ glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::
 	else
 		tv = glm::vec2{ targetPreviousVelocity.x * -1.0f , targetPreviousVelocity.z * -1.0f };
 	// Change its length to be equal to the desired follow distance.
-	tv = (tv / glm::length(tv)) * 1.5f;
+	tv = (tv / glm::length(tv)) * 2.0f;
 	// Find the position to follow.
 	glm::vec3 followPosition = glm::vec3{ targetPosition.x + tv.x, targetPosition.y, targetPosition.z + tv.y };
 

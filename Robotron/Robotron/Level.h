@@ -43,16 +43,25 @@
 class Level
 {
 public:
-	Level(GLFWwindow* window, int levelNum);
+	Level(GLFWwindow* window);
 	~Level();
 
+	// Increases the level count of the game and spawns the next enemies.
+	void initalizeNextLevel();
+	// Returns true if there are still alive enemies in the level.
+	bool checkEnemiesAlive();
 	void executeOneFrame();
-
-	void process(float _fDeltaTick);
+	// Respawn players a moment after death time if they still have lives left. 
+	void respawnDeadPlayers();
+	void triggerNextLevel();
 
 private:
 
-	Clock m_pClock;
+	void spawnEnemies(int levelType);
+	void process(float _fDeltaTick);
+	void processSetUpPhase();
+
+	Clock m_clock;
 	Scene m_scene;
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;
@@ -67,5 +76,8 @@ private:
 
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	int m_levelNum;
+	bool m_inSetupPhase;
+	bool m_descendingPlayers;
+	int m_setUpTick = 0;
 };
 
