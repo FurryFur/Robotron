@@ -33,7 +33,7 @@ int main()
 
 		// If there are no new enemies alive in the scene, go to the next level.
 		if (!level.checkEnemiesAlive())
-			level.initalizeNextLevel();
+			level.triggerNextLevel();
 	}
 
 	glfwDestroyWindow(window);

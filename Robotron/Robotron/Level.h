@@ -53,11 +53,13 @@ public:
 	void executeOneFrame();
 	// Respawn players a moment after death time if they still have lives left. 
 	void respawnDeadPlayers();
+	void triggerNextLevel();
 
 private:
 
 	void spawnEnemies(int levelType);
 	void process(float _fDeltaTick);
+	void processSetUpPhase();
 
 	Clock m_clock;
 	Scene m_scene;
@@ -74,5 +76,8 @@ private:
 
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	int m_levelNum;
+	bool m_inSetupPhase;
+	bool m_descendingPlayers;
+	int m_setUpTick = 0;
 };
 

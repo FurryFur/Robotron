@@ -21,6 +21,8 @@ Level::Level(GLFWwindow* window)
 
 	m_window = window;
 	m_levelNum = 0;
+	m_inSetupPhase = false;
+	m_descendingPlayers = true;
 
 	std::string strServerMode;
 	std::cout << "Run in server mode: ";
@@ -36,8 +38,10 @@ Level::Level(GLFWwindow* window)
 		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 1.0f }));
 
 	Entity& player = EntityUtils::createPlayer(m_scene,
-		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
+		glm::translate({}, glm::vec3{ 0.0f, 50.0f, 0.0f }));
 	player.componentMask |= COMPONENT_NETWORK;
+
+	spawnEnemies(0);
 
 	// Create the skybox
 	Entity& skybox = EntityUtils::createSkybox(m_scene, {
@@ -221,20 +225,6 @@ void Level::spawnEnemies(int levelType)
 void Level::initalizeNextLevel()
 {
 	++m_levelNum;
-	
-	int randomNum;
-	
-	// Only spawn zombies or mixed below level 5.
-	if (m_levelNum < 5)
-		randomNum = randomInt(0, 1);
-	
-	// Spawn all enemy types above level 5.
-	else if (m_levelNum % 5 != 0)
-		randomNum = randomInt(0, 3);
-	
-	// A bonus level occurs every 5 levels.
-	else
-		randomNum = 4;
 
 	// Cycle over all the entities in the scene
 	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
@@ -261,6 +251,21 @@ void Level::initalizeNextLevel()
 		}
 	}
 
+	// Decide the level type using a random number between 0-4.
+	int randomNum;
+
+	// Only spawn zombies or mixed below level 5.
+	if (m_levelNum < 5)
+		randomNum = randomInt(0, 1);
+
+	// Spawn all enemy types above level 5.
+	else if (m_levelNum % 5 != 0)
+		randomNum = randomInt(0, 3);
+
+	// A bonus level occurs every 5 levels.
+	else
+		randomNum = 4;
+
 	spawnEnemies(randomNum);
 }
 
@@ -282,15 +287,13 @@ bool Level::checkEnemiesAlive()
 void Level::executeOneFrame()
 {
 	float fDT = m_clock.GetDeltaTick();
-	
 	process(fDT);
-	respawnDeadPlayers();
-
 	m_clock.Process();
 
 	Sleep(1);
 }
 
+// If enough time has passed since their death and they have lives remaining, the player is respawned.
 void Level::respawnDeadPlayers()
 {
 	// Cycle through all the entites in the scene.
@@ -303,7 +306,8 @@ void Level::respawnDeadPlayers()
 			&& m_scene.entities.at(i)->playerStats.deathTime + 3.0f <= m_clock.GetCurTime())
 		{
 			m_scene.entities.at(i)->playerStats.isRespawning = false;
-			m_scene.entities.at(i)->transform[3] = glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f };
+			m_scene.entities.at(i)->transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
+			m_descendingPlayers = true;
 		}
 	}
 }
@@ -314,7 +318,7 @@ void Level::process(float deltaTick)
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
 	m_networkSystem->beginFrame();
-
+	respawnDeadPlayers();
 	// Update all the entities using all the systems.
 	for (size_t i = 0; i < m_scene.entities.size(); ++i) {
 		m_inputSystem.update(*m_scene.entities.at(i));
@@ -328,8 +332,67 @@ void Level::process(float deltaTick)
 		m_playerbulletsystem.update(*m_scene.entities.at(i), deltaTick);
 	}
 
+	if (m_inSetupPhase)
+	{
+		++m_setUpTick;
+		processSetUpPhase();
+	}
+
+	// When respawning, players spawn above the level.
+	// This checks if they are above the level everyframe
+	// and moves them one unit of space down.
+	if (m_descendingPlayers == true)
+	{
+		m_descendingPlayers = false;
+		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+		{
+			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL
+				&& m_scene.entities.at(i)->transform[3].y > 1.0f)
+			{
+				--m_scene.entities.at(i)->transform[3].y;
+				m_descendingPlayers = true;
+			}
+		}
+	}
 	// Do operations that should happen at the end of the frame.
 	m_renderSystem.endRender();
 
 	glfwPollEvents();
+}
+
+// Handles the animation between levels. The player flies up, level spawns. And they desend in the centre of the screen.
+void Level::processSetUpPhase()
+{
+	// For the first 50 ticks, ascend the players
+	if (m_setUpTick <= 50)
+	{
+		// Cycle through all the entites in the scene.
+		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+		{
+			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
+				++m_scene.entities.at(i)->transform[3].y;
+		}
+		if(m_setUpTick == 50)
+			initalizeNextLevel();
+	}
+	// For the last 50 ticks, descend the players
+	else
+	{
+		// Cycle through all the entites in the scene.
+		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+		{
+			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
+				--m_scene.entities.at(i)->transform[3].y;
+		}
+		if (m_setUpTick == 100)
+		{
+			m_inSetupPhase = false;
+			m_setUpTick = 0;
+		}
+	}
+}
+
+void Level::triggerNextLevel()
+{
+	m_inSetupPhase = true;
 }
