@@ -33,7 +33,7 @@ const std::vector<VertexFormat>& GLPrimitives::getSphereVertices()
 				s_vertices.emplace_back(VertexFormat{
 					position,                    // Position
 					position,                    // Normal (same as position for a unit sphere)
-					glm::vec2{ phi, -theta } }); // Texture Coordinate
+					glm::vec2{ phi / (2 * M_PI), -theta / (2 * M_PI) } }); // Texture Coordinate
 			}
 		}
 	}

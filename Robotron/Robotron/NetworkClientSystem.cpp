@@ -43,6 +43,11 @@ void NetworkClientSystem::update(Entity& entity)
 	// Do interpolation with snapshots here
 }
 
+void NetworkClientSystem::endFrame()
+{
+
+}
+
 void NetworkClientSystem::destroyIfExists(size_t entityNetID)
 {
 	if (entityNetID < m_netEntities.size()) {

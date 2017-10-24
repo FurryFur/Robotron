@@ -177,6 +177,7 @@ void Level::process(float deltaTick)
 	}
 
 	// Do operations that should happen at the end of the frame.
+	m_networkSystem->endFrame();
 	m_renderSystem.endRender();
 
 	glfwPollEvents();

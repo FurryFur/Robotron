@@ -13,6 +13,11 @@
 
 #pragma once
 
+#include <glm\glm.hpp>
+#include <glm\gtc\type_ptr.hpp>
+
+class OutBufferStream;
+
 namespace GLMUtils {
 	// Limits a vector to the specified magnitude
 	template <typename VecT>
@@ -25,3 +30,13 @@ namespace GLMUtils {
 		return vec;
 	}
 }
+
+OutBufferStream& operator<<(OutBufferStream& obs, const glm::vec2& vec);
+
+OutBufferStream& operator<<(OutBufferStream& obs, const glm::vec3& vec);
+
+OutBufferStream& operator<<(OutBufferStream& obs, const glm::vec4& vec);
+
+OutBufferStream& operator<<(OutBufferStream& obs, const glm::mat3& mat);
+
+OutBufferStream& operator<<(OutBufferStream& obs, const glm::mat4& mat);

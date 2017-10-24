@@ -129,6 +129,21 @@
     <ClCompile Include="PlayerBulletSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
+    <ClCompile Include="RPC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InputComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GLMUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene.h">
@@ -254,9 +269,6 @@
     <ClInclude Include="RPC.h">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ScorePickUpSystem.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
@@ -265,6 +277,15 @@
     </ClInclude>
     <ClInclude Include="PlayerBulletSystem.h">
       <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferStream.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerInfo.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="StreamableQueue.h">
+      <Filter>Header Files\Networking</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

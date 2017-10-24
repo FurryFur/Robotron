@@ -14,6 +14,7 @@ public:
 
 	virtual void beginFrame() = 0;
 	virtual void update(Entity&) = 0;
+	virtual void endFrame() = 0;
 
 protected:
 	void sendData(const Packet&, const sockaddr_in&);

@@ -9,6 +9,7 @@
 
 NetworkServerSystem::NetworkServerSystem(Scene& scene)
 	: NetworkSystem(scene)
+	, m_curSeqenceNum{ 0 }
 {
 	m_socket.initialise(8456);
 
@@ -38,18 +39,13 @@ void NetworkServerSystem::beginFrame()
 void NetworkServerSystem::update(Entity& entity)
 {
 	// Detect object deletion
-	int& id = entity.network.id;
+	std::int32_t& id = entity.network.id;
 	bool isNewEntity = entity.network.isNewEntity;
 	if (entity.componentMask == COMPONENT_NONE && id > -1) {
 		// Notify clients of deletion
 		// TODO: Add redundancy here, so that missed packets don't cause an
 		// object to NOT be removed on the client side.
-		Packet packet;
-		packet.serialize(PACKET_TYPE_DESTROY, id);
-		broadcastToClients(packet);
-
-		// Remove entity from networking
-		m_netEntities.at(id) = nullptr;
+		destroyNetworkEntity(id);
 	}
 
 	// Detect new entities
@@ -63,11 +59,11 @@ void NetworkServerSystem::update(Entity& entity)
 			auto freeIt = std::find(m_netEntities.begin(), m_netEntities.end(), nullptr);
 			if (freeIt != m_netEntities.end()) {
 				// Assign the new entity a free id if found
-				entity.network.id = std::distance(m_netEntities.begin(), freeIt);
+				entity.network.id = static_cast<std::int32_t>(std::distance(m_netEntities.begin(), freeIt));
 				*freeIt = &entity;
 			} else {
 				// Otherwise assign the new entity a brand new id
-				entity.network.id = m_netEntities.size();
+				entity.network.id = static_cast<std::int32_t>(m_netEntities.size());
 				m_netEntities.push_back(&entity);
 			}
 		}
@@ -77,9 +73,35 @@ void NetworkServerSystem::update(Entity& entity)
 		entity.network.isNewEntity = false;
 
 		// Broadcast ghost entity creation command to clients
-		Packet packet;
-		packet.serialize(PACKET_TYPE_CREATE_GHOST, id, entity.transform);
-		broadcastToClients(packet);
+		//if (entity.hasAllComponents(COMPONENT_PLAYER_CONTROL)) {
+		//	//RPCCreatePlayerGhost(id, playerInfo, )
+		//}
+
+		std::unique_ptr<RPCCreateGhost> rpc;
+		if (entity.hasAllComponents(COMPONENT_ENEMY01)) {
+			rpc = std::make_unique<RPCCreateGhost>(id,
+				ModelID::MODEL_ENEMY_ZOMBIE, entity.transform);
+		} else if (entity.hasAllComponents(COMPONENT_ENEMY02)) {
+			rpc = std::make_unique<RPCCreateGhost>(id,
+				ModelID::MODEL_ENEMY_SHOOTER, entity.transform);
+		} else if (entity.hasAllComponents(COMPONENT_ENEMY03)) {
+			rpc = std::make_unique<RPCCreateGhost>(id,
+				ModelID::MODEL_ENEMY_SNAKE, entity.transform);
+		} else if (entity.hasAllComponents(COMPONENT_PLAYERBULLET)) {
+			//  TODO: Add enemy bullets
+			rpc = std::make_unique <RPCCreateGhost>(id,
+				ModelID::MODEL_PLAYER_BULLET, entity.transform);
+		} else if (entity.hasAllComponents(COMPONENT_SCOREPICKUP)) {
+			// TODO: Add different pickup types
+			rpc = std::make_unique <RPCCreateGhost>(id,
+				ModelID::MODEL_SCORE_PICKUP_1, entity.transform);
+		} else {
+			rpc = nullptr;
+		}
+
+		if (rpc) {
+			bufferRpc(std::move(rpc));
+		}
 	}
 
 	if (entity.hasAllComponents(COMPONENT_NETWORK | COMPONENT_TRANSFORM)) {
@@ -90,9 +112,46 @@ void NetworkServerSystem::update(Entity& entity)
 	}
 }
 
+void NetworkServerSystem::endFrame()
+{
+	OutBufferStream obs;
+	obs << m_rpcGroupBuffer;
+	obs.getData();
+}
+
+void NetworkServerSystem::destroyNetworkEntity(std::int32_t id)
+{
+	if (m_netEntities.at(id) == nullptr)
+		return;
+
+	if (m_netEntities.at(id)->componentMask != COMPONENT_NONE)
+		m_netEntities.at(id)->componentMask = COMPONENT_NONE;
+
+	auto rpc = std::make_unique<RPCDestroyGhost>(id);
+	bufferRpc(std::move(rpc));
+
+	// Stop tracking entity on the server
+	m_netEntities.at(id) = nullptr;
+}
+
 void NetworkServerSystem::broadcastToClients(Packet packet)
 {
 	for (auto& address : m_clients) {
 		sendData(packet, address);
 	}
+}
+
+void NetworkServerSystem::bufferRpc(std::unique_ptr<RemoteProcedureCall> rpc)
+{
+	// Add a new rpc group to the buffer if the sequence number has increased
+	RPCGroup* rpcGroup = m_rpcGroupBuffer.size() > 0 ? 
+		&m_rpcGroupBuffer.front() : nullptr;
+	if (!rpcGroup || rpcGroup->sequenceNum() < m_curSeqenceNum) {
+		// Create a new RPCGroup for the current sequence number
+		m_rpcGroupBuffer.emplace(m_curSeqenceNum);
+		rpcGroup = &m_rpcGroupBuffer.front();
+	}
+
+	// Add the rpc to the latest RPCGroup
+	rpcGroup->addRPC(std::move(rpc));
 }

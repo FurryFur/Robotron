@@ -148,7 +148,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.model = GLPrimitives::getSphereModel();
 
 	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture2.jpg");
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
 
 	entity.inputMap = {};
 	entity.inputMap.mouseInputEnabled = false;

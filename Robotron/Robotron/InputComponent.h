@@ -17,6 +17,8 @@
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
 
+class OutBufferStream;
+
 struct InputComponent {
 	glm::vec3 axis;
 	glm::vec3 orientationDelta;
@@ -25,3 +27,5 @@ struct InputComponent {
 	bool btn3Down;
 	bool btn4Down;
 };
+
+OutBufferStream& operator<<(OutBufferStream&, const InputComponent&);
