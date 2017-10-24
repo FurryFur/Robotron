@@ -58,7 +58,7 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 	{
 		if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						          //its a player object
 			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
-			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 15)								                  //the player is within the enemys aggro range
+			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 30)								                  //the player is within the enemys aggro range
 		{
 			targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z};
 			targetVelocity = m_scene.entities.at(i)->physics.velocity;
@@ -94,12 +94,12 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 		Acc = wander(entity);
 
 	// Limit the steering acceleration.
-	if (glm::length(Acc) > 0.002f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.002f);
+	if (glm::length(Acc) > 0.1f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.1f);
 
 	// Add the acceleration to the velocity.
-	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x, 0, entity.physics.velocity.z + Acc.z };
-	entity.physics.velocity += Acc;
+	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick, 0, entity.physics.velocity.z + Acc.z * deltaTick };
+	entity.physics.velocity += Acc * deltaTick;
 
 	//const float kDebugScale = 100;
 	//glm::vec3 position = glm::vec3(entity.transform[3]);

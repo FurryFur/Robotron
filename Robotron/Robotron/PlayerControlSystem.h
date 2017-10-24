@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include "Clock.h"
+
 struct Scene;
 struct Entity;
 
@@ -22,7 +24,7 @@ public:
 	PlayerControlSystem(Scene& scene);
 
 	// Updates the entities position from input
-	void update(Entity&);
+	void update(Entity& entity, Clock& clock);
 
 private:
 	Scene& m_scene;

@@ -67,12 +67,12 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 	}
 
 	// Limit the steering acceleration.
-	if (glm::length(Acc) > 0.002f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.002f);
+	if (glm::length(Acc) > 0.1f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.1f);
 
 	// Add the acceleration to the velocity.
-	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x , 0, entity.physics.velocity.z + Acc.z};
-	entity.physics.velocity += Acc;
+	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick , 0, entity.physics.velocity.z + Acc.z * deltaTick };
+	entity.physics.velocity += Acc * deltaTick;
 
 	//TODO: ADD FLOCKING CODE HERE
 	//if (isSeekingPlayer)

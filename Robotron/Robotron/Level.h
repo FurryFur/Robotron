@@ -51,13 +51,15 @@ public:
 	// Returns true if there are still alive enemies in the level.
 	bool checkEnemiesAlive();
 	void executeOneFrame();
+	// Respawn players a moment after death time if they still have lives left. 
+	void respawnDeadPlayers();
 
 private:
 
 	void spawnEnemies(int levelType);
 	void process(float _fDeltaTick);
 
-	Clock m_pClock;
+	Clock m_clock;
 	Scene m_scene;
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;

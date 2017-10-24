@@ -16,4 +16,6 @@
 struct PlayerStatsComponent {
 	int score;
 	int lives;
+	bool isRespawning;
+	double deathTime;
 };

@@ -57,7 +57,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 	{
 		if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						          //its a player object
 			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
-			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 25)								                  //the player is within the enemys aggro range
+			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 40)								                  //the player is within the enemys aggro range
 		{
 			targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z };
 			targetVelocity = m_scene.entities.at(i)->physics.velocity;
@@ -72,10 +72,10 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 	if (targetFound)
 	{
 		// Pursue to the target if above a certain distance away from them.
-		if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) > 10)
+		if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) > 15)
 			Acc = pursue(targetPosition, targetVelocity, targetMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
-		// Avade from the target if above a certain distance away from them.
-		else
+		// Avade from the target if too close to a player.
+		else if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) < 5)
 			Acc = evade(targetPosition, targetVelocity, targetMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
@@ -98,12 +98,12 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 		Acc = wander(entity);
 
 	// Limit the steering acceleration.
-	if (glm::length(Acc) > 0.002f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.002f);
+	if (glm::length(Acc) > 0.1f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.1f);
 
 	// Add the acceleration to the velocity.
-	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x, 0, entity.physics.velocity.z + Acc.z };
-	entity.physics.velocity += Acc;
+	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick, 0, entity.physics.velocity.z + Acc.z * deltaTick };
+	entity.physics.velocity += Acc * deltaTick;
 
 	//TODO: ADD FLOCKING CODE HERE
 	//if (isSeekingPlayer)

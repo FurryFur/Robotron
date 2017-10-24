@@ -17,7 +17,7 @@ Level::Level(GLFWwindow* window)
 	, m_playerbulletsystem(m_scene)
 {
 
-	m_pClock.Process();
+	m_clock.Process();
 
 	m_window = window;
 	m_levelNum = 0;
@@ -236,9 +236,10 @@ void Level::initalizeNextLevel()
 	else
 		randomNum = 4;
 
-	// Delete all score pickups and update the players score.
+	// Cycle over all the entities in the scene
 	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
 	{
+		// Delete all score pickups and update the players score.
 		if ((m_scene.entities.at(i)->componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP)
 		{
 			// Increase the player's score value.
@@ -250,6 +251,13 @@ void Level::initalizeNextLevel()
 					++m_scene.entities.at(i)->aiVariables.followEntity->playerStats.lives;
 			}
 			m_scene.destroyEntity(*m_scene.entities.at(i));
+		}
+
+		// Move the player back to the centre point of the level
+		if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
+		{
+			m_scene.entities.at(i)->transform[3].x = 0.0f;
+			m_scene.entities.at(i)->transform[3].z = 0.0f;
 		}
 	}
 
@@ -273,13 +281,31 @@ bool Level::checkEnemiesAlive()
 
 void Level::executeOneFrame()
 {
-	float fDT = m_pClock.GetDeltaTick();
+	float fDT = m_clock.GetDeltaTick();
 	
 	process(fDT);
+	respawnDeadPlayers();
 
-	m_pClock.Process();
+	m_clock.Process();
 
 	Sleep(1);
+}
+
+void Level::respawnDeadPlayers()
+{
+	// Cycle through all the entites in the scene.
+	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+	{
+		// Return true when the first entity is found with an enemy tag.
+		if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL
+			&& m_scene.entities.at(i)->playerStats.isRespawning == true
+			&& m_scene.entities.at(i)->playerStats.lives > 0
+			&& m_scene.entities.at(i)->playerStats.deathTime + 3.0f <= m_clock.GetCurTime())
+		{
+			m_scene.entities.at(i)->playerStats.isRespawning = false;
+			m_scene.entities.at(i)->transform[3] = glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f };
+		}
+	}
 }
 
 void Level::process(float deltaTick)
@@ -292,7 +318,7 @@ void Level::process(float deltaTick)
 	// Update all the entities using all the systems.
 	for (size_t i = 0; i < m_scene.entities.size(); ++i) {
 		m_inputSystem.update(*m_scene.entities.at(i));
-		m_playerControlSystem.update(*m_scene.entities.at(i));
+		m_playerControlSystem.update(*m_scene.entities.at(i), m_clock);
 		m_networkSystem->update(*m_scene.entities.at(i));
 		m_renderSystem.update(*m_scene.entities.at(i));
 		m_enemy01ControlSystem.update(*m_scene.entities.at(i), deltaTick);
