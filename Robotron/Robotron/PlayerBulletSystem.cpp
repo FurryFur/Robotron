@@ -64,8 +64,13 @@ void PlayerBulletSystem::update(Entity& entity, float deltaTick)
 			|| (m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY03) == COMPONENT_ENEMY03)
 			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 1)
 		{
+			// Destroy the bullet.
 			m_scene.destroyEntity(entity);
-			m_scene.destroyEntity(*m_scene.entities.at(i));
+			// Damage the enemy.
+			--m_scene.entities.at(i)->aiVariables.lives;
+			// Check if the enemy is below 0 health before killing them.
+			if(m_scene.entities.at(i)->aiVariables.lives <= 0)
+				m_scene.destroyEntity(*m_scene.entities.at(i));
 			return;
 		}
 	}

@@ -84,6 +84,11 @@ void Level::spawnEnemies(int levelType)
 	int snakePartsCount = 0;
 	int shooterCount = 0;
 
+	int score1PickUpCount = m_levelNum + randomInt(0, 2);
+	int score2PickUpCount = m_levelNum + randomInt(-4, -2);
+	int healthPickUpCount = m_levelNum + randomInt(-4, -2);
+
+
 	// Spawn Zombies level type
 	if (levelType == 0)
 	{
@@ -109,6 +114,9 @@ void Level::spawnEnemies(int levelType)
 	else if (levelType == 4)
 	{
 		zombieCount = randomInt(1, 3);
+		score1PickUpCount += randomInt(4, 8);
+		score2PickUpCount += randomInt(2, 6);
+		healthPickUpCount += randomInt(1, 3);
 	}
 
 	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
@@ -161,10 +169,8 @@ void Level::spawnEnemies(int levelType)
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
 	}
 
-	//CreateScorePickups
-	unsigned int numberOfScorePickups01 = 2 + m_levelNum + randomInt(-2, 2);
-	
-	for (int i = 0; i <= numberOfScorePickups01; ++i)
+	// Create ScorePickups01
+	for (int i = 0; i < score1PickUpCount; ++i)
 	{
 		float randX = randomReal<float>(-20.0f, -5.0f);
 		if (randomInt(0, 1) == 0)
@@ -175,6 +181,38 @@ void Level::spawnEnemies(int levelType)
 			randZ += 25;
 	
 		Entity& enemy = EntityUtils::createScorePickUp01(m_scene,
+			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
+			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+	}
+
+	// Create ScorePickups02
+	for (int i = 0; i < score2PickUpCount; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randX += 25;
+
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randZ += 25;
+
+		Entity& enemy = EntityUtils::createScorePickUp02(m_scene,
+			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
+			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+	}
+
+	// Create Health Pickups
+	for (int i = 0; i < healthPickUpCount; ++i)
+	{
+		float randX = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randX += 25;
+
+		float randZ = randomReal<float>(-20.0f, -5.0f);
+		if (randomInt(0, 1) == 0)
+			randZ += 25;
+
+		Entity& enemy = EntityUtils::createHealthPickUp(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
 			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
 	}
@@ -206,7 +244,10 @@ void Level::initalizeNextLevel()
 			// Increase the player's score value.
 			if (m_scene.entities.at(i)->aiVariables.followEntity != NULL)
 			{
-				m_scene.entities.at(i)->aiVariables.followEntity->playerStats.score += 10;
+				if (m_scene.entities.at(i)->aiVariables.lifePickUp != true)
+					m_scene.entities.at(i)->aiVariables.followEntity->playerStats.score += m_scene.entities.at(i)->aiVariables.score;
+				else
+					++m_scene.entities.at(i)->aiVariables.followEntity->playerStats.lives;
 			}
 			m_scene.destroyEntity(*m_scene.entities.at(i));
 		}
