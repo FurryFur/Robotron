@@ -118,11 +118,7 @@ void NetworkServerSystem::update(Entity& entity)
 		// network system.
 		entity.network.isNewEntity = false;
 
-		// Broadcast ghost entity creation command to clients
-		//if (entity.hasAllComponents(COMPONENT_PLAYER_CONTROL)) {
-		//	//RPCCreatePlayerGhost(id, playerInfo, )
-		//}
-
+		// Create remote procedure calls to inform clients of new entity creation
 		std::unique_ptr<RPCCreateGhost> rpc;
 		if (entity.hasAllComponents(COMPONENT_ENEMY01)) {
 			rpc = std::make_unique<RPCCreateGhost>(id,
@@ -154,6 +150,7 @@ void NetworkServerSystem::update(Entity& entity)
 	 && entity.hasAllComponents(COMPONENT_NETWORK | COMPONENT_TRANSFORM 
 	                          | COMPONENT_PHYSICS)) {
 		++entity.network.priority;
+		m_snapshotPriorityQ.push(&entity);
 	}
 }
 
@@ -213,6 +210,7 @@ void NetworkServerSystem::selectGhostSnapshots(SnapshotBufT& dst,
 	dst.clear();
 	for (size_t i = 0; i < maxSnapshots && !src.empty(); ++i) {
 		Entity* entity = src.top();
+		src.pop();
 		dst.emplace_back(entity->transform, entity->physics);
 		entity->network.priority = 0;
 	}

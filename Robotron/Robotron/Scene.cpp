@@ -21,9 +21,14 @@ Entity& Scene::createEntity(size_t componentMask)
 		newEntity->network.id = -1;
 	}
 
+	// TODO: Add code to run the default constructors of each component
+	// in the component mask so we don't have to remember to zero memory
+	// and set special creation flags.
+
 	newEntity->componentMask = componentMask;
 
 	newEntity->network.isNewEntity = true;
+	newEntity->network.priority = 0;
 
 	return *newEntity;
 }

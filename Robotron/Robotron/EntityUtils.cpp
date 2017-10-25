@@ -53,7 +53,8 @@ Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& transform)
 Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY01);
+	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY01
+	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
 	entity.aiVariables = {};
@@ -81,7 +82,8 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int positionInQueue)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
-	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY02);
+	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY02
+	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
 	entity.aiVariables = {};
@@ -111,7 +113,8 @@ Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int
 Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
-	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY03);
+	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY03
+	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
 	entity.aiVariables = {};
@@ -138,7 +141,8 @@ Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-		| COMPONENT_LOGIC | COMPONENT_SCOREPICKUP);
+	                                  | COMPONENT_LOGIC | COMPONENT_SCOREPICKUP
+	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
 	entity.aiVariables = {};
@@ -165,7 +169,8 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-		| COMPONENT_LOGIC | COMPONENT_SCOREPICKUP);
+	                                  | COMPONENT_LOGIC | COMPONENT_SCOREPICKUP
+	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
 	entity.aiVariables = {};
@@ -191,7 +196,8 @@ Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transfor
 Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-		| COMPONENT_LOGIC | COMPONENT_SCOREPICKUP);
+	                                  | COMPONENT_LOGIC | COMPONENT_SCOREPICKUP
+	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
 	entity.aiVariables = {};
@@ -219,7 +225,8 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL 
 	                                  | COMPONENT_INPUT_MAP | COMPONENT_MODEL
-	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
+	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC
+	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
 	entity.aiVariables = {};
@@ -253,7 +260,8 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-		| COMPONENT_LOGIC | COMPONENT_PLAYERBULLET);
+	                                  | COMPONENT_LOGIC | COMPONENT_PLAYERBULLET
+	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
 	entity.aiVariables = {};

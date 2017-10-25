@@ -12,7 +12,7 @@ OutBufferStream & RPCGroup::serialize(OutBufferStream& obs) const
 {
 	// Sequence numbers will be stored implicitely by array index.
 	// First write out the number of RPCs in the group
-	obs << m_rpcs.size();
+	obs << static_cast<std::uint32_t>(m_rpcs.size());
 	for (auto& rpc : m_rpcs) {
 		// Then write out each rpc in the group to the buffer.
 		obs << *rpc;

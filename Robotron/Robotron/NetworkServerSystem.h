@@ -16,6 +16,7 @@ struct Scene;
 struct Entity;
 
 class EntityPriorityComparitor {
+public:
 	bool operator()(const Entity* lhs, const Entity* rhs)
 	{
 		return lhs->network.priority > rhs->network.priority;
