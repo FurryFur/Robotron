@@ -48,26 +48,29 @@ void NetworkSystem::sendData(const Packet& packet, const sockaddr_in& address)
 
 bool NetworkSystem::receiveData(Packet& outPacket, sockaddr_in& outAddress)
 {
-	//int sizeofAddress = sizeof(outAddress);
+	int sizeofAddress = sizeof(outAddress);
 
-	//// Retrieve a dataframe from the socket
-	//int numBytesRead = recvfrom(
-	//	m_socket.getSocketHandle(),
-	//	reinterpret_cast<char*>(&outPacket),
-	//	sizeof(outPacket),
-	//	0,
-	//	reinterpret_cast<sockaddr*>(&outAddress),
-	//	&sizeofAddress
-	//);
+	// Retrieve a datagram from the socket
+	int numBytesRead = recvfrom(
+		m_socket.getSocketHandle(),
+		m_recvBuffer.data(),
+		m_recvBuffer.size(),
+		0,
+		reinterpret_cast<sockaddr*>(&outAddress),
+		&sizeofAddress
+	);
 
-	//// Do error checking
-	//int error = WSAGetLastError();
-	//if (error == WSAEWOULDBLOCK)
-	//	return false;
-	//if (error != 0 && error != WSAEWOULDBLOCK) {
-	//	std::cout << "Error receiving data, error code: " << error << std::endl;
-	//	return false;
-	//}
+	//InBufferStream ibs(m_recvBuffer, numBytesRead);
+	//ibs >> outPacket;
+
+	// Do error checking
+	int error = WSAGetLastError();
+	if (error == WSAEWOULDBLOCK)
+		return false;
+	if (error != 0 && error != WSAEWOULDBLOCK) {
+		std::cout << "Error receiving data, error code: " << error << std::endl;
+		return false;
+	}
 
 	//// Do stuff with result
 	//if (numBytesRead > 0) {
@@ -99,4 +102,19 @@ bool NetworkSystem::receiveData(Packet& outPacket, sockaddr_in& outAddress)
 	//}
 
 	return false;
+}
+
+void NetworkSystem::allocateRecvBuffer()
+{
+	// Determine to maximum size required for the receive buffer
+	int maxBufferSize;
+	int maxBufferSizeSize = sizeof(maxBufferSize);
+	int result = getsockopt(m_socket.getSocketHandle(), SOL_SOCKET, SO_MAX_MSG_SIZE, (char *)&maxBufferSize, &maxBufferSizeSize);
+	if (result == SOCKET_ERROR) {
+		// TODO: Add logging here
+		std::cout << "Warning: Unable to get maximum datagram size" << std::endl;
+		m_recvBuffer.resize(64000);
+	} else {
+		m_recvBuffer.resize(maxBufferSize);
+	}
 }

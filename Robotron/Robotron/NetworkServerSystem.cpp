@@ -8,6 +8,7 @@
 #include "GhostSnapshot.h"
 
 #include <algorithm>
+#include <iostream>
 
 using namespace std::chrono;
 
@@ -18,6 +19,7 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene)
 	, m_willSendPcktThisFrame{ true }
 {
 	m_socket.initialise(8456);
+	allocateRecvBuffer();
 
 	// TODO: Create client connection code instead of hard coding single
 	// client

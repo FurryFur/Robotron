@@ -20,9 +20,11 @@ public:
 protected:
 	void sendData(const Packet&, const sockaddr_in&);
 	bool receiveData(Packet& outPacket, sockaddr_in& outAddress);
+	void allocateRecvBuffer();
 
 	CSocket m_socket;
 	Scene& m_scene;
 	std::vector<Entity*> m_netEntities;
+	std::vector<char> m_recvBuffer;
 	OutBufferStream m_obs;
 };

@@ -9,12 +9,14 @@ NetworkClientSystem::NetworkClientSystem(Scene& scene)
 	: NetworkSystem(scene)
 {
 	m_socket.initialise(4567);
+	allocateRecvBuffer();
 }
 
 void NetworkClientSystem::beginFrame()
 {
-	//Packet packet;
-	//while (receiveData(packet)) {
+	Packet packet;
+	sockaddr_in address;
+	while (receiveData(packet, address)) {
 	//	if (packet.type == PACKET_TYPE_CREATE_GHOST) {
 	//		// If a ghost entity with this id already exists, then destroy it first
 	//		destroyIfExists(packet.entityNetID);
@@ -35,7 +37,7 @@ void NetworkClientSystem::beginFrame()
 	//	if (packet.type == PACKET_TYPE_DESTROY) {
 	//		destroyIfExists(packet.entityNetID);
 	//	}
-	//}
+	}
 }
 
 void NetworkClientSystem::update(Entity& entity)

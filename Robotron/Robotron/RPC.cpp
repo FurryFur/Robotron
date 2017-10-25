@@ -8,7 +8,7 @@ void RPCGroup::addRPC(std::unique_ptr<RemoteProcedureCall> rpc)
 	m_rpcs.push_back(std::move(rpc));
 }
 
-OutBufferStream & RPCGroup::serialize(OutBufferStream& obs) const
+OutBufferStream& RPCGroup::serialize(OutBufferStream& obs) const
 {
 	// Sequence numbers will be stored implicitely by array index.
 	// First write out the number of RPCs in the group
