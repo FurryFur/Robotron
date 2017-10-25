@@ -1,33 +1,27 @@
 #pragma once
 
-#include "InputComponent.h"
-#include "PhysicsComponent.h"
+#include "GhostSnapshot.h"
+#include "StreamableEvictQueue.h"
+#include "StreamableVector.h"
+#include "RPC.h"
 
-#include <glm\glm.hpp>
+#include <cstdint>
+#include <vector>
 
-enum PacketType {
-	PACKET_TYPE_CREATE_GHOST,
-	PACKET_TYPE_GHOST_SNAPSHOT,
-	PACKET_TYPE_TRANSFORM,
-	PACKET_TYPE_INPUT,
-	PACKET_TYPE_DESTROY
-};
+class OutBufferStream;
 
 struct Packet {
-	PacketType type;
-	int entityNetID;
+	Packet() = default;
+	Packet(const Packet&) = delete;
+	Packet(Packet&&) = default;
+	Packet& operator=(const Packet&) = delete;
+	Packet& operator=(Packet&&) = default;
 
-	union {
-		PhysicsComponent ghostSnapshot;
-		glm::mat4 transform;
-		InputComponent input;
-	};
+	std::uint32_t sequenceNum;
+	StreamableVector<GhostSnapshot, 64> ghostSnapshotBuffer;
+	StreamableEvictQueue<RPCGroup, 32> rpcGroupBuffer;
 
-	Packet() {}
-
-	void serialize(int entityNetID, const glm::mat4& transform);
-	void serialize(int entityNetID, PhysicsComponent ghostSnapshot);
-	void serialize(int entityNetID, InputComponent input);
-	void serialize(PacketType, int entityNetID);
-	void serialize(PacketType, int entityNetID, const glm::mat4& transform);
+	OutBufferStream& serialize(OutBufferStream&) const;
 };
+
+OutBufferStream& operator<<(OutBufferStream&, const Packet&);

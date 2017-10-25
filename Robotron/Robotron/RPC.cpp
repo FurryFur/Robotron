@@ -1,22 +1,19 @@
 #include "RPC.h"
-#include "GLMUtils.h"
 
-RPCGroup::RPCGroup(std::uint32_t sequenceNum)
-	: m_sequenceNum{ sequenceNum }
-{
-}
+#include "BufferStream.h"
+#include "GLMUtils.h"
 
 void RPCGroup::addRPC(std::unique_ptr<RemoteProcedureCall> rpc)
 {
-	rpcs.push_back(std::move(rpc));
+	m_rpcs.push_back(std::move(rpc));
 }
 
 OutBufferStream & RPCGroup::serialize(OutBufferStream& obs) const
 {
 	// Sequence numbers will be stored implicitely by array index.
 	// First write out the number of RPCs in the group
-	obs << rpcs.size();
-	for (auto& rpc : rpcs) {
+	obs << m_rpcs.size();
+	for (auto& rpc : m_rpcs) {
 		// Then write out each rpc in the group to the buffer.
 		obs << *rpc;
 	}
@@ -24,9 +21,9 @@ OutBufferStream & RPCGroup::serialize(OutBufferStream& obs) const
 	return obs;
 }
 
-std::uint32_t RPCGroup::sequenceNum() const
+const std::vector<std::unique_ptr<RemoteProcedureCall>>& RPCGroup::getRpcs()
 {
-	return m_sequenceNum;
+	return m_rpcs;
 }
 
 OutBufferStream& operator<<(OutBufferStream& obs, ModelID modelID)
@@ -57,7 +54,7 @@ RPCDestroyGhost::RPCDestroyGhost(std::int32_t entityNetId)
 	
 }
 
-void RPCDestroyGhost::execute()
+void RPCDestroyGhost::execute(std::vector<Entity*>& netEntities)
 {
 }
 
@@ -72,15 +69,20 @@ RemoteProcedureCall::RemoteProcedureCall(std::int32_t entityNetid)
 {
 }
 
+std::int32_t RemoteProcedureCall::getEntityNetId()
+{
+	return m_entityNetId;
+}
+
 RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId, 
 	const PlayerInfo& playerInfo, const glm::mat4 & transform)
 	: RemoteProcedureCall(entityNetId)
-	, m_playerInfo{ playerInfo }
+	, m_playerInfo(playerInfo)
 	, m_transform{ transform }
 {
 }
 
-void RPCCreatePlayerGhost::execute()
+void RPCCreatePlayerGhost::execute(std::vector<Entity*>& netEntities)
 {
 }
 
@@ -99,7 +101,7 @@ RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId,
 {
 }
 
-void RPCCreateGhost::execute()
+void RPCCreateGhost::execute(std::vector<Entity*>& netEntities)
 {
 }
 
@@ -116,7 +118,7 @@ RPCRecordInput::RPCRecordInput(std::int32_t entityNetId, const InputComponent& i
 {
 }
 
-void RPCRecordInput::execute()
+void RPCRecordInput::execute(std::vector<Entity*>& netEntities)
 {
 }
 

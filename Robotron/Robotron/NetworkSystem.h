@@ -1,6 +1,7 @@
 #pragma once
 
 #include "socket.h"
+#include "BufferStream.h"
 
 #include <vector>
 
@@ -18,9 +19,10 @@ public:
 
 protected:
 	void sendData(const Packet&, const sockaddr_in&);
-	bool receiveData(Packet&);
+	bool receiveData(Packet& outPacket, sockaddr_in& outAddress);
 
 	CSocket m_socket;
 	Scene& m_scene;
 	std::vector<Entity*> m_netEntities;
+	OutBufferStream m_obs;
 };

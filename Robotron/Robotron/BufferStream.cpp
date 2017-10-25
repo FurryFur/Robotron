@@ -87,7 +87,7 @@ void OutBufferStream::reset() noexcept
 	m_writeHeadIdx = 0;
 }
 
-std::uint8_t* OutBufferStream::getData()
+const char* OutBufferStream::getData()
 {
 	return m_data.data();
 }

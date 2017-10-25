@@ -22,7 +22,7 @@ public:
 	void write(const T* _array, size_t length) noexcept;
 
 	void reset() noexcept;
-	std::uint8_t* getData();
+	const char* getData();
 
 	// Returns the size of the buffer in bytes
 	size_t getBytesWritten();
@@ -40,7 +40,7 @@ public:
 	OutBufferStream& operator<<(const std::string&) noexcept;
 
 private:
-	std::vector<std::uint8_t> m_data;
+	std::vector<char> m_data;
 	size_t m_writeHeadIdx;
 };
 

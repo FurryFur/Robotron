@@ -146,6 +146,7 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	
 	entity.transform = transform;
 
+	// TODO: Fix weird integer bool assignment!!!
 	entity.aiVariables.lifePickUp = 10;
 	entity.model = GLPrimitives::getSphereModel();
 

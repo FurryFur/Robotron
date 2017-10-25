@@ -10,4 +10,10 @@ struct NetworkComponent {
 	// A server should respond by notifying clients to create
 	// new ghost objects.
 	bool isNewEntity;
+
+	// The priority that this entity has when the server is decided
+	// which entities should have snapshots sent to clients.
+	// This priority will slowly accumulate the longer an entity
+	// goes without having a snapshot sent out.
+	int priority;
 };

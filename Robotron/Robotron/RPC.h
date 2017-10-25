@@ -3,11 +3,13 @@
 #include "InputComponent.h"
 #include "PlayerInfo.h"
 #include "BufferStream.h"
+#include "Entity.h"
 
 #include <glm\glm.hpp>
 
 #include <vector>
 #include <memory>
+#include <cstdint>
 
 struct InputComponent;
 
@@ -36,21 +38,22 @@ class RemoteProcedureCall {
 public:
 	RemoteProcedureCall(std::int32_t entityNetid);
 
-	virtual void execute() = 0;
+	virtual void execute(std::vector<Entity*>& netEntities) = 0;
 	virtual OutBufferStream& serialize(OutBufferStream&) const = 0;
 
-	friend OutBufferStream& operator<<(OutBufferStream&,
-		const RemoteProcedureCall&);
+	std::int32_t getEntityNetId();
 
 protected:
 	std::int32_t m_entityNetId;
 };
 
+OutBufferStream& operator<<(OutBufferStream&, const RemoteProcedureCall&);
+
 class RPCCreatePlayerGhost : public RemoteProcedureCall {
 	RPCCreatePlayerGhost(std::int32_t entityNetId, const PlayerInfo&,
 		const glm::mat4& transform);
 
-	virtual void execute() override;
+	virtual void execute(std::vector<Entity*>& netEntities) override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 
 private:
@@ -63,7 +66,7 @@ public:
 	RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
 		glm::mat4 transform);
 
-	virtual void execute() override;
+	virtual void execute(std::vector<Entity*>& netEntities) override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 
 private:
@@ -75,15 +78,17 @@ class RPCDestroyGhost : public RemoteProcedureCall {
 public:
 	RPCDestroyGhost(std::int32_t entityNetId);
 
-	virtual void execute() override;
+	virtual void execute(std::vector<Entity*>& netEntities) override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 };
 
+// A remote procedure call sent from the client that updates input state
+// on the server.
 class RPCRecordInput : public RemoteProcedureCall {
 public:
 	RPCRecordInput(std::int32_t entityNetId, const InputComponent&);
 
-	virtual void execute() override;
+	virtual void execute(std::vector<Entity*>& netEntities) override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 	
 private:
@@ -94,16 +99,13 @@ private:
 // These should be grouped by packet sequence number.
 class RPCGroup {
 public:
-	RPCGroup(std::uint32_t sequenceNum);
-
 	void addRPC(std::unique_ptr<RemoteProcedureCall> rpc);
 	OutBufferStream& serialize(OutBufferStream&) const;
 
-	friend OutBufferStream& operator<<(OutBufferStream&, const RPCGroup&);
-
-	std::uint32_t sequenceNum() const;
+	const std::vector<std::unique_ptr<RemoteProcedureCall>>& getRpcs();
 
 private:
-	std::uint32_t m_sequenceNum;
-	std::vector<std::unique_ptr<RemoteProcedureCall>> rpcs;
+	std::vector<std::unique_ptr<RemoteProcedureCall>> m_rpcs;
 };
+
+OutBufferStream& operator<<(OutBufferStream&, const RPCGroup&);

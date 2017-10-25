@@ -17,6 +17,8 @@
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
 
+#include <array>
+
 class OutBufferStream;
 
 struct InputComponent {
@@ -26,6 +28,13 @@ struct InputComponent {
 	bool btn2Down;
 	bool btn3Down;
 	bool btn4Down;
+
+	// These represent buttons that are currently down
+	// std::array<bool, 4> btnsDown;
+	// These represent action buttons that have been pressed and have
+	// not yet been handled. These should be set to false once the action
+	// has been handled.
+	// std::array<bool, 4> actionBtnsPressed;
 };
 
 OutBufferStream& operator<<(OutBufferStream&, const InputComponent&);
