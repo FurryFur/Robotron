@@ -22,6 +22,8 @@ struct Packet {
 	StreamableEvictQueue<RPCGroup, 32> rpcGroupBuffer;
 
 	OutBufferStream& serialize(OutBufferStream&) const;
+	InBufferStream& deserialize(InBufferStream&);
 };
 
 OutBufferStream& operator<<(OutBufferStream&, const Packet&);
+InBufferStream& operator>>(InBufferStream&, Packet&);

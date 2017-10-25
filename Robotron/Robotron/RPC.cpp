@@ -12,13 +12,23 @@ OutBufferStream& RPCGroup::serialize(OutBufferStream& obs) const
 {
 	// Sequence numbers will be stored implicitely by array index.
 	// First write out the number of RPCs in the group
-	obs << static_cast<std::uint32_t>(m_rpcs.size());
+	obs << static_cast<std::uint16_t>(m_rpcs.size());
 	for (auto& rpc : m_rpcs) {
 		// Then write out each rpc in the group to the buffer.
 		obs << *rpc;
 	}
 
 	return obs;
+}
+
+InBufferStream& RPCGroup::deserialize(InBufferStream& ibs)
+{
+	std::uint16_t size;
+	ibs >> size;
+	m_rpcs.resize(size);
+	for (auto& rpc : m_rpcs) {
+		ibs >> *rpc;
+	}
 }
 
 const std::vector<std::unique_ptr<RemoteProcedureCall>>& RPCGroup::getRpcs()
@@ -38,6 +48,20 @@ OutBufferStream& operator<<(OutBufferStream& obs, RPCType rpcType)
 	return obs;
 }
 
+InBufferStream& operator>>(InBufferStream& ibs, ModelID& modelID)
+{
+	std::uint8_t tmp;
+	ibs >> tmp;
+	modelID = static_cast<ModelID>(tmp);
+}
+
+InBufferStream& operator>>(InBufferStream& ibs, RPCType& rpcType)
+{
+	std::uint8_t tmp;
+	ibs >> tmp;
+	rpcType = static_cast<RPCType>(tmp);
+}
+
 OutBufferStream& operator<<(OutBufferStream& obs, const RemoteProcedureCall& rpc)
 {
 	return rpc.serialize(obs);
@@ -46,6 +70,11 @@ OutBufferStream& operator<<(OutBufferStream& obs, const RemoteProcedureCall& rpc
 OutBufferStream& operator<<(OutBufferStream& obs, const RPCGroup& rpcGroup)
 {
 	return rpcGroup.serialize(obs);
+}
+
+InBufferStream& operator>>(InBufferStream& ibs, RPCGroup& rpcGroup)
+{
+	rpcGroup.deserialize(ibs);
 }
 
 RPCDestroyGhost::RPCDestroyGhost(std::int32_t entityNetId)
@@ -62,6 +91,11 @@ OutBufferStream & RPCDestroyGhost::serialize(OutBufferStream& obs) const
 {
 	obs << RPCType::RPC_DESTROY_GHOST << m_entityNetId;
 	return obs;
+}
+
+InBufferStream & RPCDestroyGhost::deserialize(InBufferStream &)
+{
+	// TODO: insert return statement here
 }
 
 RemoteProcedureCall::RemoteProcedureCall(std::int32_t entityNetid)
@@ -93,6 +127,11 @@ OutBufferStream& RPCCreatePlayerGhost::serialize(OutBufferStream& obs) const
 	return obs;
 }
 
+InBufferStream & RPCCreatePlayerGhost::deserialize(InBufferStream &)
+{
+	// TODO: insert return statement here
+}
+
 RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
 	glm::mat4 transform)
 	: RemoteProcedureCall(entityNetId)
@@ -112,6 +151,12 @@ OutBufferStream& RPCCreateGhost::serialize(OutBufferStream& obs) const
 	return obs;
 }
 
+InBufferStream& RPCCreateGhost::deserialize(InBufferStream& ibs)
+{
+	ibs >> RPCType::RPC_CREATE_GHOST >> m_entityNetId >> m_modelId
+		>> m_transform;
+}
+
 RPCRecordInput::RPCRecordInput(std::int32_t entityNetId, const InputComponent& input)
 	: RemoteProcedureCall(entityNetId)
 	, m_input(input)
@@ -126,4 +171,9 @@ OutBufferStream & RPCRecordInput::serialize(OutBufferStream& obs) const
 {
 	obs << RPC_RECORD_INPUT << m_entityNetId << m_input;
 	return obs;
+}
+
+InBufferStream & RPCRecordInput::deserialize(InBufferStream &)
+{
+	// TODO: insert return statement here
 }

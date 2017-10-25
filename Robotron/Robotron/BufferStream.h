@@ -6,20 +6,19 @@
 
 class OutBufferStream {
 public:
-	void write(std::uint64_t) noexcept;
-	void write(std::uint32_t) noexcept;
-	void write(std::uint16_t) noexcept;
-	void write(std::uint8_t) noexcept;
-	void write(std::int64_t) noexcept;
-	void write(std::int32_t) noexcept;
-	void write(std::int16_t) noexcept;
-	void write(std::int8_t) noexcept;
-	void write(std::float_t) noexcept;
-	void write(std::double_t) noexcept;
-	void write(const std::string&) noexcept;
-
+	OutBufferStream& write(std::uint64_t) noexcept;
+	OutBufferStream& write(std::uint32_t) noexcept;
+	OutBufferStream& write(std::uint16_t) noexcept;
+	OutBufferStream& write(std::uint8_t) noexcept;
+	OutBufferStream& write(std::int64_t) noexcept;
+	OutBufferStream& write(std::int32_t) noexcept;
+	OutBufferStream& write(std::int16_t) noexcept;
+	OutBufferStream& write(std::int8_t) noexcept;
+	OutBufferStream& write(std::float_t) noexcept;
+	OutBufferStream& write(std::double_t) noexcept;
+	OutBufferStream& write(const std::string&) noexcept;
 	template<typename T>
-	void write(const T* _array, size_t length) noexcept;
+	OutBufferStream& write(const T* _array, size_t length) noexcept;
 
 	void reset() noexcept;
 	const char* getData();
@@ -45,7 +44,7 @@ private:
 };
 
 template<typename T>
-inline void OutBufferStream::write(const T* _array, size_t length) noexcept
+inline OutBufferStream& OutBufferStream::write(const T* _array, size_t length) noexcept
 {
 	size_t chunkSize = length * sizeof(T);
 	if (m_writeHeadIdx + chunkSize > m_data.size())
@@ -53,4 +52,56 @@ inline void OutBufferStream::write(const T* _array, size_t length) noexcept
 
 	for (size_t i = 0; i < length; ++i)
 		write(_array[i]);
+
+	return *this;
+}
+
+
+class InBufferStream {
+public:
+	InBufferStream(const std::vector<char>& data) noexcept;
+
+	InBufferStream& read(std::uint64_t&) noexcept;
+	InBufferStream& read(std::uint32_t&) noexcept;
+	InBufferStream& read(std::uint16_t&) noexcept;
+	InBufferStream& read(std::uint8_t&) noexcept;
+	InBufferStream& read(std::int64_t&) noexcept;
+	InBufferStream& read(std::int32_t&) noexcept;
+	InBufferStream& read(std::int16_t&) noexcept;
+	InBufferStream& read(std::int8_t&) noexcept;
+	InBufferStream& read(std::float_t&) noexcept;
+	InBufferStream& read(std::double_t&) noexcept;
+	InBufferStream& read(std::string&) noexcept;
+	template<typename T>
+	InBufferStream& read(T* dstArray, size_t length) noexcept;
+
+	void reset() noexcept;
+
+	// Returns the size of the buffer in bytes
+	size_t getBytesRead();
+
+	InBufferStream& operator>>(std::uint64_t&) noexcept;
+	InBufferStream& operator>>(std::uint32_t&) noexcept;
+	InBufferStream& operator>>(std::uint16_t&) noexcept;
+	InBufferStream& operator>>(std::uint8_t&) noexcept;
+	InBufferStream& operator>>(std::int64_t&) noexcept;
+	InBufferStream& operator>>(std::int32_t&) noexcept;
+	InBufferStream& operator>>(std::int16_t&) noexcept;
+	InBufferStream& operator>>(std::int8_t&) noexcept;
+	InBufferStream& operator>>(std::float_t&) noexcept;
+	InBufferStream& operator>>(std::double_t&) noexcept;
+	InBufferStream& operator>>(std::string&) noexcept;
+
+private:
+	const std::vector<char>& m_data;
+	size_t m_readHeadIdx;
+};
+
+template<typename T>
+inline InBufferStream& InBufferStream::read(T* dstArray, size_t length) noexcept
+{
+	for (size_t i = 0; i < length; ++i)
+		read(dstArray[i]);
+
+	return *this;
 }

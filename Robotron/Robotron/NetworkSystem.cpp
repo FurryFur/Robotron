@@ -60,8 +60,8 @@ bool NetworkSystem::receiveData(Packet& outPacket, sockaddr_in& outAddress)
 		&sizeofAddress
 	);
 
-	//InBufferStream ibs(m_recvBuffer, numBytesRead);
-	//ibs >> outPacket;
+	InBufferStream ibs(m_recvBuffer);
+	ibs >> outPacket;
 
 	// Do error checking
 	int error = WSAGetLastError();
