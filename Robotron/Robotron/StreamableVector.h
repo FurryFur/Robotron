@@ -28,17 +28,17 @@ public:
 	T& back();
 
 	// Returns a referece to the item at position i
-	T& at(size_t i);
+	T& at(std::uint16_t i);
 
 	// Clears the vector
 	void clear();
 
 	// Returns the current size of the vector. This is garanteed
 	// to be less than the max size.
-	std::uint16_t size();
+	std::uint16_t size() const;
 
 	// Retuns the maximum size of the vector
-	std::uint16_t getMaxSize();
+	std::uint16_t getMaxSize() const;
 
 	// Serializes the vector to an OutBufferStream object
 	OutBufferStream& serialize(OutBufferStream&) const;
@@ -78,7 +78,7 @@ inline T& StreamableVector<T, maxSize>::back()
 }
 
 template<typename T, std::uint16_t maxSize>
-inline T& StreamableVector<T, maxSize>::at(size_t i)
+inline T& StreamableVector<T, maxSize>::at(std::uint16_t i)
 {
 	return m_vector.at(i);
 }
@@ -90,13 +90,13 @@ inline void StreamableVector<T, maxSize>::clear()
 }
 
 template<typename T, std::uint16_t maxSize>
-inline std::uint16_t StreamableVector<T, maxSize>::size()
+inline std::uint16_t StreamableVector<T, maxSize>::size() const
 {
 	return static_cast<std::uint16_t>(m_vector.size());
 }
 
 template<typename T, std::uint16_t maxSize>
-inline std::uint16_t StreamableVector<T, maxSize>::getMaxSize()
+inline std::uint16_t StreamableVector<T, maxSize>::getMaxSize() const
 {
 	return maxSize;
 }
@@ -112,8 +112,7 @@ inline OutBufferStream& StreamableVector<T, maxSize>::serialize(OutBufferStream&
 }
 
 template<typename T, std::uint16_t maxSize>
-inline OutBufferStream& operator<<(OutBufferStream& obs,
-	const StreamableVector<T, maxSize>& vector)
+inline OutBufferStream& operator<<(OutBufferStream& obs, const StreamableVector<T, maxSize>& vector)
 {
 	return vector.serialize(obs);
 }
@@ -121,20 +120,25 @@ inline OutBufferStream& operator<<(OutBufferStream& obs,
 template<typename T, std::uint16_t maxSize>
 inline InBufferStream& StreamableVector<T, maxSize>::deserialize(InBufferStream& ibs)
 {
+	if (ibs.getError())
+		return ibs;
+
 	std::uint16_t size;
 	ibs >> size;
-	assert(size <= maxSize);
+	if (size > maxSize) {
+		ibs.setError(IBS_ERROR_CORRUPT_DATA);
+		return ibs;
+	}
 
 	m_vector.resize(size);
 	for (T& val : m_vector)
 		ibs >> val;
 
-	return obs;
+	return ibs;
 }
 
 template<typename T, std::uint16_t maxSize>
-inline InBufferStream& operator>>(InBufferStream& ibs,
-	StreamableVector<T, maxSize>& vector)
+inline InBufferStream& operator>>(InBufferStream& ibs, StreamableVector<T, maxSize>& vector)
 {
 	return vector.deserialize(ibs);
 }

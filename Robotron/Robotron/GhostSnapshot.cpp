@@ -27,5 +27,5 @@ OutBufferStream& operator<<(OutBufferStream& obs, const GhostSnapshot& snapshot)
 
 InBufferStream & operator>>(InBufferStream& ibs, GhostSnapshot& snapshot)
 {
-	snapshot.deserialize(ibs);
+	return snapshot.deserialize(ibs);
 }

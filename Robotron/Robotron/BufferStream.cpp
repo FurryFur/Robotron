@@ -1,5 +1,13 @@
 #include "BufferStream.h"
 
+#include <cstring>
+#include <iostream>
+
+OutBufferStream::OutBufferStream()
+	: m_writeHeadIdx{ 0 }
+{
+}
+
 OutBufferStream& OutBufferStream::write(std::uint64_t dword) noexcept
 {
 	if (m_writeHeadIdx + sizeof(dword) > m_data.size())
@@ -156,83 +164,176 @@ OutBufferStream& OutBufferStream::operator<<(const std::string& str) noexcept
 	return write(str);
 }
 
-InBufferStream::InBufferStream(const std::vector<char>& data) noexcept
+InBufferStream::InBufferStream(const std::vector<char>& buffer) noexcept
+	: m_data{ buffer }
+	, m_readHeadIdx{ 0 }
+	, m_error{ IBS_ERROR_NONE }
 {
+}
 
+IBSError InBufferStream::checkBufferOverrun(size_t nextReadHeadIdx)
+{
+	if (m_error)
+		return m_error;
+
+	if (nextReadHeadIdx > m_data.size()) {
+		setError(IBS_ERROR_WOULD_READ_PAST_END);
+	}
+
+	return m_error;
+}
+
+IBSError InBufferStream::checkBufferOverrunStr()
+{
+	if (m_error)
+		return m_error;
+
+	if (std::memchr(&m_data[m_readHeadIdx], 0, m_data.size() - m_readHeadIdx)) {
+		setError(IBS_ERROR_WOULD_READ_PAST_END);
+	}
+
+	return m_error;
+}
+
+IBSError InBufferStream::getError()
+{
+	return m_error;
+}
+
+void InBufferStream::setError(IBSError error)
+{
+	if (error != IBS_ERROR_NONE) {
+		std::cout << "Error occured reading data from input buffer stream" << std::endl;
+		switch (error)
+		{
+		case IBS_ERROR_CORRUPT_DATA:
+			std::cout << "Data was corrupted" << std::endl;
+			break;
+		case IBS_ERROR_WOULD_READ_PAST_END:
+			std::cout << "Detected would overrun buffer" << std::endl;
+			break;
+		default:
+			break;
+		}
+		m_error = error;
+	}
 }
 
 InBufferStream& InBufferStream::read(std::uint64_t& outDword) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outDword);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outDword = *reinterpret_cast<const std::uint64_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outDword);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::uint32_t& outWord) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outWord);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outWord = *reinterpret_cast<const std::uint32_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outWord);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::uint16_t& outShort) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outShort);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outShort = *reinterpret_cast<const std::uint16_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outShort);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::uint8_t& outByte) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outByte);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outByte = *reinterpret_cast<const std::uint8_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outByte);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::int64_t& outDword) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outDword);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outDword = *reinterpret_cast<const std::int64_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outDword);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::int32_t& outWord) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outWord);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outWord = *reinterpret_cast<const std::int32_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outWord);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::int16_t& outShort) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outShort);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outShort = *reinterpret_cast<const std::int16_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outShort);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::int8_t& outByte) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outByte);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outByte = *reinterpret_cast<const std::int8_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outByte);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::float_t& outFloat) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outFloat);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outFloat = *reinterpret_cast<const std::float_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outFloat);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::double_t& outDouble) noexcept
 {
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outDouble);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
 	outDouble = *reinterpret_cast<const std::double_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx += sizeof(outDouble);
+	m_readHeadIdx = nextReadHeadIdx;
 	return *this;
 }
 
 InBufferStream& InBufferStream::read(std::string& outString) noexcept
 {
+	if (checkBufferOverrunStr() != IBS_ERROR_NONE)
+		return *this;
+
 	outString = m_data[m_readHeadIdx];
 	m_readHeadIdx += outString.length();
 	return *this;

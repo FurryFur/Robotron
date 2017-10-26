@@ -6,6 +6,8 @@
 
 class OutBufferStream {
 public:
+	OutBufferStream();
+
 	OutBufferStream& write(std::uint64_t) noexcept;
 	OutBufferStream& write(std::uint32_t) noexcept;
 	OutBufferStream& write(std::uint16_t) noexcept;
@@ -56,10 +58,20 @@ inline OutBufferStream& OutBufferStream::write(const T* _array, size_t length) n
 	return *this;
 }
 
+enum IBSError {
+	IBS_ERROR_NONE,
+	IBS_ERROR_CORRUPT_DATA,
+	IBS_ERROR_WOULD_READ_PAST_END
+};
 
 class InBufferStream {
 public:
-	InBufferStream(const std::vector<char>& data) noexcept;
+	InBufferStream(const std::vector<char>& buffer) noexcept;
+
+	IBSError checkBufferOverrun(size_t nextReadHeadIdx);
+	IBSError checkBufferOverrunStr();
+	IBSError getError();
+	void setError(IBSError);
 
 	InBufferStream& read(std::uint64_t&) noexcept;
 	InBufferStream& read(std::uint32_t&) noexcept;
@@ -95,6 +107,7 @@ public:
 private:
 	const std::vector<char>& m_data;
 	size_t m_readHeadIdx;
+	IBSError m_error;
 };
 
 template<typename T>

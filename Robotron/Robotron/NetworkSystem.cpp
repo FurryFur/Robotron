@@ -60,9 +60,6 @@ bool NetworkSystem::receiveData(Packet& outPacket, sockaddr_in& outAddress)
 		&sizeofAddress
 	);
 
-	InBufferStream ibs(m_recvBuffer);
-	ibs >> outPacket;
-
 	// Do error checking
 	int error = WSAGetLastError();
 	if (error == WSAEWOULDBLOCK)
@@ -70,6 +67,15 @@ bool NetworkSystem::receiveData(Packet& outPacket, sockaddr_in& outAddress)
 	if (error != 0 && error != WSAEWOULDBLOCK) {
 		std::cout << "Error receiving data, error code: " << error << std::endl;
 		return false;
+	}
+
+	if (numBytesRead > 0) {
+		InBufferStream ibs(m_recvBuffer);
+		ibs >> outPacket;
+
+		if (!ibs.getError()) {
+			return true;
+		}
 	}
 
 	//// Do stuff with result

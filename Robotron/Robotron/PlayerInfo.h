@@ -3,6 +3,7 @@
 #include <string>
 
 class OutBufferStream;
+class InBufferStream;
 
 struct PlayerInfo {
 	std::string username;
@@ -10,4 +11,5 @@ struct PlayerInfo {
 	std::uint32_t score;
 };
 
-OutBufferStream& operator<<(OutBufferStream& obs, const PlayerInfo& playerInfo);
+OutBufferStream& operator<<(OutBufferStream&, const PlayerInfo&);
+InBufferStream& operator>>(InBufferStream&, PlayerInfo&);

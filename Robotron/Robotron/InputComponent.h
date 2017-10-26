@@ -20,6 +20,7 @@
 #include <array>
 
 class OutBufferStream;
+class InBufferStream;
 
 struct InputComponent {
 	glm::vec3 axis;
@@ -38,3 +39,4 @@ struct InputComponent {
 };
 
 OutBufferStream& operator<<(OutBufferStream&, const InputComponent&);
+InBufferStream& operator>>(InBufferStream&, InputComponent&);

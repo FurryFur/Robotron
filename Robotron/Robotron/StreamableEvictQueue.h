@@ -28,17 +28,17 @@ public:
 	T& front();
 
 	// Returns the item at position i
-	T& at(size_t i);
+	T& at(std::uint16_t i);
 
 	// Clears the queue
 	void clear();
 
 	// Returns the current size of the queue. This is garanteed
 	// to be less than the max size.
-	std::uint16_t size();
+	std::uint16_t size() const;
 
 	// Retuns the maximum size of the queue
-	std::uint16_t getMaxSize();
+	std::uint16_t getMaxSize() const;
 
 	// Serializes the queue to an OutBufferStream object
 	OutBufferStream& serialize(OutBufferStream&) const;
@@ -62,7 +62,7 @@ inline T& StreamableEvictQueue<T, maxSize>::front()
 }
 
 template<typename T, std::uint16_t maxSize>
-inline T& StreamableEvictQueue<T, maxSize>::at(size_t i)
+inline T& StreamableEvictQueue<T, maxSize>::at(std::uint16_t i)
 {
 	return m_queue.at(i);
 }
@@ -74,13 +74,13 @@ inline void StreamableEvictQueue<T, maxSize>::clear()
 }
 
 template<typename T, std::uint16_t maxSize>
-inline std::uint16_t StreamableEvictQueue<T, maxSize>::size()
+inline std::uint16_t StreamableEvictQueue<T, maxSize>::size() const
 {
 	return static_cast<std::uint16_t>(m_queue.size());
 }
 
 template<typename T, std::uint16_t maxSize>
-inline std::uint16_t StreamableEvictQueue<T, maxSize>::getMaxSize()
+inline std::uint16_t StreamableEvictQueue<T, maxSize>::getMaxSize() const
 {
 	return maxSize;
 }
@@ -98,25 +98,31 @@ inline OutBufferStream& StreamableEvictQueue<T, maxSize>::serialize(OutBufferStr
 template<typename T, std::uint16_t maxSize>
 inline InBufferStream& StreamableEvictQueue<T, maxSize>::deserialize(InBufferStream& ibs)
 {
+	if (ibs.getError())
+		return ibs;
+
 	std::uint16_t size;
 	ibs >> size;
-	assert(size <= maxSize);
+	if (size > maxSize) {
+		ibs.setError(IBS_ERROR_CORRUPT_DATA);
+		return ibs;
+	}
 
 	m_queue.resize(size);
 	for (T& val : m_queue)
 		ibs >> val;
+
+	return ibs;
 }
 
 template<typename T, std::uint16_t maxSize>
-inline OutBufferStream& operator<<(OutBufferStream& obs, 
-	const StreamableEvictQueue<T, maxSize>& queue)
+inline OutBufferStream& operator<<(OutBufferStream& obs, const StreamableEvictQueue<T, maxSize>& queue)
 {
 	return queue.serialize(obs);
 }
 
 template<typename T, std::uint16_t maxSize>
-inline InBufferStream& operator>>(InBufferStream& ibs,
-	const StreamableEvictQueue<T, maxSize>& queue)
+inline InBufferStream& operator>>(InBufferStream& ibs, StreamableEvictQueue<T, maxSize>& queue)
 {
 	return queue.deserialize(ibs);
 }

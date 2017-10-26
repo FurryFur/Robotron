@@ -39,6 +39,7 @@ InBufferStream& operator>>(InBufferStream&, RPCType&);
 
 class RemoteProcedureCall {
 public:
+	RemoteProcedureCall() = default;
 	RemoteProcedureCall(std::int32_t entityNetid);
 
 	virtual void execute(std::vector<Entity*>& netEntities) = 0;
@@ -52,8 +53,11 @@ protected:
 };
 
 OutBufferStream& operator<<(OutBufferStream&, const RemoteProcedureCall&);
+InBufferStream& operator>>(InBufferStream&, RemoteProcedureCall&);
 
 class RPCCreatePlayerGhost : public RemoteProcedureCall {
+public:
+	RPCCreatePlayerGhost() = default;
 	RPCCreatePlayerGhost(std::int32_t entityNetId, const PlayerInfo&,
 		const glm::mat4& transform);
 
@@ -68,6 +72,7 @@ private:
 
 class RPCCreateGhost : public RemoteProcedureCall {
 public:
+	RPCCreateGhost() = default;
 	RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
 		glm::mat4 transform);
 
@@ -82,6 +87,7 @@ private:
 
 class RPCDestroyGhost : public RemoteProcedureCall {
 public:
+	RPCDestroyGhost() = default;
 	RPCDestroyGhost(std::int32_t entityNetId);
 
 	virtual void execute(std::vector<Entity*>& netEntities) override;
@@ -93,6 +99,7 @@ public:
 // on the server.
 class RPCRecordInput : public RemoteProcedureCall {
 public:
+	RPCRecordInput() = default;
 	RPCRecordInput(std::int32_t entityNetId, const InputComponent&);
 
 	virtual void execute(std::vector<Entity*>& netEntities) override;

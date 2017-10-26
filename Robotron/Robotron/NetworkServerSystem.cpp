@@ -8,6 +8,7 @@
 #include "GhostSnapshot.h"
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 using namespace std::chrono;
@@ -30,7 +31,7 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene)
 	address.sin_family = AF_INET;
 	ClientInfo clientInfo;
 	clientInfo.lastSeqNumSeen = 0;
-	clientInfo.playerInfo.username = "Defaut";
+	clientInfo.playerInfo.username = "Default";
 	clientInfo.playerInfo.lives = 3;
 	clientInfo.playerInfo.score = 0;
 	m_clients.insert(std::make_pair(address, clientInfo));
@@ -54,11 +55,11 @@ void NetworkServerSystem::receiveAndProcess()
 		// that we haven't seen before.
 		std::uint32_t seqNumSeen = clientIt->second.lastSeqNumSeen;
 		std::uint32_t seqNumRecvd = m_recvPacket.sequenceNum;
-		size_t bufferOffset = std::max(static_cast<size_t>(seqNumRecvd - seqNumSeen), 
-			                            m_recvPacket.rpcGroupBuffer.size() - 1);
+		std::uint32_t bufferOffset = std::min(seqNumRecvd - seqNumSeen - 1,
+			                                  static_cast<std::uint32_t>(m_recvPacket.rpcGroupBuffer.size() - 1));
 		
 		// Execute RPCs received from client
-		for (size_t i = bufferOffset; i >= 0; --i) {
+		for (int i = bufferOffset; i >= 0; --i) {
 			RPCGroup& rpcGroup = m_recvPacket.rpcGroupBuffer.at(i);
 			for (auto& rpc : rpcGroup.getRpcs()) {
 				// TODO: Add check to make sure rpc is being executed
@@ -68,7 +69,7 @@ void NetworkServerSystem::receiveAndProcess()
 		}
 
 		// Update the last sequence number seen from the client
-		clientIt->second.lastSeqNumSeen = seqNumRecvd;
+		clientIt->second.lastSeqNumSeen = seqNumSeen > seqNumRecvd;
 	}
 }
 
@@ -147,13 +148,6 @@ void NetworkServerSystem::update(Entity& entity)
 			bufferRpc(std::move(rpc));
 		}
 	}
-
-	if (m_willSendPcktThisFrame
-	 && entity.hasAllComponents(COMPONENT_NETWORK | COMPONENT_TRANSFORM 
-	                          | COMPONENT_PHYSICS)) {
-		++entity.network.priority;
-		m_snapshotPriorityQ.push(&entity);
-	}
 }
 
 void NetworkServerSystem::handleEntityDestruction(Entity& entity)
@@ -177,11 +171,21 @@ void NetworkServerSystem::handleEntityDestruction(Entity& entity)
 void NetworkServerSystem::endFrame()
 {
 	if (m_willSendPcktThisFrame) {
+		// Set packet sequence number
 		m_sendPacket.sequenceNum = m_curSeqenceNum;
+
+		// Get ghost snapshots to send to clients
+		for (Entity* entity : m_netEntities) {
+			if (entity) {
+				++entity->network.priority;
+				m_snapshotPriorityQ.push(entity);
+			}
+		}
 		selectGhostSnapshots(m_sendPacket.ghostSnapshotBuffer, 
 		                     m_snapshotPriorityQ, 
 		                     m_sendPacket.ghostSnapshotBuffer.getMaxSize());
 
+		// Send packet to clients
 		broadcastToClients(m_sendPacket);
 
 		m_snapshotPriorityQ = {};

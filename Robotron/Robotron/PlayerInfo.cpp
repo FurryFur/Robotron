@@ -4,6 +4,10 @@
 
 OutBufferStream& operator<<(OutBufferStream& obs, const PlayerInfo& playerInfo)
 {
-	obs << playerInfo.username << playerInfo.lives << playerInfo.score;
-	return obs;
+	return obs << playerInfo.username << playerInfo.lives << playerInfo.score;
+}
+
+InBufferStream& operator>>(InBufferStream& ibs, PlayerInfo& playerInfo)
+{
+	return ibs >> playerInfo.username >> playerInfo.lives >> playerInfo.score;
 }

@@ -23,12 +23,37 @@ OutBufferStream& RPCGroup::serialize(OutBufferStream& obs) const
 
 InBufferStream& RPCGroup::deserialize(InBufferStream& ibs)
 {
+	if (ibs.getError())
+		return ibs;
+
 	std::uint16_t size;
 	ibs >> size;
 	m_rpcs.resize(size);
+	std::unique_ptr<RemoteProcedureCall> rpc;
 	for (auto& rpc : m_rpcs) {
+		RPCType rpcType;
+		ibs >> rpcType;
+		switch (rpcType)
+		{
+		case RPC_CREATE_PLAYER_GHOST:
+			rpc = std::make_unique<RPCCreatePlayerGhost>();
+			break;
+		case RPC_CREATE_GHOST:
+			rpc = std::make_unique<RPCCreateGhost>();
+			break;
+		case RPC_DESTROY_GHOST:
+			rpc = std::make_unique<RPCDestroyGhost>();
+			break;
+		case RPC_RECORD_INPUT:
+			rpc = std::make_unique<RPCRecordInput>();
+			break;
+		default:
+			ibs.setError(IBS_ERROR_CORRUPT_DATA);
+			break;
+		}
 		ibs >> *rpc;
 	}
+	return ibs;
 }
 
 const std::vector<std::unique_ptr<RemoteProcedureCall>>& RPCGroup::getRpcs()
@@ -53,6 +78,7 @@ InBufferStream& operator>>(InBufferStream& ibs, ModelID& modelID)
 	std::uint8_t tmp;
 	ibs >> tmp;
 	modelID = static_cast<ModelID>(tmp);
+	return ibs;
 }
 
 InBufferStream& operator>>(InBufferStream& ibs, RPCType& rpcType)
@@ -60,11 +86,17 @@ InBufferStream& operator>>(InBufferStream& ibs, RPCType& rpcType)
 	std::uint8_t tmp;
 	ibs >> tmp;
 	rpcType = static_cast<RPCType>(tmp);
+	return ibs;
 }
 
 OutBufferStream& operator<<(OutBufferStream& obs, const RemoteProcedureCall& rpc)
 {
 	return rpc.serialize(obs);
+}
+
+InBufferStream& operator>>(InBufferStream& ibs, RemoteProcedureCall& rpc)
+{
+	return rpc.deserialize(ibs);
 }
 
 OutBufferStream& operator<<(OutBufferStream& obs, const RPCGroup& rpcGroup)
@@ -74,28 +106,27 @@ OutBufferStream& operator<<(OutBufferStream& obs, const RPCGroup& rpcGroup)
 
 InBufferStream& operator>>(InBufferStream& ibs, RPCGroup& rpcGroup)
 {
-	rpcGroup.deserialize(ibs);
+	return rpcGroup.deserialize(ibs);
 }
 
 RPCDestroyGhost::RPCDestroyGhost(std::int32_t entityNetId)
 	: RemoteProcedureCall(entityNetId)
 {
-	
 }
 
 void RPCDestroyGhost::execute(std::vector<Entity*>& netEntities)
 {
 }
 
-OutBufferStream & RPCDestroyGhost::serialize(OutBufferStream& obs) const
+OutBufferStream& RPCDestroyGhost::serialize(OutBufferStream& obs) const
 {
 	obs << RPCType::RPC_DESTROY_GHOST << m_entityNetId;
 	return obs;
 }
 
-InBufferStream & RPCDestroyGhost::deserialize(InBufferStream &)
+InBufferStream& RPCDestroyGhost::deserialize(InBufferStream& ibs)
 {
-	// TODO: insert return statement here
+	return ibs >> m_entityNetId;
 }
 
 RemoteProcedureCall::RemoteProcedureCall(std::int32_t entityNetid)
@@ -108,7 +139,7 @@ std::int32_t RemoteProcedureCall::getEntityNetId()
 	return m_entityNetId;
 }
 
-RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId, 
+RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId,
 	const PlayerInfo& playerInfo, const glm::mat4 & transform)
 	: RemoteProcedureCall(entityNetId)
 	, m_playerInfo(playerInfo)
@@ -127,9 +158,9 @@ OutBufferStream& RPCCreatePlayerGhost::serialize(OutBufferStream& obs) const
 	return obs;
 }
 
-InBufferStream & RPCCreatePlayerGhost::deserialize(InBufferStream &)
+InBufferStream& RPCCreatePlayerGhost::deserialize(InBufferStream& ibs)
 {
-	// TODO: insert return statement here
+	return ibs >> m_entityNetId >> m_playerInfo >> m_transform;
 }
 
 RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
@@ -153,8 +184,7 @@ OutBufferStream& RPCCreateGhost::serialize(OutBufferStream& obs) const
 
 InBufferStream& RPCCreateGhost::deserialize(InBufferStream& ibs)
 {
-	ibs >> RPCType::RPC_CREATE_GHOST >> m_entityNetId >> m_modelId
-		>> m_transform;
+	return ibs >> m_entityNetId >> m_modelId >> m_transform;
 }
 
 RPCRecordInput::RPCRecordInput(std::int32_t entityNetId, const InputComponent& input)
@@ -167,13 +197,13 @@ void RPCRecordInput::execute(std::vector<Entity*>& netEntities)
 {
 }
 
-OutBufferStream & RPCRecordInput::serialize(OutBufferStream& obs) const
+OutBufferStream& RPCRecordInput::serialize(OutBufferStream& obs) const
 {
 	obs << RPC_RECORD_INPUT << m_entityNetId << m_input;
 	return obs;
 }
 
-InBufferStream & RPCRecordInput::deserialize(InBufferStream &)
+InBufferStream& RPCRecordInput::deserialize(InBufferStream& ibs)
 {
-	// TODO: insert return statement here
+	return ibs >> m_entityNetId >> m_input;
 }
