@@ -71,7 +71,7 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.12f;
+	entity.controlVars.moveSpeed = 0.14f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -103,7 +103,7 @@ Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
 
-	entity.controlVars.moveSpeed = 0.15f;
+	entity.controlVars.moveSpeed = 0.17f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -132,7 +132,7 @@ Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.12f;
+	entity.controlVars.moveSpeed = 0.14f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -148,6 +148,7 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
+	entity.physics.velocity = { 0.0f, 0.0f, 0.0f };
 	entity.aiVariables = {};
 	entity.playerStats = {};
 	
@@ -160,7 +161,7 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.8f;
+	entity.controlVars.moveSpeed = 0.12f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -176,6 +177,7 @@ Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transfor
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
+	entity.physics.velocity = { 0.0f, 0.0f, 0.0f };
 	entity.aiVariables = {};
 	entity.playerStats = {};
 
@@ -187,7 +189,7 @@ Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transfor
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.8f;
+	entity.controlVars.moveSpeed = 0.12f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -203,6 +205,7 @@ Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
+	entity.physics.velocity = { 0.0f, 0.0f, 0.0f };
 	entity.aiVariables = {};
 	entity.playerStats = {};
 
@@ -214,7 +217,7 @@ Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.8f;
+	entity.controlVars.moveSpeed = 0.12f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -251,7 +254,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.inputMap.forwardBtnMap = GLFW_KEY_W;
 	entity.inputMap.backwardBtnMap = GLFW_KEY_S;
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.moveSpeed = 0.12f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -277,7 +280,7 @@ Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.moveSpeed = 0.12f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -303,7 +306,7 @@ Entity& EntityUtils::createEnemyBullet(Scene& scene, const glm::mat4& transform)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.moveSpeed = 0.12f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
