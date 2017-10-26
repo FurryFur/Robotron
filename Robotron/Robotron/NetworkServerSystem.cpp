@@ -55,8 +55,8 @@ void NetworkServerSystem::receiveAndProcess()
 		// that we haven't seen before.
 		std::uint32_t seqNumSeen = clientIt->second.lastSeqNumSeen;
 		std::uint32_t seqNumRecvd = m_recvPacket.sequenceNum;
-		std::uint32_t bufferOffset = std::min(seqNumRecvd - seqNumSeen - 1,
-			                                  static_cast<std::uint32_t>(m_recvPacket.rpcGroupBuffer.size() - 1));
+		std::uint32_t bufferOffset = std::min((seqNumRecvd - seqNumSeen - 1),
+			                                  (static_cast<std::uint32_t>(m_recvPacket.rpcGroupBuffer.size() - 1)));
 		
 		// Execute RPCs received from client
 		for (int i = bufferOffset; i >= 0; --i) {
@@ -69,7 +69,8 @@ void NetworkServerSystem::receiveAndProcess()
 		}
 
 		// Update the last sequence number seen from the client
-		clientIt->second.lastSeqNumSeen = seqNumSeen > seqNumRecvd;
+		if (seqNumRecvd > seqNumSeen)
+			clientIt->second.lastSeqNumSeen = seqNumRecvd;
 	}
 }
 

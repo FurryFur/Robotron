@@ -1,6 +1,8 @@
 #pragma once
 #include "NetworkSystem.h"
 
+struct Scene;
+struct Entity;
 
 class NetworkClientSystem : public NetworkSystem
 {
@@ -13,5 +15,7 @@ public:
 
 private:
 	void destroyIfExists(size_t entityNetID);
+
+	std::uint32_t m_lastSeqNumSeen;
 };
 

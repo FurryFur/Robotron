@@ -3,7 +3,6 @@
 #include "NetworkSystem.h"
 #include "socket.h"
 #include "RPC.h"
-#include "Packet.h"
 #include "ClientInfo.h"
 
 #include <vector>
@@ -14,6 +13,7 @@
 
 struct Scene;
 struct Entity;
+struct Packet;
 
 class EntityPriorityComparitor {
 public:
@@ -42,12 +42,6 @@ private:
 	std::uint32_t m_curSeqenceNum;
 
 	bool m_willSendPcktThisFrame;
-
-	// A reusable packet for sending data
-	Packet m_sendPacket;
-
-	// A reusable packet for receiving data
-	Packet m_recvPacket;
 
 	std::unordered_map<sockaddr_in, ClientInfo> m_clients;
 

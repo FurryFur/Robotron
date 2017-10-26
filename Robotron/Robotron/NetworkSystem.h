@@ -2,6 +2,7 @@
 
 #include "socket.h"
 #include "BufferStream.h"
+#include "Packet.h"
 
 #include <vector>
 
@@ -26,5 +27,12 @@ protected:
 	Scene& m_scene;
 	std::vector<Entity*> m_netEntities;
 	std::vector<char> m_recvBuffer;
+
+	// A reusable packet for sending data
+	Packet m_sendPacket;
+
+	// A reusable packet for receiving data
+	Packet m_recvPacket;
+
 	OutBufferStream m_obs;
 };

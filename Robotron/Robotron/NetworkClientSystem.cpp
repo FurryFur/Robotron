@@ -5,8 +5,11 @@
 #include "EntityUtils.h"
 #include "Entity.h"
 
+#include <cmath>
+
 NetworkClientSystem::NetworkClientSystem(Scene& scene)
 	: NetworkSystem(scene)
+	, m_lastSeqNumSeen{ 0 }
 {
 	m_socket.initialise(4567);
 	allocateRecvBuffer();
@@ -14,9 +17,26 @@ NetworkClientSystem::NetworkClientSystem(Scene& scene)
 
 void NetworkClientSystem::beginFrame()
 {
-	Packet packet;
 	sockaddr_in address;
-	while (receiveData(packet, address)) {
+	while (receiveData(m_recvPacket, address)) {
+		// Get figure out which remote procedure calls we got from the server
+		// that we haven't seen before.
+		std::uint32_t seqNumRecvd = m_recvPacket.sequenceNum;
+		std::uint32_t bufferOffset = std::min((seqNumRecvd - m_lastSeqNumSeen - 1),
+			(static_cast<std::uint32_t>(m_recvPacket.rpcGroupBuffer.size() - 1)));
+
+		// Execute RPCs received from server
+		for (int i = bufferOffset; i >= 0; --i) {
+			RPCGroup& rpcGroup = m_recvPacket.rpcGroupBuffer.at(i);
+			for (auto& rpc : rpcGroup.getRpcs()) {
+				rpc->execute(m_netEntities);
+			}
+		}
+
+		// Update the last sequence number seen from the server
+		if (seqNumRecvd > m_lastSeqNumSeen)
+			m_lastSeqNumSeen = seqNumRecvd;
+
 	//	if (packet.type == PACKET_TYPE_CREATE_GHOST) {
 	//		// If a ghost entity with this id already exists, then destroy it first
 	//		destroyIfExists(packet.entityNetID);
