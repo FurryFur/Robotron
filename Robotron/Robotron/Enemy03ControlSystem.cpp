@@ -23,6 +23,7 @@
 #include "AIUtils.h"
 #include "Scene.h"
 #include "Entity.h"
+#include "EntityUtils.h"
 #include "RenderSystem.h"
 
 #include <glm\glm.hpp>
@@ -73,7 +74,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 	{
 		// Pursue to the target if above a certain distance away from them.
 		if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) > 15)
-			Acc = pursue(targetPosition, targetVelocity, targetMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+			Acc = seekWithArrival(targetPosition, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
 		// Avade from the target if too close to a player.
 		else if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) < 5)
 			Acc = evade(targetPosition, targetVelocity, targetMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
@@ -92,6 +93,17 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 		// Add a flock acceleration to the culmative acceleration.
 		if (nearbyNeighbours.size() > 0)
 			Acc += flock(nearbyNeighbours, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+
+		// Occasionally shoot a bullet at the player
+		// Create the bullet and apply the velocity.
+		if (randomInt(0, 50) == 1)
+		{
+			Entity& bullet = EntityUtils::createEnemyBullet(m_scene,
+				glm::translate({}, glm::vec3(entity.transform[3]))
+				* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+			glm::vec3 bulletVelocity = ((targetPosition - glm::vec3(entity.transform[3]) + entity.physics.velocity) / (glm::length(targetPosition - glm::vec3(entity.transform[3])) + entity.physics.velocity)) * 0.2f;
+			bullet.physics.velocity = bulletVelocity;
+		}
 	}
 	// If the seek returns 0 then wander.
 	else
