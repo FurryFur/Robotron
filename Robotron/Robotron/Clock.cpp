@@ -53,7 +53,7 @@ Clock::Process()
 	m_currentTime = glfwGetTime();;
 
 	//Time difference between this frame and the previous frame
-	m_deltaTime = (m_currentTime - m_lastTime);
+	m_deltaTime = static_cast<float>(m_currentTime - m_lastTime);
 
 	//Prepare for the next frame
 	m_lastTime = m_currentTime;
@@ -67,10 +67,9 @@ Clock::Process()
 	m_timeElapsed += m_deltaTime;
 }
 
-float
-Clock::GetDeltaTick()
+float Clock::GetDeltaTick()
 {
-	return static_cast<float>(m_deltaTime);
+	return m_deltaTime;
 }
 
 double Clock::GetCurTime()

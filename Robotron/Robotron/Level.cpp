@@ -302,11 +302,9 @@ bool Level::checkEnemiesAlive()
 
 void Level::executeOneFrame()
 {
+	m_clock.Process();
 	float fDT = m_clock.GetDeltaTick();
 	process(fDT);
-	m_clock.Process();
-
-	Sleep(1);
 }
 
 // If enough time has passed since their death and they have lives remaining, the player is respawned.

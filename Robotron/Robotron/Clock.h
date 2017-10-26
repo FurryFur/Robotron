@@ -53,7 +53,7 @@ public:
 
 protected:
 	double m_timeElapsed;
-	double m_deltaTime;
+	float m_deltaTime;
 	double m_lastTime;
 	double m_currentTime;
 	double m_secondsPerCount;
