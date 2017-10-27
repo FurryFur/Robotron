@@ -104,7 +104,7 @@ void RenderSystem::update(const Entity& entity)
 {
 	// Filter renderable entities
 	const size_t kRenderableMask = COMPONENT_MODEL;
-	if ((entity.componentMask & kRenderableMask) != kRenderableMask)
+	if (!entity.hasComponents(kRenderableMask))
 		return;
 
 	// Can't render anything without a camera set
@@ -112,7 +112,7 @@ void RenderSystem::update(const Entity& entity)
 		return;
 	}
 
-	bool hasTransform = entity.hasAllComponents(COMPONENT_TRANSFORM);
+	bool hasTransform = entity.hasComponents(COMPONENT_TRANSFORM);
 
 	// Swap the current global render state with this RenderSystems state.
 	s_renderState = m_renderState;

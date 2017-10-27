@@ -102,7 +102,7 @@ void InputSystem::beginFrame()
 void InputSystem::update(Entity& entity)
 {
 	// DEBUG!!!
-	if (entity.hasAllComponents(COMPONENT_MODEL)) {
+	if (entity.hasComponents(COMPONENT_MODEL)) {
 		if (glfwGetKey(m_window, GLFW_KEY_KP_MULTIPLY) == GLFW_PRESS) {
 			for (size_t i = 0; i < entity.model.materials.size(); ++i) {
 				entity.model.materials.at(i).shaderParams.metallicness = clamp(entity.model.materials.at(i).shaderParams.metallicness + 0.01f, 0.001f, 1.0f);
@@ -177,7 +177,7 @@ void InputSystem::update(Entity& entity)
 
 	// Filter input receivers
 	const size_t kInputReceiverMask = COMPONENT_INPUT | COMPONENT_INPUT_MAP;
-	if ((entity.componentMask & kInputReceiverMask) != kInputReceiverMask)
+	if (!entity.hasComponents(kInputReceiverMask))
 		return;
 
 	InputComponent& input = entity.input;

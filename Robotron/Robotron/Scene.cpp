@@ -11,7 +11,7 @@ Entity& Scene::createEntity(size_t componentMask)
 	Entity* newEntity;
 
 	auto freeMem = std::find_if(m_entities.begin(), m_entities.end(), [](const std::unique_ptr<Entity>& entity) {
-		return entity->componentMask == COMPONENT_NONE;
+		return entity->hasComponents(COMPONENT_NONE);
 	});
 	if (freeMem != m_entities.end())
 		// Reuse destroyed entity memory
@@ -27,7 +27,7 @@ Entity& Scene::createEntity(size_t componentMask)
 	// in the component mask so we don't have to remember to zero memory
 	// and set special creation flags.
 
-	newEntity->componentMask = componentMask;
+	newEntity->addComponents(componentMask);
 
 	newEntity->network.isNewEntity = true;
 	newEntity->network.priority = 0;
@@ -37,7 +37,7 @@ Entity& Scene::createEntity(size_t componentMask)
 
 void Scene::destroyEntity(Entity& entity)
 {
-	entity.componentMask = COMPONENT_NONE;
+	entity.destroy();
 }
 
 Entity& Scene::getEntity(size_t entityID)

@@ -45,7 +45,7 @@ EnemyBulletSystem::EnemyBulletSystem(Scene& scene)
 void EnemyBulletSystem::update(Entity& entity, float deltaTick)
 {
 	// Check that the entity is an enemy bullet object before proceeding.
-	if ((entity.componentMask & COMPONENT_ENEMYBULLET) != COMPONENT_ENEMYBULLET)
+	if (!entity.hasComponents(COMPONENT_ENEMYBULLET))
 		return;
 
 	if ((entity.transform[3] + glm::vec4{ entity.physics.velocity, 0 }).x > 20.0f

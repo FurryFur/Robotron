@@ -42,7 +42,7 @@ Enemy03ControlSystem::Enemy03ControlSystem(Scene& scene)
 void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 {
 	// Check that the entity is an Enemy03 object before proceeding.
-	if ((entity.componentMask & COMPONENT_ENEMY03) != COMPONENT_ENEMY03)
+	if (!entity.hasComponents(COMPONENT_ENEMY03))
 		return;
 	
 	// Set the target position out of scope.
@@ -56,7 +56,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 	// Find the closest player object to seek to.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						          //its a player object
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL) 					                                           //its a player object
 			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
 			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 40)								                  //the player is within the enemys aggro range
 		{
@@ -83,8 +83,8 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 		// Find all the closest Enemy01 neighbours and store them in a vector.
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if (((m_scene.getEntity(i).componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01) &&
-				(glm::length(glm::vec2(m_scene.getEntity(i).transform[3].x - entity.transform[3].x, m_scene.getEntity(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
+			if ((m_scene.getEntity(i).hasComponents(COMPONENT_ENEMY01)) &&
+			    (glm::length(glm::vec2(m_scene.getEntity(i).transform[3].x - entity.transform[3].x, m_scene.getEntity(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
 			{
 				nearbyNeighbours.push_back(&m_scene.getEntity(i));
 			}

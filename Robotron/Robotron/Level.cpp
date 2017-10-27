@@ -41,7 +41,7 @@ Level::Level(GLFWwindow* window)
 
 	Entity& player = EntityUtils::createPlayer(m_scene,
 		glm::translate({}, glm::vec3{ 0.0f, 50.0f, 0.0f }));
-	player.componentMask |= COMPONENT_NETWORK;
+	player.addComponent(COMPONENT_NETWORK);
 
 	float randX = randomReal<float>(-18.0f, -6.0f);
 	if (randomInt(0, 1) == 0)
@@ -157,7 +157,7 @@ void Level::spawnEnemies(int levelType)
 
 		Entity& enemy = EntityUtils::createEnemy01(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
-		enemy.componentMask |= COMPONENT_NETWORK;
+		enemy.addComponent(COMPONENT_NETWORK);
 	}
 
 	// Create all the snake enemy types in the scene.
@@ -247,7 +247,7 @@ void Level::initalizeNextLevel()
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		// Delete all score pickups and update the players score.
-		if ((m_scene.getEntity(i).componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP)
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_SCOREPICKUP))
 		{
 			// Increase the player's score value.
 			if (m_scene.getEntity(i).aiVariables.followEntity != NULL)
@@ -261,7 +261,7 @@ void Level::initalizeNextLevel()
 		}
 
 		// Move the player back to the centre point of the level
-		if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
 		{
 			m_scene.getEntity(i).transform[3].x = 0.0f;
 			m_scene.getEntity(i).transform[3].z = 0.0f;
@@ -292,9 +292,9 @@ bool Level::checkEnemiesAlive()
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		// Return true when the first entity is found with an enemy tag.
-		if ((m_scene.getEntity(i).componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01
-		 || (m_scene.getEntity(i).componentMask & COMPONENT_ENEMY02) == COMPONENT_ENEMY02
-		 || (m_scene.getEntity(i).componentMask & COMPONENT_ENEMY03) == COMPONENT_ENEMY03)
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_ENEMY01)
+		 || m_scene.getEntity(i).hasComponents(COMPONENT_ENEMY02)
+		 || m_scene.getEntity(i).hasComponents(COMPONENT_ENEMY03))
 			return true;
 	}
 
@@ -315,10 +315,10 @@ void Level::respawnDeadPlayers()
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		// Return true when the first entity is found with an enemy tag.
-		if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL
-			&& m_scene.getEntity(i).playerStats.isRespawning == true
-			&& m_scene.getEntity(i).playerStats.lives > 0
-			&& m_scene.getEntity(i).playerStats.deathTime + 3.0f <= m_clock.GetCurTime())
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
+		    && m_scene.getEntity(i).playerStats.isRespawning == true
+		    && m_scene.getEntity(i).playerStats.lives > 0
+		    && m_scene.getEntity(i).playerStats.deathTime + 3.0f <= m_clock.GetCurTime())
 		{
 			m_scene.getEntity(i).playerStats.isRespawning = false;
 			m_scene.getEntity(i).transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
@@ -362,8 +362,8 @@ void Level::process(float deltaTick)
 		m_descendingPlayers = false;
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL
-				&& m_scene.getEntity(i).transform[3].y > 1.0f)
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
+			 && m_scene.getEntity(i).transform[3].y > 1.0f)
 			{
 				--m_scene.getEntity(i).transform[3].y;
 				m_descendingPlayers = true;
@@ -386,7 +386,7 @@ void Level::processSetUpPhase()
 		// Cycle through all the entites in the scene.
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
 				++m_scene.getEntity(i).transform[3].y;
 		}
 		if(m_setUpTick == 50)
@@ -398,7 +398,7 @@ void Level::processSetUpPhase()
 		// Cycle through all the entites in the scene.
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
 				--m_scene.getEntity(i).transform[3].y;
 		}
 		if (m_setUpTick == 100)

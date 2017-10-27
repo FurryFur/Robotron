@@ -42,7 +42,7 @@ ScorePickUpSystem::ScorePickUpSystem(Scene& scene)
 void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 {
 	// Check that the entity is an Enemy01 object before proceeding.
-	if ((entity.componentMask & COMPONENT_SCOREPICKUP) != COMPONENT_SCOREPICKUP)
+	if (!entity.hasComponents(COMPONENT_SCOREPICKUP))
 		return;
 	
 	// If the player dies. Stop following them.
@@ -62,7 +62,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 		// Find the closest player object to follow.
 		for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						                          //its a player object
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)						                          //its a player object
 				&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - glm::vec3(entity.transform[3]))     //it is the closet player to the target
 				&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 5)							                                      //the player is within the enemys aggro range
 			{
@@ -83,7 +83,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 		// Find all the closest Enemy01 neighbours and store them in a vector.
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if (((m_scene.getEntity(i).componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP) &&
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_SCOREPICKUP) &&
 				(glm::length(glm::vec2(m_scene.getEntity(i).transform[3].x - entity.transform[3].x, m_scene.getEntity(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
 			{
 				nearbyNeighbours.push_back(&m_scene.getEntity(i));

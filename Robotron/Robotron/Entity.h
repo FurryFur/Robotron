@@ -29,9 +29,7 @@ enum ComponentMask {
 	COMPONENT_ENEMYBULLET = 1 << 14
 };
 
-struct Entity
-{
-	size_t componentMask;
+struct Entity {
 	glm::mat4 transform;
 	PhysicsComponent physics;
 	ModelComponent model;
@@ -46,16 +44,24 @@ struct Entity
 	Entity() = default;
 	Entity(Entity&&) = default;
 	Entity(const Entity&) = delete;
+	Entity& operator=(const Entity&) = delete;
+	Entity& operator=(Entity&&) = default;
 
 	// Overload equality to check identity equivalence
 	bool operator==(const Entity& rhs) const;
 
 	// Returns true if ALL the components in the supplied component 
 	// mask are present in the entity.
-	bool hasAllComponents(size_t componentMask) const;
+	bool hasComponents(size_t componentMask) const;
 
 	// Returns true if ANY of the components in the supplied component
-	// mask are presnet in the entity.
-	bool hasAnyComponent(size_t componentMaks) const;
+	// mask are present in the entity.
+	bool hasAnyComponent(size_t componentMask) const;
+
+	// Returns true if this entity has any components
+	bool hasComponents();
+
+private:
+	size_t m_componentMask;
 };
 

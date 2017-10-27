@@ -99,7 +99,7 @@ void NetworkServerSystem::update(Entity& entity)
 	handleEntityDestruction(entity);
 
 	// Detect new entities
-	if (entity.hasAllComponents(COMPONENT_NETWORK) && isNewEntity) {
+	if (entity.hasComponents(COMPONENT_NETWORK) && isNewEntity) {
 		// Check if we can reuse the entities current id
 		if (0 <= id && id < m_netEntities.size())
 			// Reuse existing id from old entity
@@ -124,20 +124,20 @@ void NetworkServerSystem::update(Entity& entity)
 
 		// Create remote procedure calls to inform clients of new entity creation
 		std::unique_ptr<RPCCreateGhost> rpc;
-		if (entity.hasAllComponents(COMPONENT_ENEMY01)) {
+		if (entity.hasComponents(COMPONENT_ENEMY01)) {
 			rpc = std::make_unique<RPCCreateGhost>(id,
 				ModelID::MODEL_ENEMY_ZOMBIE, entity.transform);
-		} else if (entity.hasAllComponents(COMPONENT_ENEMY02)) {
+		} else if (entity.hasComponents(COMPONENT_ENEMY02)) {
 			rpc = std::make_unique<RPCCreateGhost>(id,
 				ModelID::MODEL_ENEMY_SHOOTER, entity.transform);
-		} else if (entity.hasAllComponents(COMPONENT_ENEMY03)) {
+		} else if (entity.hasComponents(COMPONENT_ENEMY03)) {
 			rpc = std::make_unique<RPCCreateGhost>(id,
 				ModelID::MODEL_ENEMY_SNAKE, entity.transform);
-		} else if (entity.hasAllComponents(COMPONENT_PLAYERBULLET)) {
+		} else if (entity.hasComponents(COMPONENT_PLAYERBULLET)) {
 			//  TODO: Add enemy bullets
 			rpc = std::make_unique <RPCCreateGhost>(id,
 				ModelID::MODEL_PLAYER_BULLET, entity.transform);
-		} else if (entity.hasAllComponents(COMPONENT_SCOREPICKUP)) {
+		} else if (entity.hasComponents(COMPONENT_SCOREPICKUP)) {
 			// TODO: Add different pickup types
 			rpc = std::make_unique <RPCCreateGhost>(id,
 				ModelID::MODEL_SCORE_PICKUP_1, entity.transform);
@@ -154,12 +154,9 @@ void NetworkServerSystem::update(Entity& entity)
 void NetworkServerSystem::handleEntityDestruction(Entity& entity)
 {
 	std::int32_t& id = entity.network.id;
-	if (entity.componentMask == COMPONENT_NONE && id > -1) {
+	if (!entity.hasComponents() && id > -1) {
 		if (m_netEntities.at(id) == nullptr)
 			return;
-
-		if (m_netEntities.at(id)->componentMask != COMPONENT_NONE)
-			m_netEntities.at(id)->componentMask = COMPONENT_NONE;
 
 		auto rpc = std::make_unique<RPCDestroyGhost>(id);
 		bufferRpc(std::move(rpc));

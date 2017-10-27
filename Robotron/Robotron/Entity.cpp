@@ -5,12 +5,17 @@ bool Entity::operator==(const Entity& rhs) const
 	return this == &rhs;
 }
 
-bool Entity::hasAllComponents(size_t _componentMask) const
+bool Entity::hasComponents(size_t componentMask) const
 {
-	return (this->componentMask & _componentMask) == _componentMask;
- }
+	return (m_componentMask & componentMask) == componentMask;
+}
 
-bool Entity::hasAnyComponent(size_t _componentMask) const
+bool Entity::hasAnyComponent(size_t componentMask) const
 {
-	return (this->componentMask & _componentMask) > 0;
+	return (m_componentMask & componentMask) > 0;
+}
+
+bool Entity::hasComponents()
+{
+	return m_componentMask != COMPONENT_NONE;
 }
