@@ -132,19 +132,19 @@ void InputSystem::update(Entity& entity)
 		glm::vec3 bulletVelocity;
 		// The player is shooting right
 		if ((!shootUp && !shootDown && !shootLeft && shootRight) || (shootUp && shootDown && !shootLeft && shootRight))
-			bulletVelocity = glm::vec3{ -0.4f, 0.0f, m_scene.m_entities.at(1)->physics.velocity.z };
+			bulletVelocity = glm::vec3{ -0.4f, 0.0f, m_scene.getEntity(1).physics.velocity.z };
 
 		// The player is shooting left
 		if ((!shootUp && !shootDown && shootLeft && !shootRight) || (shootUp && shootDown && shootLeft && !shootRight))
-			bulletVelocity = glm::vec3{ 0.4f, 0.0f, m_scene.m_entities.at(1)->physics.velocity.z };
+			bulletVelocity = glm::vec3{ 0.4f, 0.0f, m_scene.getEntity(1).physics.velocity.z };
 
 		// The player is shooting down.
 		if ((!shootUp && shootDown && !shootLeft && !shootRight) || (!shootUp && shootDown && shootLeft && shootRight))
-			bulletVelocity = glm::vec3{ m_scene.m_entities.at(1)->physics.velocity.x, 0.0f, -0.4f };
+			bulletVelocity = glm::vec3{ m_scene.getEntity(1).physics.velocity.x, 0.0f, -0.4f };
 
 		// The player is shooting up.
 		if ((shootUp && !shootDown && !shootLeft && !shootRight) || (shootUp && !shootDown && shootLeft && shootRight))
-			bulletVelocity = glm::vec3{ m_scene.m_entities.at(1)->physics.velocity.x, 0.0f, 0.4f };
+			bulletVelocity = glm::vec3{ m_scene.getEntity(1).physics.velocity.x, 0.0f, 0.4f };
 
 		// The player is shooting right up
 		if (shootUp && !shootDown && !shootLeft && shootRight)
@@ -164,7 +164,7 @@ void InputSystem::update(Entity& entity)
 
 		// Create the bullet and apply the velocity.
 		Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
-			glm::translate({}, glm::vec3(m_scene.m_entities.at(1)->transform[3]))
+			glm::translate({}, glm::vec3(m_scene.getEntity(1).transform[3]))
 			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
 		bullet.physics.velocity = bulletVelocity;
 

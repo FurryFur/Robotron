@@ -47,13 +47,13 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 	glm::vec3 followPosition;
 
 	// Cycle through the other entities in the scene and find another enemy02 with the next lowest position in queue
-	for (unsigned int i = 0; i < m_scene.m_entities.size(); ++i)
+	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if ((m_scene.m_entities.at(i)->componentMask & COMPONENT_ENEMY02) == COMPONENT_ENEMY02 &&
-			m_scene.m_entities.at(i)->aiVariables.positionInQueue ==  followNumber - 1)
+		if (m_scene.getEntity(i).hasAllComponents(COMPONENT_ENEMY02) 
+		 && m_scene.getEntity(i).aiVariables.positionInQueue ==  followNumber - 1)
 		{
-			followPosition = m_scene.m_entities.at(i)->transform[3];
-			followNumber = m_scene.m_entities.at(i)->aiVariables.positionInQueue;
+			followPosition = m_scene.getEntity(i).transform[3];
+			followNumber = m_scene.getEntity(i).aiVariables.positionInQueue;
 			break;
 		}
 	}

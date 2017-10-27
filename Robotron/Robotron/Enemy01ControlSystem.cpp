@@ -54,15 +54,15 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 	bool targetFound = false;
 
 	// Find the closest player object to seek to.
-	for (unsigned int i = 0; i < m_scene.m_entities.size(); ++i)
+	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if ((m_scene.m_entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						          //its a player object
-			&& glm::length(m_scene.m_entities.at(i)->transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
-			&& glm::length(m_scene.m_entities.at(i)->transform[3] - entity.transform[3]) < 30)								                  //the player is within the enemys aggro range
+		if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						          //its a player object
+			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
+			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 30)								                  //the player is within the enemys aggro range
 		{
-			targetPosition = { m_scene.m_entities.at(i)->transform[3].x, m_scene.m_entities.at(i)->transform[3].y, m_scene.m_entities.at(i)->transform[3].z};
-			targetVelocity = m_scene.m_entities.at(i)->physics.velocity;
-			targetMoveSpeed = m_scene.m_entities.at(i)->controlVars.moveSpeed;
+			targetPosition = { m_scene.getEntity(i).transform[3].x, m_scene.getEntity(i).transform[3].y, m_scene.getEntity(i).transform[3].z};
+			targetVelocity = m_scene.getEntity(i).physics.velocity;
+			targetMoveSpeed = m_scene.getEntity(i).controlVars.moveSpeed;
 			targetFound = true;
 		}
 	}
@@ -76,12 +76,12 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 
 		std::vector<Entity*> nearbyNeighbours;
 		// Find all the closest Enemy01 neighbours and store them in a vector.
-		for (unsigned int i = 0; i < m_scene.m_entities.size(); ++i)
+		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if (((m_scene.m_entities.at(i)->componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01) &&
-				(glm::length(glm::vec2(m_scene.m_entities.at(i)->transform[3].x - entity.transform[3].x, m_scene.m_entities.at(i)->transform[3].z - entity.transform[3].z))) <= 2.0f)
+			if (((m_scene.getEntity(i).componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01) &&
+				(glm::length(glm::vec2(m_scene.getEntity(i).transform[3].x - entity.transform[3].x, m_scene.getEntity(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
 			{
-				nearbyNeighbours.push_back(m_scene.m_entities.at(i).get());
+				nearbyNeighbours.push_back(&m_scene.getEntity(i));
 			}
 		}
 

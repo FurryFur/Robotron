@@ -52,9 +52,7 @@ Level::Level(GLFWwindow* window)
 		randZ += 23;
 
 	// Create all the snake enemy types in the scene.
-	for (float i = 0.0f; i < 18.0f; ++i)
-	{
-
+	for (int i = 0; i < 18; ++i) {
 		EntityUtils::createEnemy02(m_scene,
 			glm::translate({}, glm::vec3{ -19.0f + i, 1.0f, -19.0f + i }), i);
 	}
