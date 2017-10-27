@@ -77,10 +77,6 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick , 0, entity.physics.velocity.z + Acc.z * deltaTick };
 	entity.physics.velocity += Acc * deltaTick;
 
-	//TODO: ADD FLOCKING CODE HERE
-	//if (isSeekingPlayer)
-	//
-
 	//const float kDebugScale = 100;
 	//glm::vec3 position = glm::vec3(entity.transform[3]);
 	//RenderSystem::drawDebugArrow(position, position + entity.physics.velocity * kDebugScale);
