@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Utils.h"
-
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -10,10 +8,8 @@ class OutBufferStream {
 public:
 	OutBufferStream();
 
-	template<typename T, typename = std::enable_if_t<IsFixedWidthTypeV<T>>>
+	template<typename T, typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
 	OutBufferStream& write(T) noexcept;
-	OutBufferStream& write(std::float_t) noexcept;
-	OutBufferStream& write(std::double_t) noexcept;
 	OutBufferStream& write(const std::string&) noexcept;
 	template<typename T>
 	OutBufferStream& write(const T* _array, size_t length) noexcept;
@@ -24,16 +20,8 @@ public:
 	// Returns the size of the buffer in bytes
 	size_t getBytesWritten();
 
-	OutBufferStream& operator<<(std::uint64_t) noexcept;
-	OutBufferStream& operator<<(std::uint32_t) noexcept;
-	OutBufferStream& operator<<(std::uint16_t) noexcept;
-	OutBufferStream& operator<<(std::uint8_t) noexcept;
-	OutBufferStream& operator<<(std::int64_t) noexcept;
-	OutBufferStream& operator<<(std::int32_t) noexcept;
-	OutBufferStream& operator<<(std::int16_t) noexcept;
-	OutBufferStream& operator<<(std::int8_t) noexcept;
-	OutBufferStream& operator<<(std::float_t) noexcept;
-	OutBufferStream& operator<<(std::double_t) noexcept;
+	template<typename T, typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+	OutBufferStream& operator<<(T) noexcept;
 	OutBufferStream& operator<<(const std::string&) noexcept;
 
 private:
@@ -41,7 +29,7 @@ private:
 	size_t m_writeHeadIdx;
 };
 
-template<typename T, typename = std::enable_if_t<IsFixedWidthTypeV<T>>>
+template<typename T, typename>
 inline OutBufferStream& OutBufferStream::write(T val) noexcept
 {
 	if (m_writeHeadIdx + sizeof(T) > m_data.size())
@@ -66,6 +54,12 @@ inline OutBufferStream& OutBufferStream::write(const T* _array, size_t length) n
 	return *this;
 }
 
+template<typename T, typename>
+inline OutBufferStream & OutBufferStream::operator<<(T val) noexcept
+{
+	return write(val);
+}
+
 enum IBSError {
 	IBS_ERROR_NONE,
 	IBS_ERROR_CORRUPT_DATA,
@@ -81,16 +75,8 @@ public:
 	IBSError getError();
 	void setError(IBSError);
 
-	InBufferStream& read(std::uint64_t&) noexcept;
-	InBufferStream& read(std::uint32_t&) noexcept;
-	InBufferStream& read(std::uint16_t&) noexcept;
-	InBufferStream& read(std::uint8_t&) noexcept;
-	InBufferStream& read(std::int64_t&) noexcept;
-	InBufferStream& read(std::int32_t&) noexcept;
-	InBufferStream& read(std::int16_t&) noexcept;
-	InBufferStream& read(std::int8_t&) noexcept;
-	InBufferStream& read(std::float_t&) noexcept;
-	InBufferStream& read(std::double_t&) noexcept;
+	template<typename T, typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+	InBufferStream& read(T&) noexcept;
 	InBufferStream& read(std::string&) noexcept;
 	template<typename T>
 	InBufferStream& read(T* dstArray, size_t length) noexcept;
@@ -100,16 +86,8 @@ public:
 	// Returns the size of the buffer in bytes
 	size_t getBytesRead();
 
-	InBufferStream& operator>>(std::uint64_t&) noexcept;
-	InBufferStream& operator>>(std::uint32_t&) noexcept;
-	InBufferStream& operator>>(std::uint16_t&) noexcept;
-	InBufferStream& operator>>(std::uint8_t&) noexcept;
-	InBufferStream& operator>>(std::int64_t&) noexcept;
-	InBufferStream& operator>>(std::int32_t&) noexcept;
-	InBufferStream& operator>>(std::int16_t&) noexcept;
-	InBufferStream& operator>>(std::int8_t&) noexcept;
-	InBufferStream& operator>>(std::float_t&) noexcept;
-	InBufferStream& operator>>(std::double_t&) noexcept;
+	template<typename T, typename = std::enable_if_t<std::is_trivially_copyable<T>::value>>
+	InBufferStream& operator>>(T&) noexcept;
 	InBufferStream& operator>>(std::string&) noexcept;
 
 private:
@@ -118,6 +96,18 @@ private:
 	IBSError m_error;
 };
 
+template<typename T, typename>
+inline InBufferStream & InBufferStream::read(T& outVal) noexcept
+{
+	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(T);
+	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
+		return *this;
+
+	outVal = *reinterpret_cast<const T*>(&m_data[m_readHeadIdx]);
+	m_readHeadIdx = nextReadHeadIdx;
+	return *this;
+}
+
 template<typename T>
 inline InBufferStream& InBufferStream::read(T* dstArray, size_t length) noexcept
 {
@@ -125,4 +115,10 @@ inline InBufferStream& InBufferStream::read(T* dstArray, size_t length) noexcept
 		read(dstArray[i]);
 
 	return *this;
+}
+
+template<typename T, typename>
+inline InBufferStream& InBufferStream::operator>>(T& outVal) noexcept
+{
+	return read(outVal);
 }

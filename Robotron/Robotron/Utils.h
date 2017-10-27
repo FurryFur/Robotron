@@ -21,8 +21,6 @@
 #include <functional>
 #include <future>
 #include <chrono>
-#include <type_traits>
-#include <cstdint>
 
 // A simple mulidimensional array
 template <typename T, size_t DimFirst, size_t... Dims>
@@ -196,18 +194,3 @@ constexpr const T& clamp(const T& v, const T& lo, const T& hi)
 {
 	return clamp(v, lo, hi, std::less<>());
 }
-
-template<typename T>
-struct IsFixedWidthType : std::integral_constant<bool,
-	   std::is_same<std::uint64_t, typename std::remove_cv<T>::type>::value
-	|| std::is_same<std::uint32_t, typename std::remove_cv<T>::type>::value
-	|| std::is_same<std::uint16_t, typename std::remove_cv<T>::type>::value
-	|| std::is_same<std::uint8_t,  typename std::remove_cv<T>::type>::value
-	|| std::is_same<std::int64_t,  typename std::remove_cv<T>::type>::value
-	|| std::is_same<std::int32_t,  typename std::remove_cv<T>::type>::value
-	|| std::is_same<std::int16_t,  typename std::remove_cv<T>::type>::value
-	|| std::is_same<std::int8_t,   typename std::remove_cv<T>::type>::value>
-{};
-
-template<typename T>
-constexpr bool IsFixedWidthTypeV = IsFixedWidthType<T>::value;

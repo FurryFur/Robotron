@@ -8,16 +8,6 @@ OutBufferStream::OutBufferStream()
 {
 }
 
-OutBufferStream& OutBufferStream::write(std::float_t _float) noexcept
-{
-	return write(*reinterpret_cast<std::uint32_t*>(&_float));
-}
-
-OutBufferStream& OutBufferStream::write(std::double_t _double) noexcept
-{
-	return write(*reinterpret_cast<std::uint64_t*>(&_double));
-}
-
 OutBufferStream& OutBufferStream::write(const std::string& str) noexcept
 {
 	size_t chunkSize = str.length() + 1;
@@ -43,56 +33,6 @@ const char* OutBufferStream::getData()
 size_t OutBufferStream::getBytesWritten()
 {
 	return m_writeHeadIdx;
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::uint64_t dword) noexcept
-{
-	return write(dword);
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::uint32_t word) noexcept
-{
-	return write(word);
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::uint16_t _short) noexcept
-{
-	return write(_short);
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::uint8_t byte) noexcept
-{
-	return write(byte);
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::int64_t dword) noexcept
-{
-	return write(dword);
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::int32_t word) noexcept
-{
-	return write(word);
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::int16_t _short) noexcept
-{
-	return write(_short);
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::int8_t byte) noexcept
-{
-	return write(byte);
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::float_t _float) noexcept
-{
-	return write(_float);
-}
-
-OutBufferStream& OutBufferStream::operator<<(std::double_t _double) noexcept
-{
-	return write(_double);
 }
 
 OutBufferStream& OutBufferStream::operator<<(const std::string& str) noexcept
@@ -155,116 +95,6 @@ void InBufferStream::setError(IBSError error)
 	}
 }
 
-InBufferStream& InBufferStream::read(std::uint64_t& outDword) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outDword);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outDword = *reinterpret_cast<const std::uint64_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
-InBufferStream& InBufferStream::read(std::uint32_t& outWord) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outWord);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outWord = *reinterpret_cast<const std::uint32_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
-InBufferStream& InBufferStream::read(std::uint16_t& outShort) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outShort);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outShort = *reinterpret_cast<const std::uint16_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
-InBufferStream& InBufferStream::read(std::uint8_t& outByte) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outByte);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outByte = *reinterpret_cast<const std::uint8_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
-InBufferStream& InBufferStream::read(std::int64_t& outDword) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outDword);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outDword = *reinterpret_cast<const std::int64_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
-InBufferStream& InBufferStream::read(std::int32_t& outWord) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outWord);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outWord = *reinterpret_cast<const std::int32_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
-InBufferStream& InBufferStream::read(std::int16_t& outShort) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outShort);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outShort = *reinterpret_cast<const std::int16_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
-InBufferStream& InBufferStream::read(std::int8_t& outByte) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outByte);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outByte = *reinterpret_cast<const std::int8_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
-InBufferStream& InBufferStream::read(std::float_t& outFloat) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outFloat);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outFloat = *reinterpret_cast<const std::float_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
-InBufferStream& InBufferStream::read(std::double_t& outDouble) noexcept
-{
-	size_t nextReadHeadIdx = m_readHeadIdx + sizeof(outDouble);
-	if (checkBufferOverrun(nextReadHeadIdx) != IBS_ERROR_NONE)
-		return *this;
-
-	outDouble = *reinterpret_cast<const std::double_t*>(&m_data[m_readHeadIdx]);
-	m_readHeadIdx = nextReadHeadIdx;
-	return *this;
-}
-
 InBufferStream& InBufferStream::read(std::string& outString) noexcept
 {
 	if (checkBufferOverrunStr() != IBS_ERROR_NONE)
@@ -283,56 +113,6 @@ void InBufferStream::reset() noexcept
 size_t InBufferStream::getBytesRead()
 {
 	return m_readHeadIdx;
-}
-
-InBufferStream& InBufferStream::operator>>(std::uint64_t& outDword) noexcept
-{
-	return read(outDword);
-}
-
-InBufferStream& InBufferStream::operator>>(std::uint32_t& outWord) noexcept
-{
-	return read(outWord);
-}
-
-InBufferStream& InBufferStream::operator>>(std::uint16_t& outShort) noexcept
-{
-	return read(outShort);
-}
-
-InBufferStream& InBufferStream::operator>>(std::uint8_t& outByte) noexcept
-{
-	return read(outByte);
-}
-
-InBufferStream& InBufferStream::operator>>(std::int64_t& outDword) noexcept
-{
-	return read(outDword);
-}
-
-InBufferStream& InBufferStream::operator>>(std::int32_t& outWord) noexcept
-{
-	return read(outWord);
-}
-
-InBufferStream& InBufferStream::operator>>(std::int16_t& outShort) noexcept
-{
-	return read(outShort);
-}
-
-InBufferStream& InBufferStream::operator>>(std::int8_t& outByte) noexcept
-{
-	return read(outByte);
-}
-
-InBufferStream& InBufferStream::operator>>(std::float_t& outFloat) noexcept
-{
-	return read(outFloat);
-}
-
-InBufferStream& InBufferStream::operator>>(std::double_t& outDouble) noexcept
-{
-	return read(outDouble);
 }
 
 InBufferStream& InBufferStream::operator>>(std::string& outString) noexcept
