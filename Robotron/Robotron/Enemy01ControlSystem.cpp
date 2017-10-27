@@ -94,8 +94,8 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 		Acc = wander(entity);
 
 	// Limit the steering acceleration.
-	if (glm::length(Acc) > 0.1f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.1f);
+	if (glm::length(Acc) > 0.2f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.2f);
 
 	// Add the acceleration to the velocity.
 	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick, 0, entity.physics.velocity.z + Acc.z * deltaTick };

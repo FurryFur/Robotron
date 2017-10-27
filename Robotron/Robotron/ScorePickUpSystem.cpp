@@ -68,8 +68,6 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 			{
 				targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z };
 				entity.aiVariables.followEntity = m_scene.entities.at(i).get();
-				// Increase the movement speed once a target is found
-				entity.controlVars.moveSpeed = 0.18f;
 			}
 		}
 	}
@@ -101,8 +99,8 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 		Acc = wander(entity);
 
 	// Limit the steering acceleration.
-	if (glm::length(Acc) > 3.0f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 3.0f);
+	if (glm::length(Acc) > 3.2f)
+		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 3.2f);
 
 	// Add the acceleration to the velocity.
 	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick, 0, entity.physics.velocity.z + Acc.z * deltaTick };
