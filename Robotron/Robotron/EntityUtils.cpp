@@ -346,7 +346,8 @@ Entity& EntityUtils::createCube(Scene& scene, const glm::mat4 & transform)
 Entity& EntityUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm::vec3& center, const glm::vec3& up)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_INPUT 
-	                                  | COMPONENT_CAMERA | COMPONENT_TRANSFORM);
+	                                  | COMPONENT_CAMERA | COMPONENT_TRANSFORM
+	                                  | COMPONENT_PLAYER_CONTROL);
 
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.005f;

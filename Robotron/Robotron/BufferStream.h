@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Utils.h"
+
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -8,14 +10,8 @@ class OutBufferStream {
 public:
 	OutBufferStream();
 
-	OutBufferStream& write(std::uint64_t) noexcept;
-	OutBufferStream& write(std::uint32_t) noexcept;
-	OutBufferStream& write(std::uint16_t) noexcept;
-	OutBufferStream& write(std::uint8_t) noexcept;
-	OutBufferStream& write(std::int64_t) noexcept;
-	OutBufferStream& write(std::int32_t) noexcept;
-	OutBufferStream& write(std::int16_t) noexcept;
-	OutBufferStream& write(std::int8_t) noexcept;
+	template<typename T, typename = std::enable_if_t<IsFixedWidthTypeV<T>>>
+	OutBufferStream& write(T) noexcept;
 	OutBufferStream& write(std::float_t) noexcept;
 	OutBufferStream& write(std::double_t) noexcept;
 	OutBufferStream& write(const std::string&) noexcept;
@@ -44,6 +40,18 @@ private:
 	std::vector<char> m_data;
 	size_t m_writeHeadIdx;
 };
+
+template<typename T, typename = std::enable_if_t<IsFixedWidthTypeV<T>>>
+inline OutBufferStream& OutBufferStream::write(T val) noexcept
+{
+	if (m_writeHeadIdx + sizeof(T) > m_data.size())
+		m_data.resize(m_writeHeadIdx + sizeof(T));
+
+	*reinterpret_cast<T*>(&m_data[m_writeHeadIdx]) = val;
+
+	m_writeHeadIdx += sizeof(T);
+	return *this;
+}
 
 template<typename T>
 inline OutBufferStream& OutBufferStream::write(const T* _array, size_t length) noexcept

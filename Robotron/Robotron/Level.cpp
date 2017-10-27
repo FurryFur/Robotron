@@ -139,9 +139,9 @@ void Level::spawnEnemies(int levelType)
 		healthPickUpCount += randomInt(1, 3);
 	}
 
-	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
-	//	  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
-	//	* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
+	EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
+		  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
+		* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
 
 	// Create all the zombie enemy types in the scene.
 	for (int i = 0; i < zombieCount; ++i)
