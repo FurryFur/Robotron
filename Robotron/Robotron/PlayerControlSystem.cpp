@@ -88,7 +88,8 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	{
 		if (((m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01		//its an enemy object
 		  || (m_scene.entities.at(i)->componentMask &  COMPONENT_ENEMY02) == COMPONENT_ENEMY02
-		  || (m_scene.entities.at(i)->componentMask &  COMPONENT_ENEMY03) == COMPONENT_ENEMY03)
+		  || (m_scene.entities.at(i)->componentMask &  COMPONENT_ENEMY03) == COMPONENT_ENEMY03
+		  || (m_scene.entities.at(i)->componentMask &  COMPONENT_ENEMYBULLET) == COMPONENT_ENEMYBULLET) //its an enemy bullet
 			&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 1)		    //the player is within range to be damaged by it
 		{
 			entity.playerStats.deathTime = clock.GetCurTime();
