@@ -30,7 +30,6 @@ int main()
 	while (!glfwWindowShouldClose(window)) {		
 		// Execute a from of the game.
 		level.executeOneFrame();
-
 		// If there are no new enemies alive in the scene, go to the next level.
 		if (!level.checkEnemiesAlive())
 			level.triggerNextLevel();

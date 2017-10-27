@@ -16,6 +16,7 @@ Level::Level(GLFWwindow* window)
 	, m_scorePickUpSystem(m_scene)
 	, m_playerbulletsystem(m_scene)
 	, m_enemybulletsystem(m_scene)
+	, m_label("Basic Game", "Assets/Fonts/waltographUI.ttf")
 {
 
 	m_clock.Process();
@@ -73,6 +74,10 @@ Level::Level(GLFWwindow* window)
 	// Setup the camera
 	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
 	m_renderSystem.setCamera(&cameraEntity);
+
+	m_label.setPosition(glm::vec2(10.0f, 10.0f));
+	m_label.setColor(glm::vec3(1.0f, 1.0f, 0.0f));
+	m_label.setText("cavaavhell");
 }
 
 
@@ -147,20 +152,67 @@ void Level::spawnEnemies(int levelType)
 
 
 	// Create all the snake enemy types in the scene.
-	if (randomInt(0, 1) == 0) {
-		for (float i = 0.0f; i < snakePartsCount; ++i)
+	int rand = randomInt(0, 3);
+	float randcoord = randomReal<float>(9.0f, 17.0f);
+	if (rand == 0) {
+		for (int i = 0; i < snakePartsCount; ++i)
 		{
-
-			EntityUtils::createEnemy02(m_scene,
-				glm::translate({}, glm::vec3{ -19.0f + i, 1.0f, -19.0f + i }), i);
+			if (-19.0f + i < 20.0f)
+			{
+				EntityUtils::createEnemy02(m_scene,
+					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f + i }), i);
+			}
+			else
+			{
+				EntityUtils::createEnemy02(m_scene,
+					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f}), i);
+			}
 		}
 	}
-	else {
-		for (float i = 0.0f; i < snakePartsCount; ++i)
+	else if (rand == 1) {
+		for (int i = 0; i < snakePartsCount; ++i)
 		{
 
-			EntityUtils::createEnemy02(m_scene,
-				glm::translate({}, glm::vec3{ 19.0f - i, 1.0f, 19.0f - i }), i);
+			if (19.0f - i < 20.0f)
+			{
+				EntityUtils::createEnemy02(m_scene,
+					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f - i }), i);
+			}
+			else
+			{
+				EntityUtils::createEnemy02(m_scene,
+					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f}), i);
+			}
+		}
+	}
+	else if (rand == 2) {
+		for (int i = 0; i < snakePartsCount; ++i)
+		{
+			if (-19.0f + i < 20.0f)
+			{
+				EntityUtils::createEnemy02(m_scene,
+					glm::translate({}, glm::vec3{ -19.0f + i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
+			}
+			else
+			{
+				EntityUtils::createEnemy02(m_scene,
+					glm::translate({}, glm::vec3{ -19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
+			}
+		}
+	}
+	else if (rand == 3) {
+		for (int i = 0; i < snakePartsCount; ++i)
+		{
+			if (19.0f - i < 20.0f)
+			{
+				EntityUtils::createEnemy02(m_scene,
+					glm::translate({}, glm::vec3{ 19.0f - i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
+			}
+			else
+			{
+				EntityUtils::createEnemy02(m_scene,
+					glm::translate({}, glm::vec3{ 19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
+			}
 		}
 	}
 
@@ -321,6 +373,7 @@ void Level::process(float deltaTick)
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
+
 	m_networkSystem->beginFrame();
 	respawnDeadPlayers();
 	// Update all the entities using all the systems.
@@ -328,13 +381,13 @@ void Level::process(float deltaTick)
 		m_inputSystem.update(*m_scene.entities.at(i));
 		m_playerControlSystem.update(*m_scene.entities.at(i), m_clock);
 		m_networkSystem->update(*m_scene.entities.at(i));
-		m_renderSystem.update(*m_scene.entities.at(i));
 		m_enemy01ControlSystem.update(*m_scene.entities.at(i), deltaTick);
 		m_enemy02ControlSystem.update(*m_scene.entities.at(i), deltaTick);
 		m_enemy03ControlSystem.update(*m_scene.entities.at(i), deltaTick);
 		m_scorePickUpSystem.update(*m_scene.entities.at(i), deltaTick);
 		m_playerbulletsystem.update(*m_scene.entities.at(i), deltaTick);
 		m_enemybulletsystem.update(*m_scene.entities.at(i), deltaTick);
+		m_renderSystem.update(*m_scene.entities.at(i));
 	}
 
 	if (m_inSetupPhase)
@@ -359,6 +412,9 @@ void Level::process(float deltaTick)
 			}
 		}
 	}
+
+	m_label.Render();
+
 	// Do operations that should happen at the end of the frame.
 	m_networkSystem->endFrame();
 	m_renderSystem.endRender();

@@ -8,7 +8,7 @@
 //
 // File Name	: clock.cpp
 // Description	: The clock for keeping time
-// Author		: Madeleine Day Jack Mair
+// Author		: Jack Mair
 // Mail			: jack.mair@mediadesign.school.nz
 //
 

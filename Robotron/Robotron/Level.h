@@ -33,6 +33,8 @@
 #include "PlayerBulletSystem.h"
 #include "EnemyBulletSystem.h"
 
+#include "TextLabel.h"
+
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -75,6 +77,8 @@ private:
 	PlayerBulletSystem m_playerbulletsystem;
 	EnemyBulletSystem m_enemybulletsystem;
 	std::unique_ptr<NetworkSystem> m_networkSystem;
+
+	TextLabel m_label;
 
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	int m_levelNum;

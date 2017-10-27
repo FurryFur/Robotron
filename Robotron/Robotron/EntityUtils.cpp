@@ -22,7 +22,7 @@ Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
 	setDefaultInputBindings(entity.inputMap);
 
 	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/dessert-floor.jpg");
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/dessert-floor.png");
 
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;
@@ -158,7 +158,7 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	entity.transform = transform;
 
 	// TODO: Fix weird integer bool assignment!!!
-	entity.aiVariables.lifePickUp = 10;
+	entity.aiVariables.score = 10;
 	entity.model = GLPrimitives::getSphereModel();
 
 	// Replace default texture
@@ -184,7 +184,7 @@ Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transfor
 	entity.aiVariables = {};
 	entity.playerStats = {};
 
-	entity.aiVariables.lifePickUp = 20;
+	entity.aiVariables.score = 20;
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getPyramidModel();

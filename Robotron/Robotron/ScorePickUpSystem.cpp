@@ -103,7 +103,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 3.2f);
 
 	// Add the acceleration to the velocity.
-	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick, 0, entity.physics.velocity.z + Acc.z * deltaTick };
+	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick, entity.physics.velocity.y + Acc.y * deltaTick, entity.physics.velocity.z + Acc.z * deltaTick };
 	entity.physics.velocity += Acc * deltaTick;
 
 	//const float kDebugScale = 100;
