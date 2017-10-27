@@ -21,6 +21,9 @@ Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
 
 	setDefaultInputBindings(entity.inputMap);
 
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/dessert-floor.jpg");
+
 	entity.controlVars.moveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
@@ -103,7 +106,7 @@ Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
 
-	entity.controlVars.moveSpeed = 0.17f;
+	entity.controlVars.moveSpeed = 0.2f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -161,7 +164,7 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.12f;
+	entity.controlVars.moveSpeed = 0.2f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -189,7 +192,7 @@ Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transfor
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.12f;
+	entity.controlVars.moveSpeed = 0.2f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -217,7 +220,7 @@ Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.12f;
+	entity.controlVars.moveSpeed = 0.2f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
