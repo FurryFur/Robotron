@@ -60,14 +60,14 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 		glm::vec3 targetPosition = glm::vec3{ 100, 100, 100 };
 
 		// Find the closest player object to follow.
-		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+		for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						                          //its a player object
-				&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < glm::length(targetPosition - glm::vec3(entity.transform[3]))     //it is the closet player to the target
-				&& glm::length(m_scene.entities.at(i)->transform[3] - entity.transform[3]) < 5)							                                      //the player is within the enemys aggro range
+			if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL						                          //its a player object
+				&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - glm::vec3(entity.transform[3]))     //it is the closet player to the target
+				&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 5)							                                      //the player is within the enemys aggro range
 			{
-				targetPosition = { m_scene.entities.at(i)->transform[3].x, m_scene.entities.at(i)->transform[3].y, m_scene.entities.at(i)->transform[3].z };
-				entity.aiVariables.followEntity = m_scene.entities.at(i).get();
+				targetPosition = { m_scene.getEntity(i).transform[3].x, m_scene.getEntity(i).transform[3].y, m_scene.getEntity(i).transform[3].z };
+				entity.aiVariables.followEntity = &m_scene.getEntity(i);
 			}
 		}
 	}
@@ -81,12 +81,12 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 
 		std::vector<Entity*> nearbyNeighbours;
 		// Find all the closest Enemy01 neighbours and store them in a vector.
-		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if (((m_scene.entities.at(i)->componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP) &&
-				(glm::length(glm::vec2(m_scene.entities.at(i)->transform[3].x - entity.transform[3].x, m_scene.entities.at(i)->transform[3].z - entity.transform[3].z))) <= 2.0f)
+			if (((m_scene.getEntity(i).componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP) &&
+				(glm::length(glm::vec2(m_scene.getEntity(i).transform[3].x - entity.transform[3].x, m_scene.getEntity(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
 			{
-				nearbyNeighbours.push_back(m_scene.entities.at(i).get());
+				nearbyNeighbours.push_back(&m_scene.getEntity(i));
 			}
 		}
 

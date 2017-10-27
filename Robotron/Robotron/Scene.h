@@ -23,9 +23,15 @@ struct Scene {
 public:
 	Entity& createEntity(size_t componentMask);
 	void destroyEntity(Entity&);
+	Entity& getEntity(size_t entityID);
+	size_t getEntityCount();
+	static void makeSceneCurrent(Scene* scene);
+	Scene* getCurrentScene();
 
+private:
 	// TODO: Change this to be a vector of 'observable' entities
 	// that can be observed robustly, even when a vector resize causes the
 	// entities to shift in memory.
-	std::vector<std::unique_ptr<Entity>> entities;
+	std::vector<std::unique_ptr<Entity>> m_entities;
+	static Scene* s_currentScene;
 };

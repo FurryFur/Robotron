@@ -17,6 +17,7 @@ Level::Level(GLFWwindow* window)
 	, m_playerbulletsystem(m_scene)
 	, m_enemybulletsystem(m_scene)
 {
+	Scene::makeSceneCurrent(&m_scene);
 
 	m_clock.Process();
 
@@ -245,27 +246,27 @@ void Level::initalizeNextLevel()
 	++m_levelNum;
 
 	// Cycle over all the entities in the scene
-	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		// Delete all score pickups and update the players score.
-		if ((m_scene.entities.at(i)->componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP)
+		if ((m_scene.getEntity(i).componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP)
 		{
 			// Increase the player's score value.
-			if (m_scene.entities.at(i)->aiVariables.followEntity != NULL)
+			if (m_scene.getEntity(i).aiVariables.followEntity != NULL)
 			{
-				if (m_scene.entities.at(i)->aiVariables.lifePickUp != true)
-					m_scene.entities.at(i)->aiVariables.followEntity->playerStats.score += m_scene.entities.at(i)->aiVariables.score;
+				if (m_scene.getEntity(i).aiVariables.lifePickUp != true)
+					m_scene.getEntity(i).aiVariables.followEntity->playerStats.score += m_scene.getEntity(i).aiVariables.score;
 				else
-					++m_scene.entities.at(i)->aiVariables.followEntity->playerStats.lives;
+					++m_scene.getEntity(i).aiVariables.followEntity->playerStats.lives;
 			}
-			m_scene.destroyEntity(*m_scene.entities.at(i));
+			m_scene.destroyEntity(m_scene.getEntity(i));
 		}
 
 		// Move the player back to the centre point of the level
-		if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
+		if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
 		{
-			m_scene.entities.at(i)->transform[3].x = 0.0f;
-			m_scene.entities.at(i)->transform[3].z = 0.0f;
+			m_scene.getEntity(i).transform[3].x = 0.0f;
+			m_scene.getEntity(i).transform[3].z = 0.0f;
 		}
 	}
 
@@ -290,12 +291,12 @@ void Level::initalizeNextLevel()
 bool Level::checkEnemiesAlive()
 {
 	// Cycle through all the entites in the scene.
-	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		// Return true when the first entity is found with an enemy tag.
-		if ((m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01
-		 || (m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY02) == COMPONENT_ENEMY02
-		 || (m_scene.entities.at(i)->componentMask & COMPONENT_ENEMY03) == COMPONENT_ENEMY03)
+		if ((m_scene.getEntity(i).componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01
+		 || (m_scene.getEntity(i).componentMask & COMPONENT_ENEMY02) == COMPONENT_ENEMY02
+		 || (m_scene.getEntity(i).componentMask & COMPONENT_ENEMY03) == COMPONENT_ENEMY03)
 			return true;
 	}
 
@@ -313,16 +314,16 @@ void Level::executeOneFrame()
 void Level::respawnDeadPlayers()
 {
 	// Cycle through all the entites in the scene.
-	for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		// Return true when the first entity is found with an enemy tag.
-		if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL
-			&& m_scene.entities.at(i)->playerStats.isRespawning == true
-			&& m_scene.entities.at(i)->playerStats.lives > 0
-			&& m_scene.entities.at(i)->playerStats.deathTime + 3.0f <= m_clock.GetCurTime())
+		if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL
+			&& m_scene.getEntity(i).playerStats.isRespawning == true
+			&& m_scene.getEntity(i).playerStats.lives > 0
+			&& m_scene.getEntity(i).playerStats.deathTime + 3.0f <= m_clock.GetCurTime())
 		{
-			m_scene.entities.at(i)->playerStats.isRespawning = false;
-			m_scene.entities.at(i)->transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
+			m_scene.getEntity(i).playerStats.isRespawning = false;
+			m_scene.getEntity(i).transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
 			m_descendingPlayers = true;
 		}
 	}
@@ -336,17 +337,17 @@ void Level::process(float deltaTick)
 	m_networkSystem->beginFrame();
 	respawnDeadPlayers();
 	// Update all the entities using all the systems.
-	for (size_t i = 0; i < m_scene.entities.size(); ++i) {
-		m_inputSystem.update(*m_scene.entities.at(i));
-		m_playerControlSystem.update(*m_scene.entities.at(i), m_clock);
-		m_networkSystem->update(*m_scene.entities.at(i));
-		m_renderSystem.update(*m_scene.entities.at(i));
-		m_enemy01ControlSystem.update(*m_scene.entities.at(i), deltaTick);
-		m_enemy02ControlSystem.update(*m_scene.entities.at(i), deltaTick);
-		m_enemy03ControlSystem.update(*m_scene.entities.at(i), deltaTick);
-		m_scorePickUpSystem.update(*m_scene.entities.at(i), deltaTick);
-		m_playerbulletsystem.update(*m_scene.entities.at(i), deltaTick);
-		m_enemybulletsystem.update(*m_scene.entities.at(i), deltaTick);
+	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
+		m_inputSystem.update(m_scene.getEntity(i));
+		m_playerControlSystem.update(m_scene.getEntity(i), m_clock);
+		m_networkSystem->update(m_scene.getEntity(i));
+		m_renderSystem.update(m_scene.getEntity(i));
+		m_enemy01ControlSystem.update(m_scene.getEntity(i), deltaTick);
+		m_enemy02ControlSystem.update(m_scene.getEntity(i), deltaTick);
+		m_enemy03ControlSystem.update(m_scene.getEntity(i), deltaTick);
+		m_scorePickUpSystem.update(m_scene.getEntity(i), deltaTick);
+		m_playerbulletsystem.update(m_scene.getEntity(i), deltaTick);
+		m_enemybulletsystem.update(m_scene.getEntity(i), deltaTick);
 	}
 
 	if (m_inSetupPhase)
@@ -361,12 +362,12 @@ void Level::process(float deltaTick)
 	if (m_descendingPlayers == true)
 	{
 		m_descendingPlayers = false;
-		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL
-				&& m_scene.entities.at(i)->transform[3].y > 1.0f)
+			if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL
+				&& m_scene.getEntity(i).transform[3].y > 1.0f)
 			{
-				--m_scene.entities.at(i)->transform[3].y;
+				--m_scene.getEntity(i).transform[3].y;
 				m_descendingPlayers = true;
 			}
 		}
@@ -385,10 +386,10 @@ void Level::processSetUpPhase()
 	if (m_setUpTick <= 50)
 	{
 		// Cycle through all the entites in the scene.
-		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
-				++m_scene.entities.at(i)->transform[3].y;
+			if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
+				++m_scene.getEntity(i).transform[3].y;
 		}
 		if(m_setUpTick == 50)
 			initalizeNextLevel();
@@ -397,10 +398,10 @@ void Level::processSetUpPhase()
 	else
 	{
 		// Cycle through all the entites in the scene.
-		for (unsigned int i = 0; i < m_scene.entities.size(); ++i)
+		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if ((m_scene.entities.at(i)->componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
-				--m_scene.entities.at(i)->transform[3].y;
+			if ((m_scene.getEntity(i).componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL)
+				--m_scene.getEntity(i).transform[3].y;
 		}
 		if (m_setUpTick == 100)
 		{
