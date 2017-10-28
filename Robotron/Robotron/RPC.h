@@ -1,6 +1,5 @@
 #pragma once
 
-#include "InputComponent.h"
 #include "PlayerInfo.h"
 #include "Entity.h"
 
@@ -31,11 +30,6 @@ enum RPCType : std::uint8_t {
 	RPC_DESTROY_GHOST,
 	RPC_RECORD_INPUT
 };
-
-OutBufferStream& operator<<(OutBufferStream&, ModelID);
-OutBufferStream& operator<<(OutBufferStream&, RPCType);
-InBufferStream& operator>>(InBufferStream&, ModelID&);
-InBufferStream& operator>>(InBufferStream&, RPCType&);
 
 class RemoteProcedureCall {
 public:
@@ -74,7 +68,7 @@ class RPCCreateGhost : public RemoteProcedureCall {
 public:
 	RPCCreateGhost() = default;
 	RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
-		glm::mat4 transform);
+		const glm::mat4& transform);
 
 	virtual void execute(std::vector<Entity*>& netEntities) override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;

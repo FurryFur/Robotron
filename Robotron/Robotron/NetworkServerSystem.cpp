@@ -125,22 +125,22 @@ void NetworkServerSystem::update(Entity& entity)
 		// Create remote procedure calls to inform clients of new entity creation
 		std::unique_ptr<RPCCreateGhost> rpc;
 		if (entity.hasComponents(COMPONENT_ENEMY01)) {
-			rpc = std::make_unique<RPCCreateGhost>(id,
-				ModelID::MODEL_ENEMY_ZOMBIE, entity.transform);
+			rpc = std::make_unique<RPCCreateGhost>(id,ModelID::MODEL_ENEMY_ZOMBIE, 
+				entity.transform);
 		} else if (entity.hasComponents(COMPONENT_ENEMY02)) {
-			rpc = std::make_unique<RPCCreateGhost>(id,
-				ModelID::MODEL_ENEMY_SHOOTER, entity.transform);
+			rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SHOOTER, 
+				entity.transform);
 		} else if (entity.hasComponents(COMPONENT_ENEMY03)) {
-			rpc = std::make_unique<RPCCreateGhost>(id,
-				ModelID::MODEL_ENEMY_SNAKE, entity.transform);
+			rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SNAKE,
+				entity.transform);
 		} else if (entity.hasComponents(COMPONENT_PLAYERBULLET)) {
 			//  TODO: Add enemy bullets
-			rpc = std::make_unique <RPCCreateGhost>(id,
-				ModelID::MODEL_PLAYER_BULLET, entity.transform);
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_PLAYER_BULLET, 
+				entity.transform);
 		} else if (entity.hasComponents(COMPONENT_SCOREPICKUP)) {
 			// TODO: Add different pickup types
-			rpc = std::make_unique <RPCCreateGhost>(id,
-				ModelID::MODEL_SCORE_PICKUP_1, entity.transform);
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_1, 
+				entity.transform);
 		} else {
 			rpc = nullptr;
 		}

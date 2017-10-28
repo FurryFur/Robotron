@@ -23,7 +23,7 @@
 
 struct VertexFormat;
 struct GLFWwindow;
-struct Scene;
+class Scene;
 class InputSystem;
 
 namespace GLUtils {

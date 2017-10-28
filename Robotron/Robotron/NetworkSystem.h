@@ -6,9 +6,9 @@
 
 #include <vector>
 
-struct Scene;
+class Scene;
+class Entity;
 struct Packet;
-struct Entity;
 
 class NetworkSystem {
 public:

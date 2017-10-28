@@ -37,6 +37,3 @@ struct InputComponent {
 	// has been handled.
 	// std::array<bool, 4> actionBtnsPressed;
 };
-
-OutBufferStream& operator<<(OutBufferStream&, const InputComponent&);
-InBufferStream& operator>>(InBufferStream&, InputComponent&);

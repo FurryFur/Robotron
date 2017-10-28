@@ -20,9 +20,9 @@
 
 #include <vector>
 
-struct Scene;
+class Scene;
 struct GLFWwindow;
-struct Entity;
+class Entity;
 struct ModelComponent;
 
 class RenderSystem {

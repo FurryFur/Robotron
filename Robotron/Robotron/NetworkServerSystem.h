@@ -11,8 +11,8 @@
 #include <chrono>
 #include <queue>
 
-struct Scene;
-struct Entity;
+class Scene;
+class Entity;
 struct Packet;
 
 class EntityPriorityComparitor {

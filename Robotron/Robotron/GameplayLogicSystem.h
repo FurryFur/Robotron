@@ -16,8 +16,8 @@
 
 #include "KeyObserver.h"
 
-struct Scene;
-struct Entity;
+class Scene;
+class Entity;
 class InputSystem;
 
 class GameplayLogicSystem : IKeyObserver {

@@ -19,8 +19,10 @@
 #include <vector>
 #include <memory>
 
-struct Scene {
+class Scene {
 public:
+	template<typename ...ComponentTs>
+	Entity& createEntity(size_t firstComponent, ComponentTs... rest);
 	Entity& createEntity(size_t componentMask);
 	void destroyEntity(Entity&);
 	Entity& getEntity(size_t entityID);
@@ -35,3 +37,10 @@ private:
 	std::vector<std::unique_ptr<Entity>> m_entities;
 	static Scene* s_currentScene;
 };
+
+template<typename ...ComponentTs>
+inline Entity& Scene::createEntity(size_t firstComponent, ComponentTs... rest)
+{
+	Entity& entity = createEntity(firstComponent);
+	entity.addComponents(rest);
+}

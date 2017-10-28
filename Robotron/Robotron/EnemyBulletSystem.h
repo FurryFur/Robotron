@@ -18,8 +18,8 @@
 
 #pragma once
 
-struct Scene;
-struct Entity;
+class Scene;
+class Entity;
 
 class EnemyBulletSystem {
 public:

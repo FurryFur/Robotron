@@ -18,8 +18,8 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtx\rotate_vector.hpp>
 
-struct Scene;
-struct Entity;
+class Scene;
+class Entity;
 
 class Enemy03ControlSystem {
 public:

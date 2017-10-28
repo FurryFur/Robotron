@@ -1,6 +1,10 @@
 #pragma once
 
+#include <cstdint>
+
 struct NetworkComponent {
+	NetworkComponent();
+
 	// A unique identifier for the entity on the network.
 	// A value of -1 is used to indicate an unassigned network id.
 	// A unique id will then be assigned by the server.

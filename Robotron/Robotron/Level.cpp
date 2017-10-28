@@ -41,7 +41,7 @@ Level::Level(GLFWwindow* window)
 
 	Entity& player = EntityUtils::createPlayer(m_scene,
 		glm::translate({}, glm::vec3{ 0.0f, 50.0f, 0.0f }));
-	player.addComponent(COMPONENT_NETWORK);
+	player.addComponents(COMPONENT_NETWORK);
 
 	float randX = randomReal<float>(-18.0f, -6.0f);
 	if (randomInt(0, 1) == 0)
@@ -140,9 +140,9 @@ void Level::spawnEnemies(int levelType)
 		healthPickUpCount += randomInt(1, 3);
 	}
 
-	EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
-		  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
-		* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
+	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
+	//	  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
+	//	* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
 
 	// Create all the zombie enemy types in the scene.
 	for (int i = 0; i < zombieCount; ++i)
@@ -157,7 +157,7 @@ void Level::spawnEnemies(int levelType)
 
 		Entity& enemy = EntityUtils::createEnemy01(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
-		enemy.addComponent(COMPONENT_NETWORK);
+		enemy.addComponents(COMPONENT_NETWORK);
 	}
 
 	// Create all the snake enemy types in the scene.
@@ -292,9 +292,8 @@ bool Level::checkEnemiesAlive()
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		// Return true when the first entity is found with an enemy tag.
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_ENEMY01)
-		 || m_scene.getEntity(i).hasComponents(COMPONENT_ENEMY02)
-		 || m_scene.getEntity(i).hasComponents(COMPONENT_ENEMY03))
+		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ENEMY01, COMPONENT_ENEMY02,
+			COMPONENT_ENEMY03))
 			return true;
 	}
 

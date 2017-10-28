@@ -16,8 +16,8 @@
 
 #include "Clock.h"
 
-struct Scene;
-struct Entity;
+class Scene;
+class Entity;
 
 class PlayerControlSystem {
 public:

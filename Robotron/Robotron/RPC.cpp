@@ -61,34 +61,6 @@ const std::vector<std::unique_ptr<RemoteProcedureCall>>& RPCGroup::getRpcs()
 	return m_rpcs;
 }
 
-OutBufferStream& operator<<(OutBufferStream& obs, ModelID modelID)
-{
-	obs << static_cast<std::uint8_t>(modelID);
-	return obs;
-}
-
-OutBufferStream& operator<<(OutBufferStream& obs, RPCType rpcType)
-{
-	obs << static_cast<std::uint8_t>(rpcType);
-	return obs;
-}
-
-InBufferStream& operator>>(InBufferStream& ibs, ModelID& modelID)
-{
-	std::uint8_t tmp;
-	ibs >> tmp;
-	modelID = static_cast<ModelID>(tmp);
-	return ibs;
-}
-
-InBufferStream& operator>>(InBufferStream& ibs, RPCType& rpcType)
-{
-	std::uint8_t tmp;
-	ibs >> tmp;
-	rpcType = static_cast<RPCType>(tmp);
-	return ibs;
-}
-
 OutBufferStream& operator<<(OutBufferStream& obs, const RemoteProcedureCall& rpc)
 {
 	return rpc.serialize(obs);
@@ -140,7 +112,7 @@ std::int32_t RemoteProcedureCall::getEntityNetId()
 }
 
 RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId,
-	const PlayerInfo& playerInfo, const glm::mat4 & transform)
+	const PlayerInfo& playerInfo, const glm::mat4& transform)
 	: RemoteProcedureCall(entityNetId)
 	, m_playerInfo(playerInfo)
 	, m_transform{ transform }
@@ -164,7 +136,7 @@ InBufferStream& RPCCreatePlayerGhost::deserialize(InBufferStream& ibs)
 }
 
 RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
-	glm::mat4 transform)
+	const glm::mat4& transform)
 	: RemoteProcedureCall(entityNetId)
 	, m_modelId{ modelId }
 	, m_transform { transform }
@@ -177,8 +149,7 @@ void RPCCreateGhost::execute(std::vector<Entity*>& netEntities)
 
 OutBufferStream& RPCCreateGhost::serialize(OutBufferStream& obs) const
 {
-	obs << RPCType::RPC_CREATE_GHOST << m_entityNetId << m_modelId
-	    << m_transform;
+	obs << RPCType::RPC_CREATE_GHOST << m_entityNetId << m_modelId << m_transform;
 	return obs;
 }
 

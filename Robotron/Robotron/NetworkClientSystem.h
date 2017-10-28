@@ -1,8 +1,8 @@
 #pragma once
 #include "NetworkSystem.h"
 
-struct Scene;
-struct Entity;
+class Scene;
+class Entity;
 
 class NetworkClientSystem : public NetworkSystem
 {

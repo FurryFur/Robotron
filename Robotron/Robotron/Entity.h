@@ -11,7 +11,6 @@
 #include "AIComponent.h"
 
 enum ComponentMask {
-	COMPONENT_NONE = 0,
 	COMPONENT_TRANSFORM = 1 << 0,
 	COMPONENT_PHYSICS = 1 << 1,
 	COMPONENT_MODEL = 1 << 2,
@@ -29,7 +28,8 @@ enum ComponentMask {
 	COMPONENT_ENEMYBULLET = 1 << 14
 };
 
-struct Entity {
+class Entity {
+public:
 	glm::mat4 transform;
 	PhysicsComponent physics;
 	ModelComponent model;
@@ -41,7 +41,7 @@ struct Entity {
 	NetworkComponent network;
 	AIComponent aiVariables;
 
-	Entity() = default;
+	Entity();
 	Entity(Entity&&) = default;
 	Entity(const Entity&) = delete;
 	Entity& operator=(const Entity&) = delete;
@@ -50,18 +50,58 @@ struct Entity {
 	// Overload equality to check identity equivalence
 	bool operator==(const Entity& rhs) const;
 
+	// Returns true if ALL the specified components are present 
+	// in the entity.
+	template<typename ...ComponentTs>
+	bool hasComponents(size_t first, ComponentTs... rest) const;
+
 	// Returns true if ALL the components in the supplied component 
 	// mask are present in the entity.
 	bool hasComponents(size_t componentMask) const;
 
+	// Returns true if ANY of the specified components are present
+	// in the entity.
+	template<typename ...ComponentTs>
+	bool hasComponentsAny(size_t first, ComponentTs... rest) const;
+
 	// Returns true if ANY of the components in the supplied component
 	// mask are present in the entity.
-	bool hasAnyComponent(size_t componentMask) const;
+	bool hasComponentsAny(size_t componentMask) const;
 
 	// Returns true if this entity has any components
-	bool hasComponents();
+	bool hasComponents() const;
+
+	// Adds multiple components to the entity
+	template<typename ...ComponentTs>
+	void addComponents(size_t first, ComponentTs... rest);
+
+	// Adds a component to the entity.
+	// A mask can also be specified to add more than one entity at
+	// a time i.e. (COMPONENT_NETWORK | COMPONENT_TRANSFORM).
+	void addComponents(size_t componentMask);
+
+	// Destroys the entity
+	void destroy();
 
 private:
 	size_t m_componentMask;
 };
 
+template<typename ...ComponentTs>
+inline bool Entity::hasComponents(size_t first, ComponentTs... rest) const
+{
+	return hasComponents(first) && hasComponents(rest...);
+}
+
+template<typename ...ComponentTs>
+inline bool Entity::hasComponentsAny(size_t first, ComponentTs ...rest) const
+{
+	return hasComponentsAny(first) || hasComponentsAny(rest...);
+}
+
+template<typename ...ComponentTs>
+inline void Entity::addComponents(size_t first, ComponentTs... rest)
+{
+	addComponents(first);
+	addComponents(rest...);
+}

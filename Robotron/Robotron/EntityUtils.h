@@ -19,8 +19,8 @@
 #include <vector>
 #include <string>
 
-struct Scene;
-struct Entity;
+class Scene;
+class Entity;
 struct VertexFormat;
 struct Mesh;
 struct InputComponent;

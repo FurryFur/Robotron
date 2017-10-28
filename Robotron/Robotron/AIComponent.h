@@ -16,7 +16,7 @@
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
 
-struct Entity;
+class Entity;
 
 struct AIComponent {
 	// Used by score pickups to save which entity to follow using follow leader ai.

@@ -9,10 +9,4 @@ struct PhysicsComponent;
 struct PhysicsComponent {
 	glm::vec3 velocity;
 	glm::vec3 acceleration;
-
-	OutBufferStream& serialize(OutBufferStream&) const;
-	InBufferStream& deserialize(InBufferStream&);
 };
-
-OutBufferStream& operator<<(OutBufferStream&, const PhysicsComponent&);
-InBufferStream& operator>>(InBufferStream&, PhysicsComponent&);
