@@ -40,7 +40,7 @@ Enemy02ControlSystem::Enemy02ControlSystem(Scene& scene)
 void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 {
 	// Check that the entity is an Enemy02 object before proceeding.
-	if (!entity.hasComponents(COMPONENT_ENEMY02))
+	if (!entity.hasComponents(COMPONENT_SNAKE))
 		return;
 
 	int followNumber = entity.aiVariables.positionInQueue;
@@ -49,7 +49,7 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 	// Cycle through the other entities in the scene and find another enemy02 with the next lowest position in queue
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_ENEMY02) 
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_SNAKE) 
 		 && m_scene.getEntity(i).aiVariables.positionInQueue ==  followNumber - 1)
 		{
 			followPosition = m_scene.getEntity(i).transform[3];

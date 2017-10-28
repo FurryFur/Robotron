@@ -28,7 +28,7 @@ public:
 	Entity& getEntity(size_t entityID);
 	size_t getEntityCount();
 	static void makeSceneCurrent(Scene* scene);
-	Scene* getCurrentScene();
+	static Scene* getCurrentScene();
 
 private:
 	// TODO: Change this to be a vector of 'observable' entities
@@ -42,5 +42,6 @@ template<typename ...ComponentTs>
 inline Entity& Scene::createEntity(size_t firstComponent, ComponentTs... rest)
 {
 	Entity& entity = createEntity(firstComponent);
-	entity.addComponents(rest);
+	entity.addComponents(rest...);
+	return entity;
 }

@@ -90,7 +90,7 @@ void NetworkServerSystem::beginFrame()
 	}
 }
 
-void NetworkServerSystem::update(Entity& entity)
+void NetworkServerSystem::update(Entity& entity, float deltaTick)
 {
 	std::int32_t& id = entity.network.id;
 	bool isNewEntity = entity.network.isNewEntity;
@@ -123,19 +123,28 @@ void NetworkServerSystem::update(Entity& entity)
 		entity.network.isNewEntity = false;
 
 		// Create remote procedure calls to inform clients of new entity creation
-		std::unique_ptr<RPCCreateGhost> rpc;
-		if (entity.hasComponents(COMPONENT_ENEMY01)) {
+		std::unique_ptr<RemoteProcedureCall> rpc;
+		if (entity.hasComponents(COMPONENT_PLAYER_CONTROL)) {
+			// TODO: Replace this
+			PlayerInfo playerInfo;
+			playerInfo.lives = 3;
+			playerInfo.score = 0;
+			playerInfo.username = "asdfsdf";
+			rpc = std::make_unique<RPCCreatePlayerGhost>(id, playerInfo, entity.transform);
+		} else if (entity.hasComponents(COMPONENT_ZOMBIE)) {
 			rpc = std::make_unique<RPCCreateGhost>(id,ModelID::MODEL_ENEMY_ZOMBIE, 
 				entity.transform);
-		} else if (entity.hasComponents(COMPONENT_ENEMY02)) {
-			rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SHOOTER, 
-				entity.transform);
-		} else if (entity.hasComponents(COMPONENT_ENEMY03)) {
+		} else if (entity.hasComponents(COMPONENT_SNAKE)) {
 			rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SNAKE,
 				entity.transform);
+		} else if (entity.hasComponents(COMPONENT_ENEMY_SHOOTER)) {
+			rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SHOOTER,
+				entity.transform);
 		} else if (entity.hasComponents(COMPONENT_PLAYERBULLET)) {
-			//  TODO: Add enemy bullets
 			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_PLAYER_BULLET, 
+				entity.transform);
+		} else if (entity.hasComponents(COMPONENT_ENEMYBULLET)) {
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_ENEMY_BULLET,
 				entity.transform);
 		} else if (entity.hasComponents(COMPONENT_SCOREPICKUP)) {
 			// TODO: Add different pickup types
@@ -215,7 +224,7 @@ void NetworkServerSystem::selectGhostSnapshots(SnapshotBufT& dst,
 	for (size_t i = 0; i < maxSnapshots && !src.empty(); ++i) {
 		Entity* entity = src.top();
 		src.pop();
-		dst.emplace_back(entity->transform, entity->physics);
+		dst.emplace_back(entity->network.id, entity->transform, entity->physics);
 		entity->network.priority = 0;
 	}
 }

@@ -43,7 +43,7 @@ Enemy01ControlSystem::Enemy01ControlSystem(Scene& scene)
 void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 {
 	// Check that the entity is an Enemy01 object before proceeding.
-	if (!entity.hasComponents(COMPONENT_ENEMY01))
+	if (!entity.hasComponents(COMPONENT_ZOMBIE))
 		return;
 	
 	// Set the target position out of scope.
@@ -78,7 +78,7 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 		// Find all the closest Enemy01 neighbours and store them in a vector.
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if ((m_scene.getEntity(i).hasComponents(COMPONENT_ENEMY01)) &&
+			if ((m_scene.getEntity(i).hasComponents(COMPONENT_ZOMBIE)) &&
 			    (glm::length(glm::vec2(m_scene.getEntity(i).transform[3].x - entity.transform[3].x, m_scene.getEntity(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
 			{
 				nearbyNeighbours.push_back(&m_scene.getEntity(i));

@@ -2,6 +2,7 @@
 
 #include "PlayerInfo.h"
 #include "Entity.h"
+#include "EntityUtils.h"
 
 #include <glm\glm.hpp>
 
@@ -12,17 +13,6 @@
 class OutBufferStream;
 class InBufferStream;
 struct InputComponent;
-
-enum ModelID : std::uint8_t {
-	MODEL_PLAYER_BULLET,
-	MODEL_ENEMY_BULLET,
-	MODEL_ENEMY_ZOMBIE,
-	MODEL_ENEMY_SNAKE,
-	MODEL_ENEMY_SHOOTER,
-	MODEL_SCORE_PICKUP_1,
-	MODEL_SCORE_PICKUP_2,
-	MODEL_SCORE_PICKUP_3
-};
 
 enum RPCType : std::uint8_t {
 	RPC_CREATE_PLAYER_GHOST,

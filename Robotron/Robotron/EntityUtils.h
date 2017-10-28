@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <string>
+#include <cstdint>
 
 class Scene;
 class Entity;
@@ -25,6 +26,17 @@ struct VertexFormat;
 struct Mesh;
 struct InputComponent;
 struct InputMapComponent;
+
+enum ModelID : std::uint8_t {
+	MODEL_PLAYER_BULLET,
+	MODEL_ENEMY_BULLET,
+	MODEL_ENEMY_ZOMBIE,
+	MODEL_ENEMY_SNAKE,
+	MODEL_ENEMY_SHOOTER,
+	MODEL_SCORE_PICKUP_1,
+	MODEL_SCORE_PICKUP_2,
+	MODEL_HEALTH_PICKUP
+};
 
 namespace EntityUtils {
 	// Creates a unit square facing down the positive z axis with the 
@@ -64,6 +76,10 @@ namespace EntityUtils {
 	// Creates a  Player Bullet (currently a unit sphere), centered at the origin, with the specified 
 	// transform;
 	Entity& createEnemyBullet(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+
+	Entity& createGhost(Scene&, ModelID, const glm::mat4& transform, std::int32_t entityNetId);
+
+	Entity& createPlayerGhost(Scene&, const glm::mat4& transform, std::int32_t entityNetId);
 
 	// Creates a cylinder with the specified radius and height.
 	Entity& createCylinder(Scene&, float radius = 1, float height = 1, const glm::mat4& transform = glm::mat4{ 1 });

@@ -9,6 +9,7 @@
 #include "ModelUtils.h"
 
 #include <glm\gtc\matrix_transform.hpp>
+#include <iostream>
 
 Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
 {
@@ -56,7 +57,7 @@ Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& transform)
 Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY01
+	                                  | COMPONENT_LOGIC | COMPONENT_ZOMBIE
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
@@ -86,7 +87,7 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int positionInQueue)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
-	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY02
+	                                  | COMPONENT_LOGIC | COMPONENT_SNAKE
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
@@ -118,7 +119,7 @@ Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int
 Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
-	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY03
+	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY_SHOOTER
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.physics = {};
@@ -315,6 +316,65 @@ Entity& EntityUtils::createEnemyBullet(Scene& scene, const glm::mat4& transform)
 
 	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
+	return entity;
+}
+
+Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const glm::mat4& transform, std::int32_t entityNetId)
+{
+	Entity& entity = scene.createEntity(COMPONENT_MODEL, COMPONENT_TRANSFORM, 
+	                                    COMPONENT_NETWORK, COMPONENT_PHYSICS);
+
+	switch (modelId)
+	{
+		// TODO: Replace all these with calls to a create model functions.
+		// That way we can easily change the models and textures used in a single location.
+	case MODEL_PLAYER_BULLET:
+		entity.model = GLPrimitives::getSphereModel();
+		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		break;
+	case MODEL_ENEMY_BULLET:
+		entity.model = GLPrimitives::getSphereModel();
+		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		break;
+	case MODEL_ENEMY_ZOMBIE:
+		entity.model = GLPrimitives::getSphereModel();
+		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		break;
+	case MODEL_ENEMY_SNAKE:
+		entity.model = GLPrimitives::getSphereModel();
+		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
+		break;
+	case MODEL_ENEMY_SHOOTER:
+		entity.model = GLPrimitives::getSphereModel();
+		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		break;
+	case MODEL_SCORE_PICKUP_1:
+		entity.model = GLPrimitives::getSphereModel();
+		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		break;
+	case MODEL_SCORE_PICKUP_2:
+		entity.model = GLPrimitives::getPyramidModel();
+		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		break;
+	case MODEL_HEALTH_PICKUP:
+		entity.model = GLPrimitives::getCubeModel();
+		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		break;
+	default:
+		// TODO: Add logging here.
+		std::cout << "Error: Invalid modelID when trying to create entity ghost" << std::endl;
+		break;
+	}
+
+	entity.transform = transform;
+	entity.network.id = entityNetId;
+	return entity;
+}
+
+Entity & EntityUtils::createPlayerGhost(Scene& scene, const glm::mat4& transform, std::int32_t entityNetId)
+{
+	Entity& entity = createPlayer(scene, transform);
+	entity.network.id = entityNetId;
 	return entity;
 }
 

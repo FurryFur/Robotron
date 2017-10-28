@@ -4,13 +4,16 @@
 
 #include <glm\glm.hpp>
 
+#include <cstdint>
+
 class OutBufferStream;
 class InBufferStream;
 
 struct GhostSnapshot {
 	GhostSnapshot() = default;
-	GhostSnapshot(const glm::mat4& transform, const PhysicsComponent&);
+	GhostSnapshot(std::int32_t entityNetId, const glm::mat4& transform, const PhysicsComponent&);
 
+	std::int32_t entityNetId;
 	glm::mat4 transform;
 	PhysicsComponent physics;
 

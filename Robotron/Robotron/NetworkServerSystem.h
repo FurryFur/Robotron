@@ -28,7 +28,7 @@ public:
 	NetworkServerSystem(Scene&);
 
 	virtual void beginFrame() override;
-	virtual void update(Entity&) override;
+	virtual void update(Entity&, float deltaTick) override;
 	virtual void endFrame() override;
 
 private:

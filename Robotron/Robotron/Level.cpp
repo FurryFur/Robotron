@@ -334,8 +334,8 @@ bool Level::checkEnemiesAlive()
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		// Return true when the first entity is found with an enemy tag.
-		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ENEMY01, COMPONENT_ENEMY02,
-			COMPONENT_ENEMY03))
+		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ZOMBIE, COMPONENT_SNAKE,
+			COMPONENT_ENEMY_SHOOTER))
 			return true;
 	}
 
@@ -380,7 +380,7 @@ void Level::process(float deltaTick)
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
 		m_inputSystem.update(m_scene.getEntity(i));
 		m_playerControlSystem.update(m_scene.getEntity(i), m_clock);
-		m_networkSystem->update(m_scene.getEntity(i));
+		m_networkSystem->update(m_scene.getEntity(i), deltaTick);
 		m_enemy01ControlSystem.update(m_scene.getEntity(i), deltaTick);
 		m_enemy02ControlSystem.update(m_scene.getEntity(i), deltaTick);
 		m_enemy03ControlSystem.update(m_scene.getEntity(i), deltaTick);

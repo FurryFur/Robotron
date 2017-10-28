@@ -90,8 +90,8 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	// Find the closest player object to seek to.
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ENEMY01, 
-			   COMPONENT_ENEMY02, COMPONENT_ENEMY03, COMPONENT_ENEMYBULLET) // its an enemy bullet
+		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ZOMBIE, 
+			   COMPONENT_SNAKE, COMPONENT_ENEMY_SHOOTER, COMPONENT_ENEMYBULLET) // its an enemy bullet
 			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 1)		    // the player is within range to be damaged by it
 		{
 			entity.playerStats.deathTime = clock.GetCurTime();

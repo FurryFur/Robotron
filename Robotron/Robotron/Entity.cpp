@@ -59,16 +59,16 @@ void Entity::addComponents(size_t componentMask)
 		m_componentMask |= COMPONENT_LOGIC;
 		logicVars = {};
 	}
-	if ((componentMask & COMPONENT_ENEMY01) == COMPONENT_ENEMY01) {
-		m_componentMask |= COMPONENT_ENEMY01;
+	if ((componentMask & COMPONENT_ZOMBIE) == COMPONENT_ZOMBIE) {
+		m_componentMask |= COMPONENT_ZOMBIE;
 		aiVariables = {};
 	}
-	if ((componentMask & COMPONENT_ENEMY02) == COMPONENT_ENEMY02) {
-		m_componentMask |= COMPONENT_ENEMY02;
+	if ((componentMask & COMPONENT_SNAKE) == COMPONENT_SNAKE) {
+		m_componentMask |= COMPONENT_SNAKE;
 		aiVariables = {};
 	}
-	if ((componentMask & COMPONENT_ENEMY03) == COMPONENT_ENEMY03) {
-		m_componentMask |= COMPONENT_ENEMY03;
+	if ((componentMask & COMPONENT_ENEMY_SHOOTER) == COMPONENT_ENEMY_SHOOTER) {
+		m_componentMask |= COMPONENT_ENEMY_SHOOTER;
 		aiVariables = {};
 	}
 	if ((componentMask & COMPONENT_NETWORK) == COMPONENT_NETWORK) {
@@ -77,7 +77,7 @@ void Entity::addComponents(size_t componentMask)
 		// with an isNewEntity=true indicates to the network that an entity has
 		// been destroyed and its memory reused.
 		network.isNewEntity = true;
-		network.priority = 0;
+		network.priority = 9999; // Add a high priority for new entities
 	}
 	if ((componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP) {
 		m_componentMask |= COMPONENT_SCOREPICKUP;

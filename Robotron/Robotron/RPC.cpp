@@ -1,7 +1,9 @@
 #include "RPC.h"
 
 #include "BufferStream.h"
-#include "GLMUtils.h"
+#include "Scene.h"
+
+#include <iostream>
 
 void RPCGroup::addRPC(std::unique_ptr<RemoteProcedureCall> rpc)
 {
@@ -88,6 +90,12 @@ RPCDestroyGhost::RPCDestroyGhost(std::int32_t entityNetId)
 
 void RPCDestroyGhost::execute(std::vector<Entity*>& netEntities)
 {
+	if (m_entityNetId >= 0 && m_entityNetId < netEntities.size()) {
+		Entity* netEntity = netEntities.at(m_entityNetId);
+		if (netEntity) {
+			netEntity->destroy();
+		}
+	}
 }
 
 OutBufferStream& RPCDestroyGhost::serialize(OutBufferStream& obs) const
@@ -121,6 +129,22 @@ RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId,
 
 void RPCCreatePlayerGhost::execute(std::vector<Entity*>& netEntities)
 {
+	Scene* scene = Scene::getCurrentScene();
+	if (scene) {
+		// Destroy existing entities with the same id before creating new ones
+		if (m_entityNetId > 0 && m_entityNetId < netEntities.size()) {
+			Entity* existingEntity = netEntities.at(m_entityNetId);
+			if (existingEntity)
+				existingEntity->destroy();
+		}
+
+		Entity& newEntity = EntityUtils::createPlayerGhost(*scene, m_transform, m_entityNetId);
+	}
+	else {
+		// TODO: Add logging here
+		std::cout << "Warning: Could not execute RPC Create Ghost. Missing scene, "
+			"did you forget to call Scene::makeSceneCurrent." << std::endl;
+	}
 }
 
 OutBufferStream& RPCCreatePlayerGhost::serialize(OutBufferStream& obs) const
@@ -145,6 +169,21 @@ RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId,
 
 void RPCCreateGhost::execute(std::vector<Entity*>& netEntities)
 {
+	Scene* scene = Scene::getCurrentScene();
+	if (scene) {
+		// Destroy existing entities with the same id before creating new ones
+		if (m_entityNetId > 0 && m_entityNetId < netEntities.size()) {
+			Entity* existingEntity = netEntities.at(m_entityNetId);
+			if (existingEntity)
+				existingEntity->destroy();
+		}
+
+		Entity& newEntity = EntityUtils::createGhost(*scene, m_modelId, m_transform, m_entityNetId);
+	} else {
+		// TODO: Add logging here
+		std::cout << "Warning: Could not execute RPC Create Ghost. Missing scene, "
+			"did you forget to call Scene::makeSceneCurrent." << std::endl;
+	}
 }
 
 OutBufferStream& RPCCreateGhost::serialize(OutBufferStream& obs) const
@@ -155,6 +194,8 @@ OutBufferStream& RPCCreateGhost::serialize(OutBufferStream& obs) const
 
 InBufferStream& RPCCreateGhost::deserialize(InBufferStream& ibs)
 {
+	// TODO: Add error checking when deserializing model
+	// Make sure we get a valid model id back
 	return ibs >> m_entityNetId >> m_modelId >> m_transform;
 }
 
@@ -166,6 +207,7 @@ RPCRecordInput::RPCRecordInput(std::int32_t entityNetId, const InputComponent& i
 
 void RPCRecordInput::execute(std::vector<Entity*>& netEntities)
 {
+	netEntities.at(m_entityNetId)->input = m_input;
 }
 
 OutBufferStream& RPCRecordInput::serialize(OutBufferStream& obs) const

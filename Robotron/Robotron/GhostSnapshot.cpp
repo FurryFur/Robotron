@@ -4,20 +4,21 @@
 #include "PhysicsComponent.h"
 #include "BufferStream.h"
 
-GhostSnapshot::GhostSnapshot(const glm::mat4& transform, const PhysicsComponent& physics)
+GhostSnapshot::GhostSnapshot(std::int32_t entityNetId, const glm::mat4& transform, const PhysicsComponent& physics)
 {
+	this->entityNetId = entityNetId;
 	this->transform = transform;
 	this->physics = physics;
 }
 
 OutBufferStream& GhostSnapshot::serialize(OutBufferStream& obs) const
 {
-	return obs << transform << physics;
+	return obs << entityNetId << transform << physics;
 }
 
 InBufferStream& GhostSnapshot::deserialize(InBufferStream& ibs)
 {
-	return ibs >> transform >> physics;
+	return ibs >> entityNetId >> transform >> physics;
 }
 
 OutBufferStream& operator<<(OutBufferStream& obs, const GhostSnapshot& snapshot)

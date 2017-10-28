@@ -59,8 +59,8 @@ void PlayerBulletSystem::update(Entity& entity, float deltaTick)
 	// Cycle through all the entities in the scene and check if the bullet hit an enemy.
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ENEMY01, COMPONENT_ENEMY02,
-			   COMPONENT_ENEMY03)
+		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ZOMBIE, COMPONENT_SNAKE,
+			   COMPONENT_ENEMY_SHOOTER)
 			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 1)
 		{
 			// Destroy the bullet.
