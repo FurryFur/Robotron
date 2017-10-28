@@ -65,7 +65,11 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	entity.physics.velocity = moveSpeed * axis;
 	if (axis != glm::vec3{ 0,0,0 })
 		entity.aiVariables.previousVelocity = entity.physics.velocity;
-	pos += entity.physics.velocity;
+	if(((pos + entity.physics.velocity).x < 20.0f) && ((pos + entity.physics.velocity).x > -20.0f))
+		pos.x += entity.physics.velocity.x;
+	if (((pos + entity.physics.velocity).z < 20.0f) && ((pos + entity.physics.velocity).z > -20.0f))
+		pos.z += entity.physics.velocity.z;
+
 
 	// Rotation
 	// Prevent elevation going past 90 degrees

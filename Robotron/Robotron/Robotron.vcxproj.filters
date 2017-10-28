@@ -141,6 +141,9 @@
     <ClCompile Include="EnemyBulletSystem.cpp">
       <Filter>Source Files\Systems</Filter>
     </ClCompile>
+    <ClCompile Include="TextLabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="NetworkComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -301,6 +304,9 @@
     </ClInclude>
     <ClInclude Include="EnemyBulletSystem.h">
       <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="TextLabel.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderSystem.h">
       <Filter>Header Files\Graphics</Filter>
