@@ -13,7 +13,7 @@
 //
 
 #include "GLUtils.h"
-#include "Level.h"
+#include "Game.h"
 
 #include <GLFW\glfw3.h>
 
@@ -25,14 +25,11 @@ int main()
 	//// Init combined Window and OpenGL context.
 	GLFWwindow* window = GLUtils::initOpenGL();
 
-	Level level(window);
+	Game game(window);
 
 	while (!glfwWindowShouldClose(window)) {		
 		// Execute a from of the game.
-		level.executeOneFrame();
-		// If there are no new enemies alive in the scene, go to the next level.
-		if (!level.checkEnemiesAlive())
-			level.triggerNextLevel();
+		game.executeOneFrame();
 	}
 
 	glfwDestroyWindow(window);

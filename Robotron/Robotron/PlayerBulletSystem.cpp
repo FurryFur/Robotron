@@ -41,7 +41,7 @@ PlayerBulletSystem::PlayerBulletSystem(Scene& scene)
 
 // Updates the position of the bullets every turn to travel in its travel directory.
 // Checks to see if it has hit an enemy or a wall.
-void PlayerBulletSystem::update(Entity& entity, float deltaTick)
+void PlayerBulletSystem::update(Entity& entity)
 {
 	// Check that the entity is an Enemy02 object before proceeding.
 	if (!entity.hasComponents(COMPONENT_PLAYERBULLET))

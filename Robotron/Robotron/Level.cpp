@@ -20,8 +20,6 @@ Level::Level(GLFWwindow* window)
 {
 	Scene::makeSceneCurrent(&m_scene);
 
-	m_clock.Process();
-
 	m_window = window;
 	m_levelNum = 0;
 	m_inSetupPhase = false;
@@ -342,15 +340,8 @@ bool Level::checkEnemiesAlive()
 	return false;
 }
 
-void Level::executeOneFrame()
-{
-	m_clock.Process();
-	float fDT = m_clock.GetDeltaTick();
-	process(fDT);
-}
-
 // If enough time has passed since their death and they have lives remaining, the player is respawned.
-void Level::respawnDeadPlayers()
+void Level::respawnDeadPlayers(Clock& clock)
 {
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
@@ -359,7 +350,7 @@ void Level::respawnDeadPlayers()
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
 		    && m_scene.getEntity(i).playerStats.isRespawning == true
 		    && m_scene.getEntity(i).playerStats.lives > 0
-		    && m_scene.getEntity(i).playerStats.deathTime + 3.0f <= m_clock.GetCurTime())
+		    && m_scene.getEntity(i).playerStats.deathTime + 3.0f <= clock.GetCurTime())
 		{
 			m_scene.getEntity(i).playerStats.isRespawning = false;
 			m_scene.getEntity(i).transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
@@ -368,25 +359,25 @@ void Level::respawnDeadPlayers()
 	}
 }
 
-void Level::process(float deltaTick)
-{
+void Level::process(float deltaTick, Clock& clock)
+{	
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
 
 	m_networkSystem->beginFrame();
-	respawnDeadPlayers();
+	respawnDeadPlayers(clock);
 	// Update all the entities using all the systems.
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
 		m_inputSystem.update(m_scene.getEntity(i));
-		m_playerControlSystem.update(m_scene.getEntity(i), m_clock);
+		m_playerControlSystem.update(m_scene.getEntity(i), clock);
 		m_networkSystem->update(m_scene.getEntity(i), deltaTick);
 		m_enemy01ControlSystem.update(m_scene.getEntity(i), deltaTick);
 		m_enemy02ControlSystem.update(m_scene.getEntity(i), deltaTick);
 		m_enemy03ControlSystem.update(m_scene.getEntity(i), deltaTick);
 		m_scorePickUpSystem.update(m_scene.getEntity(i), deltaTick);
-		m_playerbulletsystem.update(m_scene.getEntity(i), deltaTick);
-		m_enemybulletsystem.update(m_scene.getEntity(i), deltaTick);
+		m_playerbulletsystem.update(m_scene.getEntity(i));
+		m_enemybulletsystem.update(m_scene.getEntity(i));
 		m_renderSystem.update(m_scene.getEntity(i));
 	}
 

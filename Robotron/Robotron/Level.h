@@ -53,18 +53,16 @@ public:
 	void initalizeNextLevel();
 	// Returns true if there are still alive enemies in the level.
 	bool checkEnemiesAlive();
-	void executeOneFrame();
-	// Respawn players a moment after death time if they still have lives left. 
-	void respawnDeadPlayers();
+	void process(float _fDeltaTick, Clock& clock);
 	void triggerNextLevel();
 
 private:
-
+	
+	// Respawn players a moment after death time if they still have lives left. 
+	void respawnDeadPlayers(Clock& clock);
 	void spawnEnemies(int levelType);
-	void process(float _fDeltaTick);
 	void processSetUpPhase();
 
-	Clock m_clock;
 	Scene m_scene;
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;
