@@ -15,7 +15,6 @@ using namespace std::chrono;
 
 NetworkServerSystem::NetworkServerSystem(Scene& scene)
 	: NetworkSystem(scene)
-	, m_curSeqenceNum{ 0 }
 	, m_packetInterval{ 50 }
 	, m_willSendPcktThisFrame{ true }
 {
@@ -35,8 +34,6 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene)
 	clientInfo.playerInfo.lives = 3;
 	clientInfo.playerInfo.score = 0;
 	m_clients.insert(std::make_pair(address, clientInfo));
-
-	m_sendPacket.rpcGroupBuffer.emplace();
 
 	// Temp socket for receiving from self for testing.
 	//m_socket2.initialise(4567);
@@ -181,24 +178,13 @@ void NetworkServerSystem::endFrame()
 		// Set packet sequence number
 		m_sendPacket.sequenceNum = m_curSeqenceNum;
 
-		// Get ghost snapshots to send to clients
-		for (Entity* entity : m_netEntities) {
-			if (entity) {
-				++entity->network.priority;
-				m_snapshotPriorityQ.push(entity);
-			}
-		}
-		selectGhostSnapshots(m_sendPacket.ghostSnapshotBuffer, 
-		                     m_snapshotPriorityQ, 
+		selectGhostSnapshots(m_sendPacket.ghostSnapshotBuffer, m_netEntities,
 		                     m_sendPacket.ghostSnapshotBuffer.getMaxSize());
 
 		// Send packet to clients
 		broadcastToClients(m_sendPacket);
 
-		m_snapshotPriorityQ = {};
-		++m_curSeqenceNum;
-		// New RPC group for new sequence number
-		m_sendPacket.rpcGroupBuffer.emplace();
+		NetworkSystem::endFrame();
 	}
 }
 
@@ -209,21 +195,29 @@ void NetworkServerSystem::broadcastToClients(const Packet& packet)
 	}
 }
 
-void NetworkServerSystem::bufferRpc(std::unique_ptr<RemoteProcedureCall> rpc)
-{
-	// Add the rpc to the latest RPCGroup
-	RPCGroup& rpcGroup = m_sendPacket.rpcGroupBuffer.front();
-	rpcGroup.addRPC(std::move(rpc));
-}
-
 void NetworkServerSystem::selectGhostSnapshots(SnapshotBufT& dst, 
-                                               PriorityQT& src,
+                                               std::vector<Entity*>& src,
                                                size_t maxSnapshots)
 {
+	using PriorityQT = std::priority_queue<Entity*, std::vector<Entity*>, EntityPriorityComparitor>;
+	static PriorityQT s_snapshotPriorityQ;
+
+	// Create priority queue of entities from src
+	s_snapshotPriorityQ = {};
+	for (Entity* entity : src) {
+		if (entity) {
+			++entity->network.priority;
+			s_snapshotPriorityQ.push(entity);
+		}
+	}
+
+	// Clear destination snapshot buffer
 	dst.clear();
-	for (size_t i = 0; i < maxSnapshots && !src.empty(); ++i) {
-		Entity* entity = src.top();
-		src.pop();
+
+	// Pull snapshots from priority queue
+	for (size_t i = 0; i < maxSnapshots && !s_snapshotPriorityQ.empty(); ++i) {
+		Entity* entity = s_snapshotPriorityQ.top();
+		s_snapshotPriorityQ.pop();
 		dst.emplace_back(entity->network.id, entity->transform, entity->physics);
 		entity->network.priority = 0;
 	}

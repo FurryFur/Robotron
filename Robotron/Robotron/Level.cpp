@@ -369,16 +369,17 @@ void Level::process(float deltaTick, Clock& clock)
 	respawnDeadPlayers(clock);
 	// Update all the entities using all the systems.
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
-		m_inputSystem.update(m_scene.getEntity(i));
-		m_playerControlSystem.update(m_scene.getEntity(i), clock);
-		m_networkSystem->update(m_scene.getEntity(i), deltaTick);
-		m_enemy01ControlSystem.update(m_scene.getEntity(i), deltaTick);
-		m_enemy02ControlSystem.update(m_scene.getEntity(i), deltaTick);
-		m_enemy03ControlSystem.update(m_scene.getEntity(i), deltaTick);
-		m_scorePickUpSystem.update(m_scene.getEntity(i), deltaTick);
-		m_playerbulletsystem.update(m_scene.getEntity(i));
-		m_enemybulletsystem.update(m_scene.getEntity(i));
-		m_renderSystem.update(m_scene.getEntity(i));
+		Entity& entity = m_scene.getEntity(i);
+		m_inputSystem.update(entity);
+		m_networkSystem->update(entity, deltaTick);
+		m_playerControlSystem.update(entity, clock);
+		m_enemy01ControlSystem.update(entity, deltaTick);
+		m_enemy02ControlSystem.update(entity, deltaTick);
+		m_enemy03ControlSystem.update(entity, deltaTick);
+		m_scorePickUpSystem.update(entity, deltaTick);
+		m_playerbulletsystem.update(entity);
+		m_enemybulletsystem.update(entity);
+		m_renderSystem.update(entity);
 	}
 
 	if (m_inSetupPhase)

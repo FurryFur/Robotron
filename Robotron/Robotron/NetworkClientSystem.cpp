@@ -5,6 +5,7 @@
 #include "EntityUtils.h"
 #include "Entity.h"
 #include "GhostSnapshot.h"
+#include "RPC.h"
 
 #include <glm\gtx\matrix_interpolation.hpp>
 #include <glm\gtx\compatibility.hpp>
@@ -19,6 +20,11 @@ NetworkClientSystem::NetworkClientSystem(Scene& scene)
 {
 	m_socket.initialise(4567);
 	allocateRecvBuffer();
+
+	// TODO: Add broadcast to find servers
+	inet_pton(AF_INET, "127.0.0.1", &m_serverAddress.sin_addr);
+	m_serverAddress.sin_port = htons(8456);
+	m_serverAddress.sin_family = AF_INET;
 }
 
 void NetworkClientSystem::beginFrame()
@@ -65,27 +71,6 @@ void NetworkClientSystem::beginFrame()
 			// Update the last sequence number seen from the server
 			m_lastSeqNumSeen = seqNumRecvd;
 		}
-
-	//	if (packet.type == PACKET_TYPE_CREATE_GHOST) {
-	//		// If a ghost entity with this id already exists, then destroy it first
-	//		destroyIfExists(packet.entityNetID);
-
-	//		// TODO: Create different models based on model enum
-	//		Entity& entity = EntityUtils::createSphere(m_scene, packet.transform);
-
-	//		// Add entity to list of networked entities
-	//		if (packet.entityNetID >= m_netEntities.size())
-	//			m_netEntities.resize(packet.entityNetID + 1);
-	//		m_netEntities.at(packet.entityNetID) = &entity;
-	//	}
-	//	if (packet.type == PACKET_TYPE_TRANSFORM) {
-	//		// TODO: Save snapshot somewhere to be interpolated to
-	//		if (packet.entityNetID < m_netEntities.size() && m_netEntities.at(packet.entityNetID))
-	//			m_netEntities.at(packet.entityNetID)->transform = packet.transform;
-	//	}
-	//	if (packet.type == PACKET_TYPE_DESTROY) {
-	//		destroyIfExists(packet.entityNetID);
-	//	}
 	}
 }
 
@@ -110,7 +95,7 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 	if (!m_netEntities.at(id))
 		m_netEntities.at(id) = &entity;
 
-	// Update ghost snapshotsaa
+	// Update ghost snapshots
 	if (id < m_ghostSnapshots.size() && m_ghostSnapshots.at(id)) {
 		// TODO: Add timestamps to lerp
 		glm::mat4& eTransform = entity.transform;
@@ -129,11 +114,20 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 			ePhysics.acceleration = glm::lerp(ePhysics.acceleration, gPhysics.acceleration, lerpAmount);
 		}
 	}
+
+	// Send input updates to server
+	if (entity.hasComponents(COMPONENT_INPUT)) {
+		bufferRpc(std::make_unique<RPCRecordInput>(id, entity.input));
+	}
 }
 
 void NetworkClientSystem::endFrame()
 {
+	m_sendPacket.sequenceNum = m_curSeqenceNum;
 
+	sendData(m_sendPacket, m_serverAddress);
+
+	NetworkSystem::endFrame();
 }
 
 void NetworkClientSystem::destroyIfExists(size_t entityNetID)

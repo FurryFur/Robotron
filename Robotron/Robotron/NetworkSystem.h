@@ -8,6 +8,7 @@
 
 class Scene;
 class Entity;
+class RemoteProcedureCall;
 struct Packet;
 
 class NetworkSystem {
@@ -23,10 +24,17 @@ protected:
 	bool receiveData(Packet& outPacket, sockaddr_in& outAddress);
 	void allocateRecvBuffer();
 
+	// Saves RPC calls to be sent to clients when the next update packet is 
+	// sent out.
+	void bufferRpc(std::unique_ptr<RemoteProcedureCall> rpc);
+
 	CSocket m_socket;
 	Scene& m_scene;
 	std::vector<Entity*> m_netEntities;
 	std::vector<char> m_recvBuffer;
+
+	// The current sequence number for sending packets
+	std::uint32_t m_curSeqenceNum;
 
 	// A reusable packet for sending data
 	Packet m_sendPacket;
