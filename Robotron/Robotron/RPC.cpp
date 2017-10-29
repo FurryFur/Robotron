@@ -207,7 +207,22 @@ RPCRecordInput::RPCRecordInput(std::int32_t entityNetId, const InputComponent& i
 
 void RPCRecordInput::execute(std::vector<Entity*>& netEntities)
 {
-	netEntities.at(m_entityNetId)->input = m_input;
+	if (m_entityNetId < 0) {
+		// TODO: Do logging here
+		std::cout << "Warning: Server received an RPC with an unassigned network ID" << std::endl;
+	}
+
+	if (m_entityNetId < netEntities.size()) {
+		if (netEntities.at(m_entityNetId))
+			netEntities.at(m_entityNetId)->input = m_input;
+		else {
+			// TODO: Add logging here
+			std::cout << "Info: Received RPC for destroyed entity" << std::endl;
+		}
+	} else {
+		// TODO: Add logging here
+		std::cout << "Warning: Received RPC with out of range network id" << std::endl;
+	}
 }
 
 OutBufferStream& RPCRecordInput::serialize(OutBufferStream& obs) const

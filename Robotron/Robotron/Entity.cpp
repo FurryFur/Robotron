@@ -77,7 +77,7 @@ void Entity::addComponents(size_t componentMask)
 		// with an isNewEntity=true indicates to the network that an entity has
 		// been destroyed and its memory reused.
 		network.isNewEntity = true;
-		network.priority = 9999; // Add a high priority for new entities
+		network.priority = 999;
 	}
 	if ((componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP) {
 		m_componentMask |= COMPONENT_SCOREPICKUP;
