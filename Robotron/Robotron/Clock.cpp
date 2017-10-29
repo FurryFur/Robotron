@@ -64,6 +64,12 @@ Clock::Process()
 		m_deltaTime = 0.0;
 	}
 
+	//Cap DeltaTime
+	if (m_deltaTime > 1.0)
+	{
+		m_deltaTime = 1.0;
+	}
+
 	m_timeElapsed += m_deltaTime;
 }
 

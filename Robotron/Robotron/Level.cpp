@@ -16,7 +16,7 @@ Level::Level(GLFWwindow* window)
 	, m_scorePickUpSystem(m_scene)
 	, m_playerbulletsystem(m_scene)
 	, m_enemybulletsystem(m_scene)
-	, m_label("Basic Game", "Assets/Fonts/waltographUI.ttf")
+	, m_label("Basic Game", "Assets/Fonts/NYCTALOPIATILT.TTF")
 {
 	Scene::makeSceneCurrent(&m_scene);
 
@@ -409,8 +409,6 @@ void Level::process(float deltaTick, Clock& clock)
 	// Do operations that should happen at the end of the frame.
 	m_networkSystem->endFrame();
 	m_renderSystem.endRender();
-
-	glfwPollEvents();
 }
 
 // Handles the animation between levels. The player flies up, level spawns. And they desend in the centre of the screen.
