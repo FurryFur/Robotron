@@ -20,11 +20,13 @@
 #include "TextLabel.h"
 
 #include <memory>
+#include <string>
 
 enum GameState
 {
 	MAINMENU,
-	LOBBY,
+	JOINLOBBY,
+	HOSTSETUP,
 	GAME
 };
 
@@ -33,6 +35,7 @@ enum ButtonState
 	NOBUTTONDOWN,
 	JOINDOWN,
 	HOSTDOWN,
+	BACKDOWN,
 	QUITDOWN
 };
 
@@ -53,15 +56,24 @@ public:
 	static ButtonState s_buttonState;
 	static double s_mousePosX;
 	static double s_mousePosY;
+	static std::string s_serverNameInput;
 
 private:
+
+	void registerKeyObserver(IKeyObserver * observer);
+	void keyCallback(int key, int scancode, int action, int mods);
+
+	std::vector<IKeyObserver*> m_keyObservers;
 
 	GLFWwindow* m_window;
 	Clock m_clock;
 
+	std::vector <TextLabel> m_uiMainMenuText;
+	std::vector <TextLabel> m_uiHostSetupText;
+
 	std::unique_ptr<Level> m_level;
 
-	std::vector <TextLabel> m_uiText;
+	TextLabel m_serverNameInput;
 
 	TextLabel m_mousePosLabel;
 };

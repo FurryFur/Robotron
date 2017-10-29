@@ -49,22 +49,22 @@ Clock::Initialise()
 void
 Clock::Process()
 {
-	//Get the time this frame.
+	// Get the time this frame.
 	m_currentTime = glfwGetTime();;
 
-	//Time difference between this frame and the previous frame
+	// Time difference between this frame and the previous frame
 	m_deltaTime = static_cast<float>(m_currentTime - m_lastTime);
 
-	//Prepare for the next frame
+	// Prepare for the next frame
 	m_lastTime = m_currentTime;
 
-	//Force non-negative
+	// Force non-negative
 	if (m_deltaTime < 0.0)
 	{
 		m_deltaTime = 0.0;
 	}
 
-	//Cap DeltaTime
+	// Cap DeltaTime
 	if (m_deltaTime > 1.0)
 	{
 		m_deltaTime = 1.0;
