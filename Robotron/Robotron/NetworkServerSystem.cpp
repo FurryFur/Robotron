@@ -15,7 +15,7 @@ using namespace std::chrono;
 
 NetworkServerSystem::NetworkServerSystem(Scene& scene)
 	: NetworkSystem(scene)
-	, m_packetInterval{ 50 }
+	, m_packetInterval{ 25 }
 	, m_willSendPcktThisFrame{ true }
 {
 	m_socket.initialise(8456);
