@@ -26,7 +26,7 @@ public:
 	PlayerBulletSystem(Scene& scene);
 
 	// Updates the entities position from input.
-	void update(Entity&, float deltaTick);
+	void update(Entity&);
 
 private:
 	Scene& m_scene;
