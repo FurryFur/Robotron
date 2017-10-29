@@ -31,7 +31,6 @@ InBufferStream& RPCGroup::deserialize(InBufferStream& ibs)
 	std::uint16_t size;
 	ibs >> size;
 	m_rpcs.resize(size);
-	std::unique_ptr<RemoteProcedureCall> rpc;
 	for (auto& rpc : m_rpcs) {
 		RPCType rpcType;
 		ibs >> rpcType;
@@ -53,7 +52,8 @@ InBufferStream& RPCGroup::deserialize(InBufferStream& ibs)
 			ibs.setError(IBS_ERROR_CORRUPT_DATA);
 			break;
 		}
-		ibs >> *rpc;
+		if (rpc)
+			ibs >> *rpc;
 	}
 	return ibs;
 }

@@ -64,7 +64,7 @@ IBSError InBufferStream::checkBufferOverrunStr()
 	if (m_error)
 		return m_error;
 
-	if (std::memchr(&m_data[m_readHeadIdx], 0, m_data.size() - m_readHeadIdx)) {
+	if (!std::memchr(&m_data[m_readHeadIdx], '\0', m_data.size() - m_readHeadIdx)) {
 		setError(IBS_ERROR_WOULD_READ_PAST_END);
 	}
 
@@ -100,8 +100,8 @@ InBufferStream& InBufferStream::read(std::string& outString) noexcept
 	if (checkBufferOverrunStr() != IBS_ERROR_NONE)
 		return *this;
 
-	outString = m_data[m_readHeadIdx];
-	m_readHeadIdx += outString.length();
+	outString = &m_data[m_readHeadIdx];
+	m_readHeadIdx += outString.length() + 1;
 	return *this;
 }
 
