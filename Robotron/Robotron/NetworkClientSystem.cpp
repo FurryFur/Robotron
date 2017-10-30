@@ -99,7 +99,7 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 	if (!entity.hasComponents(COMPONENT_NETWORK, COMPONENT_TRANSFORM))
 		return;
 
-	std::int32_t& id = entity.network.id;
+	std::int32_t id = entity.network.id;
 
 	// TODO: Add logging here
 	if (id < 0) {
