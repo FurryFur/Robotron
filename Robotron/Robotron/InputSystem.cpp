@@ -18,7 +18,6 @@
 #include "KeyObserver.h"
 #include "Scene.h"
 #include "Utils.h"
-#include "EntityUtils.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\gtc\matrix_transform.hpp>
@@ -50,29 +49,69 @@ void InputSystem::keyCallback(int key, int scancode, int action, int mods)
 		return;
 	}
 
-	// Create a bullet on the player shooting right
-	if (key == GLFW_KEY_J && action == GLFW_PRESS) {
-		shootRight = true;
+	if (key == 321 && action == GLFW_PRESS) {
+		shootLeftDown = true;
 		return;
 	}
 
-	// Create a bullet on the player shooting left
-	if (key == GLFW_KEY_L && action == GLFW_PRESS) {
-		shootLeft = true;
-		return;
-	}
-
-	// Create a bullet on the player shooting down
-	if (key == GLFW_KEY_I && action == GLFW_PRESS) {
+	if (key == 322 && action == GLFW_PRESS) {
 		shootDown = true;
 		return;
 	}
 
-	// Create a bullet on the player shooting up
-	if (key == GLFW_KEY_K && action == GLFW_PRESS) {
+	if (key == 323 && action == GLFW_PRESS) {
+		shootRightDown = true;
+		return;
+	}
+
+	if (key == 324 && action == GLFW_PRESS) {
+		shootLeft = true;
+		return;
+	}
+
+	if (key == 326 && action == GLFW_PRESS) {
+		shootRight = true;
+		return;
+	}
+
+	if (key == 327 && action == GLFW_PRESS) {
+		shootLeftUp = true;
+		return;
+	}
+
+	if (key == 328 && action == GLFW_PRESS) {
 		shootUp = true;
 		return;
 	}
+
+	if (key == 329 && action == GLFW_PRESS) {
+		shootRightUp = true;
+		return;
+	}
+
+	//// Create a bullet on the player shooting right
+	//if (key == GLFW_KEY_J && action == GLFW_PRESS) {
+	//	shootRight = true;
+	//	return;
+	//}
+	//
+	//// Create a bullet on the player shooting left
+	//if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+	//	shootLeft = true;
+	//	return;
+	//}
+	//
+	//// Create a bullet on the player shooting down
+	//if (key == GLFW_KEY_I && action == GLFW_PRESS) {
+	//	shootDown = true;
+	//	return;
+	//}
+	//
+	//// Create a bullet on the player shooting up
+	//if (key == GLFW_KEY_K && action == GLFW_PRESS) {
+	//	shootUp = true;
+	//	return;
+	//}
 
 	for (auto& observer : m_keyObservers)
 		observer->keyCallback(key, scancode, action, mods);
@@ -125,54 +164,83 @@ void InputSystem::update(Entity& entity)
 		}
 	}
 
-	// Check which way the player is firing and shoot in that direction.
-	// Create a bullet on the player shooting right
-	if ((shootUp || shootDown || shootLeft || shootRight) && !((shootUp && shootDown && shootLeft && shootRight)))
+	//Update any inputs to fire the player made.
+	if (shootRight || shootLeft || shootDown || shootUp
+		|| shootRightUp || shootRightDown || shootLeftUp || shootLeftDown)
 	{
-		glm::vec3 bulletVelocity;
-		// The player is shooting right
-		if ((!shootUp && !shootDown && !shootLeft && shootRight) || (shootUp && shootDown && !shootLeft && shootRight))
-			bulletVelocity = glm::vec3{ -0.4f, 0.0f, m_scene.getEntity(1).physics.velocity.z };
+		for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
+		{
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+			{
+				m_scene.getEntity(i).controlVars.shootLeftDown = shootLeftDown;
+				m_scene.getEntity(i).controlVars.shootDown = shootDown;
+				m_scene.getEntity(i).controlVars.shootRightDown = shootRightDown;
+				m_scene.getEntity(i).controlVars.shootLeft = shootLeft;
+				m_scene.getEntity(i).controlVars.shootRight = shootRight;
+				m_scene.getEntity(i).controlVars.shootLeftUp = shootLeftUp;
+				m_scene.getEntity(i).controlVars.shootUp = shootUp;
+				m_scene.getEntity(i).controlVars.shootRightUp = shootRightUp;
 
-		// The player is shooting left
-		if ((!shootUp && !shootDown && shootLeft && !shootRight) || (shootUp && shootDown && shootLeft && !shootRight))
-			bulletVelocity = glm::vec3{ 0.4f, 0.0f, m_scene.getEntity(1).physics.velocity.z };
-
-		// The player is shooting down.
-		if ((!shootUp && shootDown && !shootLeft && !shootRight) || (!shootUp && shootDown && shootLeft && shootRight))
-			bulletVelocity = glm::vec3{ m_scene.getEntity(1).physics.velocity.x, 0.0f, -0.4f };
-
-		// The player is shooting up.
-		if ((shootUp && !shootDown && !shootLeft && !shootRight) || (shootUp && !shootDown && shootLeft && shootRight))
-			bulletVelocity = glm::vec3{ m_scene.getEntity(1).physics.velocity.x, 0.0f, 0.4f };
-
-		// The player is shooting right up
-		if (shootUp && !shootDown && !shootLeft && shootRight)
-			bulletVelocity = glm::vec3{ -0.2828f , 0, 0.2828f };
-
-		// The player is shooting right down
-		if (!shootUp && shootDown && !shootLeft && shootRight)
-			bulletVelocity = glm::vec3{ -0.2828f , 0, -0.2828f };
-
-		// The player is shooting left up
-		if (shootUp && !shootDown && shootLeft && !shootRight)
-			bulletVelocity = glm::vec3{ 0.2828f , 0, 0.2828f };
-
-		// The player is shooting left down
-		if (!shootUp && shootDown && shootLeft && !shootRight)
-			bulletVelocity = glm::vec3{ 0.2828f , 0, -0.2828f };
-
-		// Create the bullet and apply the velocity.
-		Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
-			glm::translate({}, glm::vec3(m_scene.getEntity(1).transform[3]))
-			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
-		bullet.physics.velocity = bulletVelocity;
-
-		shootUp = false;
-		shootDown = false;
-		shootLeft = false;
-		shootRight = false;
+				shootLeftDown = false;
+				shootDown = false;
+				shootRightDown = false;
+				shootLeft = false;
+				shootRight = false;
+				shootLeftUp = false;
+				shootUp = false;
+				shootRightUp = false;
+				break;
+			}
+		}
 	}
+	//// Check which way the player is firing and shoot in that direction.
+	//// Create a bullet on the player shooting right
+	//if ((shootUp || shootDown || shootLeft || shootRight) && !((shootUp && shootDown && shootLeft && shootRight)))
+	//{
+	//	glm::vec3 bulletVelocity;
+	//	// The player is shooting right
+	//	if ((!shootUp && !shootDown && !shootLeft && shootRight) || (shootUp && shootDown && !shootLeft && shootRight))
+	//		bulletVelocity = glm::vec3{ -0.4f, 0.0f, m_scene.getEntity(1).physics.velocity.z };
+	//
+	//	// The player is shooting left
+	//	if ((!shootUp && !shootDown && shootLeft && !shootRight) || (shootUp && shootDown && shootLeft && !shootRight))
+	//		bulletVelocity = glm::vec3{ 0.4f, 0.0f, m_scene.getEntity(1).physics.velocity.z };
+	//
+	//	// The player is shooting down.
+	//	if ((!shootUp && shootDown && !shootLeft && !shootRight) || (!shootUp && shootDown && shootLeft && shootRight))
+	//		bulletVelocity = glm::vec3{ m_scene.getEntity(1).physics.velocity.x, 0.0f, -0.4f };
+	//
+	//	// The player is shooting up.
+	//	if ((shootUp && !shootDown && !shootLeft && !shootRight) || (shootUp && !shootDown && shootLeft && shootRight))
+	//		bulletVelocity = glm::vec3{ m_scene.getEntity(1).physics.velocity.x, 0.0f, 0.4f };
+	//
+	//	// The player is shooting right up
+	//	if (shootUp && !shootDown && !shootLeft && shootRight)
+	//		bulletVelocity = glm::vec3{ -0.2828f , 0, 0.2828f };
+	//
+	//	// The player is shooting right down
+	//	if (!shootUp && shootDown && !shootLeft && shootRight)
+	//		bulletVelocity = glm::vec3{ -0.2828f , 0, -0.2828f };
+	//
+	//	// The player is shooting left up
+	//	if (shootUp && !shootDown && shootLeft && !shootRight)
+	//		bulletVelocity = glm::vec3{ 0.2828f , 0, 0.2828f };
+	//
+	//	// The player is shooting left down
+	//	if (!shootUp && shootDown && shootLeft && !shootRight)
+	//		bulletVelocity = glm::vec3{ 0.2828f , 0, -0.2828f };
+	//
+	//	// Create the bullet and apply the velocity.
+	//	Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
+	//		glm::translate({}, glm::vec3(m_scene.getEntity(1).transform[3]))
+	//		* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+	//	bullet.physics.velocity = bulletVelocity;
+	//
+	//	shootUp = false;
+	//	shootDown = false;
+	//	shootLeft = false;
+	//	shootRight = false;
+	//}
 
 
 	// Filter input receivers

@@ -27,6 +27,7 @@ enum GameState
 	MAINMENU,
 	JOINLOBBY,
 	HOSTSETUP,
+	LOBBY,
 	GAME
 };
 
@@ -36,6 +37,7 @@ enum ButtonState
 	JOINDOWN,
 	HOSTDOWN,
 	BACKDOWN,
+	STARTDOWN,
 	QUITDOWN
 };
 
@@ -48,7 +50,7 @@ public:
 
 	void executeOneFrame();
 
-	void render();
+	void renderMenuScreens();
 
 	void process(float deltaTick);
 
@@ -56,24 +58,27 @@ public:
 	static ButtonState s_buttonState;
 	static double s_mousePosX;
 	static double s_mousePosY;
-	static std::string s_serverNameInput;
+
+	static void registerKeyObserver(IKeyObserver * observer);
+
+	static std::vector<IKeyObserver*> s_keyObservers;
 
 private:
 
-	void registerKeyObserver(IKeyObserver * observer);
 	void keyCallback(int key, int scancode, int action, int mods);
-
-	std::vector<IKeyObserver*> m_keyObservers;
 
 	GLFWwindow* m_window;
 	Clock m_clock;
 
-	std::vector <TextLabel> m_uiMainMenuText;
-	std::vector <TextLabel> m_uiHostSetupText;
+	// Each screen state has a vector of text labels that are used to populate the interfaces.
+	std::vector <TextLabel> m_uiMainMenuLabels;
+	std::vector <TextLabel> m_uiHostSetupLabels;
+	std::vector <TextLabel> m_uiLobbyLabels;
 
 	std::unique_ptr<Level> m_level;
-
+	
+	std::string m_serverName;
 	TextLabel m_serverNameInput;
 
-	TextLabel m_mousePosLabel;
+	//TextLabel m_mousePosLabel;
 };

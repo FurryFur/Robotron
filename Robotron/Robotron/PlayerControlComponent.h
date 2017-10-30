@@ -17,4 +17,13 @@ struct PlayerControlComponent {
 	float moveSpeed;
 	float orientationSensitivity;
 	bool worldSpaceMove;
+
+	bool shootLeftDown;
+	bool shootDown;
+	bool shootRightDown;
+	bool shootLeft;
+	bool shootRight;
+	bool shootLeftUp;
+	bool shootUp;
+	bool shootRightUp;
 };
