@@ -47,9 +47,9 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 		return;
 	
 	// Set the target position out of scope.
-	glm::vec3 targetPosition  = glm::vec3{100, 100, 100};
-	glm::vec3 targetVelocity;
-	float targetMoveSpeed;
+	glm::vec3 targetsPosition  = glm::vec3{100, 100, 100};
+	glm::vec3 targetsVelocity;
+	float targetsMoveSpeed;
 	glm::vec3 currentPosition = glm::vec3{ entity.transform[3].x,  entity.transform[3].y,  entity.transform[3].z};
 	bool targetFound = false;
 
@@ -57,22 +57,22 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)          						                               //its a player object
-		 && glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
+		 && glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetsPosition - currentPosition)     //it is the closet player to the target
 		 && glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 30)								                  //the player is within the enemys aggro range
 		{
-			targetPosition = { m_scene.getEntity(i).transform[3].x, m_scene.getEntity(i).transform[3].y, m_scene.getEntity(i).transform[3].z};
-			targetVelocity = m_scene.getEntity(i).physics.velocity;
-			targetMoveSpeed = m_scene.getEntity(i).controlVars.moveSpeed;
+			targetsPosition = { m_scene.getEntity(i).transform[3].x, m_scene.getEntity(i).transform[3].y, m_scene.getEntity(i).transform[3].z};
+			targetsVelocity = m_scene.getEntity(i).physics.velocity;
+			targetsMoveSpeed = m_scene.getEntity(i).controlVars.maxMoveSpeed;
 			targetFound = true;
 		}
 	}
 
-	glm::vec3 Acc;
+	glm::vec3 acceleration;
 	// Apply the seek and flock AI if target aquired.
 	if (targetFound)
 	{
 		// Add a pursue acceleration to the culmative acceleration.
-		Acc = pursue(targetPosition, targetVelocity, targetMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+		acceleration = pursue(targetsPosition, targetsVelocity, targetsMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
 		// Find all the closest Enemy01 neighbours and store them in a vector.
@@ -87,51 +87,13 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 
 		// Add a flock acceleration to the culmative acceleration.
 		if(nearbyNeighbours.size() > 0)
-			Acc += flock(nearbyNeighbours, currentPosition, entity.physics.velocity, entity.controlVars.moveSpeed);
+			acceleration += flock(nearbyNeighbours, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 	}
 	// If the seek returns 0 then wander.
 	else
-		Acc = wander(entity);
+		acceleration = wander(entity);
 
-	// Limit the steering acceleration.
-	if (glm::length(Acc) > 0.2f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.2f);
-
-	// Add the acceleration to the velocity.
-	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick, 0, entity.physics.velocity.z + Acc.z * deltaTick };
-	entity.physics.velocity += Acc * deltaTick;
-
-	//const float kDebugScale = 100;
-	//glm::vec3 position = glm::vec3(entity.transform[3]);
-	//RenderSystem::drawDebugArrow(position, position + entity.physics.velocity * kDebugScale);
-	//RenderSystem::drawDebugArrow(position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
-	//RenderSystem::drawDebugArrow(m_scene, position, desiredVelocity, glm::length(desiredVelocity) * kDebugScale);
-
-	glm::vec4 newPosition = entity.transform[3] + glm::vec4{ newVelocity, 0 };
-	// Bounce of the boundraies of the walls
-	if (newPosition.x > 20.0f || newPosition.x < -20.0f)
-	{
-		newVelocity.x *= -1;
-		entity.aiVariables.wanderPosition.x *= -1;
-		if (newPosition.x > 20.0f)
-			entity.transform[3].x = 20.0f;
-		else
-			entity.transform[3].x = -20.0f;
-	}
-
-	if (newPosition.z > 20.0f || newPosition.z < -20.0f)
-	{
-		newVelocity.z *= -1;
-		entity.aiVariables.wanderPosition.z *= -1;
-		if (newPosition.z > 20.0f)
-			entity.transform[3].z = 20.0f;
-		else
-			entity.transform[3].z = -20.0f;
-	}
-
-	// Add the velocity to the position of the enemy.
-	entity.physics.velocity = newVelocity;
-	entity.transform[3] += glm::vec4{ entity.physics.velocity, 0 };
+	steer(entity, acceleration);
 
 	return;
 }

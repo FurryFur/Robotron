@@ -28,14 +28,14 @@
 #include <cmath>
 
 // Returns a force to move towards the target position.
-glm::vec3 seek(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+glm::vec3 seek(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
 {
 
 	// Determine the desired veloctiy to reach the target.
 	glm::vec3 displacement = (targetPosition - currentPosition);
 	float displacementMag = glm::length(displacement);
 	glm::vec3 desiredVelocity;
-	desiredVelocity = displacement / displacementMag * moveSpeed;
+	desiredVelocity = displacement / displacementMag * maxMoveSpeed;
 
 	// Determine the steering vector from the current veloctiy to the desired velocity.
 	glm::vec3 steering = desiredVelocity - currentVelocity;
@@ -46,7 +46,7 @@ glm::vec3 seek(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 cu
 }
 
 // Returns a force to move towards the target position, slows down with arrival when close.
-glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
 {
 	// Determine the desired veloctiy to reach the target.
 	glm::vec3 displacement = (targetPosition - currentPosition);
@@ -55,38 +55,39 @@ glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, g
 	// Apply arrival behaviour as the entity gets close to the target.
 	glm::vec3 desiredVelocity;
 	if (displacementMag < 2)
-		desiredVelocity = displacement / displacementMag * moveSpeed * (displacementMag / 2);
+		desiredVelocity = displacement / displacementMag * maxMoveSpeed * (displacementMag / 2);
 	else
-		desiredVelocity = displacement / displacementMag * moveSpeed;
+		desiredVelocity = displacement / displacementMag * maxMoveSpeed;
 
 	// Determine the steering vector from the current veloctiy to the desired velocity.
 	glm::vec3 steering = desiredVelocity - currentVelocity;
 
-	//RenderSystem::drawDebugArrow(currentPosition, desiredVelocity, glm::length(desiredVelocity) * 100, { 0, 0, 1 });
+	//RenderSystem::drawDebugArrow(currentPosition, desiredVelocity, glm::length(desiredVelocity) * 10.0f, { 1.0f, 1.0f, 0.0f });
+	//RenderSystem::drawDebugArrow(currentPosition, steering, glm::length(steering) * 100.0f, { 1.0f, 1.0f, 0.0f });
 
 	return steering;
 }
 
 // Returns an acceleration to move to a move to pursue a target
-glm::vec3 pursue(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+glm::vec3 pursue(glm::vec3 targetsPosition, glm::vec3 targetsVelocity, float targetsMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
 {
-	float T = glm::length(glm::vec2{ targetPosition.x - currentPosition.x, targetPosition.z - currentPosition.z }) / tragetMoveSpeed;
-	glm::vec3 futurePosition = targetPosition + targetVelocity * T;
+	float T = glm::length(glm::vec2{ targetsPosition.x - currentPosition.x, targetsPosition.z - currentPosition.z }) / targetsMoveSpeed;
+	glm::vec3 futurePosition = targetsPosition + targetsVelocity * T;
 	
 	futurePosition.y = currentPosition.y;
 
-	return seek(futurePosition, currentPosition, currentVelocity, moveSpeed);
+	return seek(futurePosition, currentPosition, currentVelocity, maxMoveSpeed);
 }
 
 // Returns an acceleration to move to a move to pursue a target
-glm::vec3 evade(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+glm::vec3 evade(glm::vec3 targetsPosition, glm::vec3 targetsVelocity, float targetsMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
 {
-	float T = glm::length(glm::vec2{ targetPosition.x - currentPosition.x, targetPosition.z - currentPosition.z }) / tragetMoveSpeed;
-	glm::vec3 futurePosition = targetPosition + targetVelocity * (T/2.0f);
+	float T = glm::length(glm::vec2{ targetsPosition.x - currentPosition.x, targetsPosition.z - currentPosition.z }) / targetsMoveSpeed;
+	glm::vec3 futurePosition = targetsPosition + targetsVelocity * (T/2.0f);
 
 	futurePosition.y = currentPosition.y;
 
-	return -seek(futurePosition, currentPosition, currentVelocity, moveSpeed);
+	return -seek(futurePosition, currentPosition, currentVelocity, maxMoveSpeed);
 }
 
 // Returns an acceleration to move to a random position forward from the current position.
@@ -94,15 +95,16 @@ glm::vec3 wander(Entity& entity)
 {
 	glm::vec3 currentPosition = entity.transform[3];
 	glm::vec3 currentVelocity = entity.physics.velocity;
-	float moveSpeed = entity.controlVars.moveSpeed;
+	float maxMoveSpeed = entity.controlVars.maxMoveSpeed;
 
 	glm::vec3 targetPosition = entity.aiVariables.wanderPosition;
 
 	// If stationary, move in a random direction.
 	if (currentVelocity.x == 0 && currentVelocity.z == 0)
 	{
-		currentVelocity.x = randomReal<float>(-moveSpeed, moveSpeed);
-		currentVelocity.z = sqrt(pow(moveSpeed, 2) - pow(currentVelocity.x, 2));
+		currentVelocity.x = randomReal<float>(-maxMoveSpeed, maxMoveSpeed);
+		currentVelocity.z = sqrt(pow(maxMoveSpeed, 2) - pow(currentVelocity.x, 2));
+		entity.physics.velocity = currentVelocity;
 		targetPosition = glm::vec3{ (currentPosition.x + currentVelocity.x), currentPosition.y
 			, (currentPosition.z + currentVelocity.z) };
 	}
@@ -122,16 +124,19 @@ glm::vec3 wander(Entity& entity)
 		float randomX = (b * radius * cos(2 * 3.14f * a / b));
 		float randomZ = (b * radius * sin(2 * 3.14f * a / b));
 
-		glm::vec3 newMaximumVelocity = (currentVelocity / glm::length(currentVelocity)) * moveSpeed * 100.0f;
+		glm::vec3 circleCenter = (currentVelocity / glm::length(currentVelocity)) * maxMoveSpeed * 100.0f;
 
-		targetPosition = { (currentPosition.x + newMaximumVelocity.x + randomX)
+		// Wander to somewhere on a circle in front of the player
+		targetPosition = { (currentPosition.x + circleCenter.x + randomX)
 			, currentPosition.y
-			,(currentPosition.z + newMaximumVelocity.z + randomZ) };
+			,(currentPosition.z + circleCenter.z + randomZ) };
 
 		entity.aiVariables.wanderPosition = targetPosition;
 	}
 
-	return seekWithArrival(targetPosition, currentPosition, currentVelocity, moveSpeed);
+	//RenderSystem::drawDebugArrow(currentPosition, targetPosition, { 0, 0, 1 });
+
+	return seekWithArrival(targetPosition, currentPosition, currentVelocity, maxMoveSpeed);
 }
 
 // Compute the alignment section of flocking
@@ -227,7 +232,7 @@ glm::vec3 computeSeparation(std::vector<Entity*> nearbyNeighbours, glm::vec3 cur
 }
 
 //Returns an acceleration that allows the ojbect to flock with its nearest neighbours
-glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
 {
 	glm::vec3 alignment = computeAlignment(nearbyNeighbours, currentVelocity);
 	glm::vec3 cohesion = computeCohesion(nearbyNeighbours, currentPosition);
@@ -240,13 +245,13 @@ glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition
 	if (flockVelocity != glm::vec3{ 0,0,0 })
 	{
 		glm::vec3 targetPosition = currentPosition + flockVelocity;
-		return seekWithArrival(targetPosition, currentPosition, currentVelocity, moveSpeed);
+		return seekWithArrival(targetPosition, currentPosition, currentVelocity, maxMoveSpeed);
 	}
 	else
 		return{ 0,0,0 };
 }
 
-glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::vec3 targetPreviousVelocity, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed)
+glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::vec3 targetPreviousVelocity, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
 {
 	// Generate a vector in the opposite direction the target is heading.
 	glm::vec2 tv;
@@ -260,5 +265,33 @@ glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::
 	glm::vec3 followPosition = glm::vec3{ targetPosition.x + tv.x, targetPosition.y, targetPosition.z + tv.y };
 
 	//Seek to that point
-	return seekWithArrival(followPosition, currentPosition, currentVelocity, moveSpeed);
+	return seekWithArrival(followPosition, currentPosition, currentVelocity, maxMoveSpeed);
+}
+
+void steer(Entity& entity, const glm::vec3& steeringAcceleration)
+{
+	// Limit the steering acceleration.
+	entity.physics.acceleration = GLMUtils::limitVec<glm::vec3>(steeringAcceleration, entity.controlVars.maxAcceleration);
+
+	// Bounce of the boundraies of the walls
+	glm::vec3 position = entity.transform[3];
+	if (position.x > 20.0f || position.x < -20.0f)
+	{
+		entity.physics.velocity.x *= -1;
+		entity.aiVariables.wanderPosition.x *= -1;
+		if (position.x > 20.0f)
+			entity.transform[3].x = 20.0f;
+		else
+			entity.transform[3].x = -20.0f;
+	}
+
+	if (position.z > 20.0f || position.z < -20.0f)
+	{
+		entity.physics.velocity.z *= -1;
+		entity.aiVariables.wanderPosition.z *= -1;
+		if (position.z > 20.0f)
+			entity.transform[3].z = 20.0f;
+		else
+			entity.transform[3].z = -20.0f;
+	}
 }

@@ -13,8 +13,9 @@
 
 #pragma once
 
-struct PlayerControlComponent {
-	float moveSpeed;
+struct ControlComponent {
+	float maxMoveSpeed;
+	float maxAcceleration;
 	float orientationSensitivity;
 	bool worldSpaceMove;
 };

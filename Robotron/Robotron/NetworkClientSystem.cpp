@@ -9,6 +9,7 @@
 
 #include <glm\gtx\matrix_interpolation.hpp>
 #include <glm\gtx\compatibility.hpp>
+#include <glm\gtx\matrix_interpolation.hpp>
 
 #include <cmath>
 #include <iostream>
@@ -60,12 +61,31 @@ void NetworkClientSystem::beginFrame()
 					return;
 				}
 
-				// Make sure we don't try to access an out of range element
-				if (id >= m_ghostSnapshots.size())
-					m_ghostSnapshots.resize(id + 1);
+				// Record ghost snapshot
+				if (id < m_netEntities.size()) {
+					Entity* entity = m_netEntities.at(id);
+					if (entity) {
+						// WARNING: May produce unexpected results for transform matrices containing scale
+						//glm::mat4 m1rot = extractMatrixRotation(m1);
+						//glm::mat4 dltRotation = m2 * transpose(m1rot);
+						//vec3 dltAxis;
+						//T dltAngle;
+						//axisAngle(dltRotation, dltAxis, dltAngle);
+						//entity->network.transformError = glm::interpolate(entity->transform, ghostSnapshot.transform);
+						entity->transform = ghostSnapshot.transform;
+						entity->physics = ghostSnapshot.physics;
+					} else {
+						// TODO: Add logging here
+						std::cout << "Warning: Client received snapshot of deleted ghost" << std::endl;
+					}
+				}
 
-				// Record new snapshot
-				m_ghostSnapshots.at(id) = std::make_unique<GhostSnapshot>(ghostSnapshot);
+				// Make sure we don't try to access an out of range element
+				//if (id >= m_ghostSnapshots.size())
+				//	m_ghostSnapshots.resize(id + 1);
+
+				//// Record new snapshot
+				//m_ghostSnapshots.at(id) = std::make_unique<GhostSnapshot>(ghostSnapshot);
 			}
 
 			// Update the last sequence number seen from the server
@@ -96,24 +116,20 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 		m_netEntities.at(id) = &entity;
 
 	// Update ghost snapshots
-	if (id < m_ghostSnapshots.size() && m_ghostSnapshots.at(id)) {
-		// TODO: Add timestamps to lerp
-		glm::mat4& eTransform = entity.transform;
-		glm::mat4& gTransform = m_ghostSnapshots.at(id)->transform;
-		PhysicsComponent& ePhysics = entity.physics;
-		PhysicsComponent& gPhysics = m_ghostSnapshots.at(id)->physics;
-		float lerpAmount = deltaTick * 20; // Lerps all the way in 50 milliseconds
-		if (entity.hasComponents(COMPONENT_TRANSFORM)) {
-			// TODO: Add delta tick here
-			// Lerp transform component to latest snapshot
-			eTransform = glm::interpolate(eTransform, gTransform, lerpAmount);
-		}
-		if (entity.hasComponents(COMPONENT_PHYSICS)) {
-			// Lerp physics component to latest snapshot
-			ePhysics.velocity = glm::lerp(ePhysics.velocity, gPhysics.velocity, lerpAmount);
-			ePhysics.acceleration = glm::lerp(ePhysics.acceleration, gPhysics.acceleration, lerpAmount);
-		}
-	}
+	//if (id < m_ghostSnapshots.size() && m_ghostSnapshots.at(id)) {
+	//	glm::mat4& transform = m_ghostSnapshots.at(id)->transform;
+	//	PhysicsComponent& physics = m_ghostSnapshots.at(id)->physics;
+	//	if (entity.hasComponents(COMPONENT_TRANSFORM)) {
+	//		// TODO: Add delta tick here
+	//		// Lerp transform component to latest snapshot
+	//		entity.transform = transform;
+	//	}
+	//	if (entity.hasComponents(COMPONENT_PHYSICS)) {
+	//		// Lerp physics component to latest snapshot
+	//		entity.physics.velocity = physics.velocity;
+	//		entity.physics.acceleration = physics.acceleration;
+	//	}
+	//}
 
 	// Send input updates to server
 	if (entity.hasComponents(COMPONENT_INPUT)) {

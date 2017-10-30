@@ -77,7 +77,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 	if (entity.aiVariables.followEntity != NULL)
 	{
 		// Add a pursue acceleration to the culmative acceleration.
-		Acc = followLeader(glm::vec3(entity.aiVariables.followEntity->transform[3]), entity.aiVariables.followEntity->physics.velocity, entity.aiVariables.followEntity->aiVariables.previousVelocity, glm::vec3(entity.transform[3]), entity.physics.velocity, entity.controlVars.moveSpeed);
+		Acc = followLeader(glm::vec3(entity.aiVariables.followEntity->transform[3]), entity.aiVariables.followEntity->physics.velocity, entity.aiVariables.followEntity->aiVariables.previousVelocity, glm::vec3(entity.transform[3]), entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
 		// Find all the closest Enemy01 neighbours and store them in a vector.
@@ -92,7 +92,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 
 		// Add a flock acceleration to the culmative acceleration.
 		if (nearbyNeighbours.size() > 0 && entity.aiVariables.followEntity->physics.velocity != glm::vec3{ 0,0,0 })
-			Acc += flock(nearbyNeighbours, glm::vec3(entity.transform[3]), entity.physics.velocity, entity.controlVars.moveSpeed);
+			Acc += flock(nearbyNeighbours, glm::vec3(entity.transform[3]), entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 	}
 	// If no player to follow, just wander.
 	else

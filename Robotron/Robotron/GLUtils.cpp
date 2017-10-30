@@ -16,7 +16,7 @@
 #include "InputSystem.h"
 #include "Material.h"
 #include "Mesh.h"
-#include "PlayerControlComponent.h"
+#include "ControlComponent.h"
 #include "Scene.h"
 #include "ShaderHelper.h"
 #include "VertexFormat.h"

@@ -16,6 +16,7 @@ Level::Level(GLFWwindow* window)
 	, m_scorePickUpSystem(m_scene)
 	, m_playerbulletsystem(m_scene)
 	, m_enemybulletsystem(m_scene)
+	, m_physicsSystem(m_scene)
 	, m_label("Basic Game", "Assets/Fonts/NYCTALOPIATILT.TTF")
 {
 	Scene::makeSceneCurrent(&m_scene);
@@ -77,6 +78,24 @@ Level::Level(GLFWwindow* window)
 	m_label.setPosition(glm::vec2(10.0f, 10.0f));
 	m_label.setColor(glm::vec3(1.0f, 1.0f, 0.0f));
 	m_label.setText("cavaavhell");
+
+
+
+	// Create all the snake enemy types in the scene.
+	float randcoord = randomReal<float>(9.0f, 17.0f);
+	for (int i = 0; i < 8; ++i)
+	{
+		if (-19.0f + i < 20.0f)
+		{
+			EntityUtils::createEnemySnake(m_scene,
+				glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f + i }), i);
+		}
+		else
+		{
+			EntityUtils::createEnemySnake(m_scene,
+				glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f }), i);
+		}
+	}
 }
 
 
@@ -144,7 +163,7 @@ void Level::spawnEnemies(int levelType)
 		if (randomInt(0, 1) == 0)
 			randZ += 25;
 
-		Entity& enemy = EntityUtils::createEnemy01(m_scene,
+		Entity& enemy = EntityUtils::createEnemyZombie(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
 		enemy.addComponents(COMPONENT_NETWORK);
 	}
@@ -158,12 +177,12 @@ void Level::spawnEnemies(int levelType)
 		{
 			if (-19.0f + i < 20.0f)
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f + i }), i);
 			}
 			else
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f}), i);
 			}
 		}
@@ -174,12 +193,12 @@ void Level::spawnEnemies(int levelType)
 
 			if (19.0f - i < 20.0f)
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f - i }), i);
 			}
 			else
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f}), i);
 			}
 		}
@@ -189,12 +208,12 @@ void Level::spawnEnemies(int levelType)
 		{
 			if (-19.0f + i < 20.0f)
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -19.0f + i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
 			}
 			else
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
 			}
 		}
@@ -204,12 +223,12 @@ void Level::spawnEnemies(int levelType)
 		{
 			if (19.0f - i < 20.0f)
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ 19.0f - i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
 			}
 			else
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ 19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
 			}
 		}
@@ -226,7 +245,7 @@ void Level::spawnEnemies(int levelType)
 		if (randomInt(0, 1) == 0)
 			randZ += 25;
 	
-		EntityUtils::createEnemy03(m_scene,
+		EntityUtils::createEnemyShooter(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
 	}
 
@@ -371,7 +390,6 @@ void Level::process(float deltaTick, Clock& clock)
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
 		Entity& entity = m_scene.getEntity(i);
 		m_inputSystem.update(entity);
-		m_networkSystem->update(entity, deltaTick);
 		m_playerControlSystem.update(entity, clock);
 		m_enemy01ControlSystem.update(entity, deltaTick);
 		m_enemy02ControlSystem.update(entity, deltaTick);
@@ -379,6 +397,8 @@ void Level::process(float deltaTick, Clock& clock)
 		m_scorePickUpSystem.update(entity, deltaTick);
 		m_playerbulletsystem.update(entity);
 		m_enemybulletsystem.update(entity);
+		m_physicsSystem.update(entity, deltaTick);
+		m_networkSystem->update(entity, deltaTick);
 		m_renderSystem.update(entity);
 	}
 

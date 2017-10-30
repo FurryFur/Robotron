@@ -2,7 +2,7 @@
 
 #include "InputComponent.h"
 #include "ModelComponent.h"
-#include "PlayerControlComponent.h"
+#include "ControlComponent.h"
 #include "PlayerStatsComponent.h"
 #include "LogicComponent.h"
 #include "InputMapComponent.h"
@@ -33,7 +33,7 @@ public:
 	glm::mat4 transform;
 	PhysicsComponent physics;
 	ModelComponent model;
-	PlayerControlComponent controlVars;
+	ControlComponent controlVars;
 	PlayerStatsComponent playerStats;
 	InputComponent input;
 	InputMapComponent inputMap;

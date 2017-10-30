@@ -74,7 +74,5 @@ void PlayerBulletSystem::update(Entity& entity)
 		}
 	}
 
-	entity.transform[3] += glm::vec4{ entity.physics.velocity, 0 };
-
 	return;
 }

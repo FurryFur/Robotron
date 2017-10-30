@@ -26,16 +26,16 @@
 #include <cmath>
 
 // Returns a force to move towards the target position.
-glm::vec3 seek(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed);
+glm::vec3 seek(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed);
 
 // Returns a force to move towards the target position, slows down with arrival when close.
-glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed);
+glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed);
 
 // Returns an acceleration to move to pursue a target
-glm::vec3 pursue(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed);
+glm::vec3 pursue(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed);
 
 // Returns an acceleration to move to evade a target
-glm::vec3 evade(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed);
+glm::vec3 evade(glm::vec3 targetPosition, glm::vec3 targetVelocity, float tragetMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed);
 
 // Returns an acceleration to move to a random position forward from the current position.
 glm::vec3 wander(Entity& entity);
@@ -50,6 +50,11 @@ glm::vec3 computeCohesion(std::vector<Entity*> nearbyNeighbours, glm::vec3 curre
 glm::vec3 computeSeparation(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition);
 
 //Returns an acceleration that allows the ojbect to flock with its nearest neighbours
-glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed);
+glm::vec3 flock(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed);
 
-glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::vec3 targetPreviousVelocity, glm::vec3 currentPosition, glm::vec3 currentVelocity, float moveSpeed);
+glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::vec3 targetPreviousVelocity, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed);
+
+// Applies steering to the entity while
+// keeping the entity within the level boundaries.
+// Entities will not exceed their maximum acceleration.
+void steer(Entity&, const glm::vec3& steeringAcceleration);

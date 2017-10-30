@@ -148,7 +148,7 @@ void InputSystem::update(Entity& entity)
 
 		// The player is shooting right up
 		if (shootUp && !shootDown && !shootLeft && shootRight)
-			bulletVelocity = glm::vec3{ -0.2828f , 0, 0.2828f };
+			bulletVelocity = glm::normalize(glm::vec3{ -0.2828f , 0, 0.2828f }) ;
 
 		// The player is shooting right down
 		if (!shootUp && shootDown && !shootLeft && shootRight)

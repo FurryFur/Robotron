@@ -62,14 +62,17 @@ void Entity::addComponents(size_t componentMask)
 	if ((componentMask & COMPONENT_ZOMBIE) == COMPONENT_ZOMBIE) {
 		m_componentMask |= COMPONENT_ZOMBIE;
 		aiVariables = {};
+		controlVars = {};
 	}
 	if ((componentMask & COMPONENT_SNAKE) == COMPONENT_SNAKE) {
 		m_componentMask |= COMPONENT_SNAKE;
 		aiVariables = {};
+		controlVars = {};
 	}
 	if ((componentMask & COMPONENT_ENEMY_SHOOTER) == COMPONENT_ENEMY_SHOOTER) {
 		m_componentMask |= COMPONENT_ENEMY_SHOOTER;
 		aiVariables = {};
+		controlVars = {};
 	}
 	if ((componentMask & COMPONENT_NETWORK) == COMPONENT_NETWORK) {
 		m_componentMask |= COMPONENT_NETWORK;
@@ -81,12 +84,18 @@ void Entity::addComponents(size_t componentMask)
 	}
 	if ((componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP) {
 		m_componentMask |= COMPONENT_SCOREPICKUP;
+		aiVariables = {};
+		controlVars = {};
 	}
 	if ((componentMask & COMPONENT_PLAYERBULLET) == COMPONENT_PLAYERBULLET) {
 		m_componentMask |= COMPONENT_PLAYERBULLET;
+		aiVariables = {};
+		controlVars = {};
 	}
 	if ((componentMask & COMPONENT_ENEMYBULLET) == COMPONENT_ENEMYBULLET) {
 		m_componentMask |= COMPONENT_ENEMYBULLET;
+		aiVariables = {};
+		controlVars = {};
 	}
 }
 
