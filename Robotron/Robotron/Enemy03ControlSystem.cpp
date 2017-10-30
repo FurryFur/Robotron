@@ -102,7 +102,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 			Entity& bullet = EntityUtils::createEnemyBullet(m_scene,
 				glm::translate({}, glm::vec3(entity.transform[3]))
 				* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
-			glm::vec3 bulletVelocity = ((targetPosition - glm::vec3(entity.transform[3]) + entity.physics.velocity) / (glm::length(targetPosition - glm::vec3(entity.transform[3])) + entity.physics.velocity)) * 0.2f;
+			glm::vec3 bulletVelocity = ((targetPosition - glm::vec3(entity.transform[3]) + entity.physics.velocity) / (glm::length(targetPosition - glm::vec3(entity.transform[3])) + entity.physics.velocity)) * 10.0f;
 			bullet.physics.velocity = bulletVelocity;
 		}
 	}

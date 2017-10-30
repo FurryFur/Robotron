@@ -102,7 +102,7 @@ void Level::spawnEnemies(int levelType)
 
 	int score1PickUpCount = m_levelNum + randomInt(0, 2);
 	int score2PickUpCount = m_levelNum + randomInt(-4, -2);
-	int healthPickUpCount = m_levelNum + randomInt(-4, -2);
+	int healthPickUpCount = 0;
 
 
 	// Spawn Zombies level type
@@ -133,7 +133,7 @@ void Level::spawnEnemies(int levelType)
 		zombieCount = randomInt(1, 3);
 		score1PickUpCount += randomInt(4, 8);
 		score2PickUpCount += randomInt(2, 6);
-		healthPickUpCount += randomInt(1, 3);
+		healthPickUpCount += randomInt(0, 1);
 	}
 
 	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
@@ -410,6 +410,7 @@ void Level::process(float deltaTick, Clock& clock)
 		m_physicsSystem.update(entity, deltaTick);
 		m_networkSystem->update(entity, deltaTick);
 		m_renderSystem.update(entity);
+		m_networkSystem->update(entity, deltaTick);
 	}
 
 	if (m_inSetupPhase)

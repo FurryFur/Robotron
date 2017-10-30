@@ -19,4 +19,13 @@ struct ControlComponent {
 	float accelerationWeight; // This scales how fast the entity will turn / accelerate
 	float orientationSensitivity;
 	bool worldSpaceMove;
+
+	bool shootLeftDown;
+	bool shootDown;
+	bool shootRightDown;
+	bool shootLeft;
+	bool shootRight;
+	bool shootLeftUp;
+	bool shootUp;
+	bool shootRightUp;
 };

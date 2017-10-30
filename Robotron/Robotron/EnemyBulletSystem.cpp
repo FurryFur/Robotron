@@ -48,10 +48,10 @@ void EnemyBulletSystem::update(Entity& entity)
 	if (!entity.hasComponents(COMPONENT_ENEMYBULLET))
 		return;
 
-	if ((entity.transform[3] + glm::vec4{ entity.physics.velocity, 0 }).x > 20.0f
-		|| (entity.transform[3] + glm::vec4{ entity.physics.velocity, 0 }).x < -20.0f
-		|| (entity.transform[3] + glm::vec4{ entity.physics.velocity, 0 }).z > 20.0f
-		|| (entity.transform[3] + glm::vec4{ entity.physics.velocity, 0 }).z < -20.0f)
+	if (entity.transform[3].x > 20.0f
+		|| entity.transform[3].x < -20.0f
+		|| entity.transform[3].z > 20.0f
+		|| entity.transform[3].z < -20.0f)
 	{
 		m_scene.destroyEntity(entity);
 		return;
