@@ -45,6 +45,7 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 
 	int followNumber = entity.aiVariables.positionInQueue;
 	glm::vec3 followPosition;
+	Entity* followEntity = nullptr;
 
 	// Cycle through the other entities in the scene and find another enemy02 with the next lowest position in queue
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
@@ -55,6 +56,7 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 			followPosition = m_scene.getEntity(i).transform[3];
 			followPosition.y = entity.transform[3].y; // Keep enemy on same plane
 			followNumber = m_scene.getEntity(i).aiVariables.positionInQueue;
+			followEntity = &m_scene.getEntity(i);
 			break;
 		}
 	}
@@ -64,10 +66,33 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 	if (followNumber == entity.aiVariables.positionInQueue)
 	{
 		acceleration = wander(entity);
+
+		float tailLength = 1;
+
+		for (unsigned int i = 1; i <= 10; ++i)
+		{
+			bool tailBreak = true;
+			// Cycle through the other entities in the scene and find another enemy02 with the next lowest position in queue
+			for (unsigned int j = 0; j < m_scene.getEntityCount(); ++j)
+			{
+				if (m_scene.getEntity(j).hasComponents(COMPONENT_SNAKE)
+					&& m_scene.getEntity(j).aiVariables.positionInQueue == entity.aiVariables.positionInQueue + i)
+				{
+					++tailLength;
+					tailBreak = false;
+				}
+			}
+			if (tailBreak)
+				break;
+		}
+
+		entity.controlVars.maxMoveSpeed = 22.857f / tailLength + 7.142f;
 	}
 	else {
 		acceleration = seekWithArrival(followPosition, glm::vec3{ entity.transform[3] }, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
-		//RenderSystem::drawDebugArrow(entity.transform[3], followPosition, { 0, 0, 1 });
+
+		if(followEntity != nullptr)
+			entity.controlVars.maxMoveSpeed = followEntity->controlVars.maxMoveSpeed;
 	}
 
 	steer(entity, acceleration);
