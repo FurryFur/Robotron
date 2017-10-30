@@ -192,7 +192,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.inputMap.forwardBtnMap = GLFW_KEY_W;
 	entity.inputMap.backwardBtnMap = GLFW_KEY_S;
 
-	entity.controlVars.maxMoveSpeed = 0.12f;
+	entity.controlVars.maxMoveSpeed = 8;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
