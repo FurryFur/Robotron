@@ -89,30 +89,6 @@ void InputSystem::keyCallback(int key, int scancode, int action, int mods)
 		return;
 	}
 
-	//// Create a bullet on the player shooting right
-	//if (key == GLFW_KEY_J && action == GLFW_PRESS) {
-	//	shootRight = true;
-	//	return;
-	//}
-	//
-	//// Create a bullet on the player shooting left
-	//if (key == GLFW_KEY_L && action == GLFW_PRESS) {
-	//	shootLeft = true;
-	//	return;
-	//}
-	//
-	//// Create a bullet on the player shooting down
-	//if (key == GLFW_KEY_I && action == GLFW_PRESS) {
-	//	shootDown = true;
-	//	return;
-	//}
-	//
-	//// Create a bullet on the player shooting up
-	//if (key == GLFW_KEY_K && action == GLFW_PRESS) {
-	//	shootUp = true;
-	//	return;
-	//}
-
 	for (auto& observer : m_keyObservers)
 		observer->keyCallback(key, scancode, action, mods);
 }

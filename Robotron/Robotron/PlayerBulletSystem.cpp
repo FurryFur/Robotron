@@ -43,14 +43,14 @@ PlayerBulletSystem::PlayerBulletSystem(Scene& scene)
 // Checks to see if it has hit an enemy or a wall.
 void PlayerBulletSystem::update(Entity& entity)
 {
-	// Check that the entity is an Enemy02 object before proceeding.
+	// Check that the entity is an Playerbullet object before proceeding.
 	if (!entity.hasComponents(COMPONENT_PLAYERBULLET))
 		return;
 	
-	if ((   entity.transform[3] + glm::vec4{ entity.physics.velocity, 0 }).x > 20.0f
-		|| (entity.transform[3] + glm::vec4{ entity.physics.velocity, 0 }).x < -20.0f
-		|| (entity.transform[3] + glm::vec4{ entity.physics.velocity, 0 }).z > 20.0f
-		|| (entity.transform[3] + glm::vec4{ entity.physics.velocity, 0 }).z < -20.0f)
+	if (   entity.transform[3].x > 20.0f
+		|| entity.transform[3].x < -20.0f
+		|| entity.transform[3].z > 20.0f
+		|| entity.transform[3].z < -20.0f)
 	{
 		m_scene.destroyEntity(entity);
 		return;

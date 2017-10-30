@@ -17,7 +17,6 @@
 #include "PlayerControlSystem.h"
 
 #include "ControlComponent.h"
-#include "PlayerControlComponent.h"
 #include "EntityUtils.h"
 #include "GLUtils.h"
 #include "GLMUtils.h"
@@ -112,35 +111,35 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 		glm::vec3 bulletVelocity;
 		// The player is shooting right
 		if (entity.controlVars.shootRight)
-			bulletVelocity = glm::vec3{ 0.4f, 0.0f, entity.physics.velocity.z };
+			bulletVelocity = glm::vec3{ 10.0f, 0.0f, entity.physics.velocity.z };
 
 		// The player is shooting left
 		else if (entity.controlVars.shootLeft)
-			bulletVelocity = glm::vec3{ -0.4f, 0.0f, entity.physics.velocity.z };
+			bulletVelocity = glm::vec3{ -10.0f, 0.0f, entity.physics.velocity.z };
 
 		// The player is shooting down.
 		else if (entity.controlVars.shootDown)
-			bulletVelocity = glm::vec3{ entity.physics.velocity.x, 0.0f, 0.4f };
+			bulletVelocity = glm::vec3{ entity.physics.velocity.x, 0.0f, 10.0f };
 
 		// The player is shooting up.
 		else if (entity.controlVars.shootUp)
-			bulletVelocity = glm::vec3{ entity.physics.velocity.x, 0.0f, -0.4f };
+			bulletVelocity = glm::vec3{ entity.physics.velocity.x, 0.0f, -10.0f };
 
 		// The player is shooting right up
 		else if (entity.controlVars.shootRightUp)
-			bulletVelocity = glm::vec3{ 0.2828f , 0, -0.2828f };
+			bulletVelocity = glm::vec3{ 7.07f , 0, -7.07f };
 
 		// The player is shooting right down
 		else if (entity.controlVars.shootRightDown)
-			bulletVelocity = glm::vec3{ 0.2828f , 0, 0.2828f };
+			bulletVelocity = glm::vec3{ 7.07f , 0, 7.07f };
 
 		// The player is shooting left up
 		else if (entity.controlVars.shootLeftUp)
-			bulletVelocity = glm::vec3{ -0.2828f , 0, -0.2828f };
+			bulletVelocity = glm::vec3{ -7.07f , 0, -7.07f };
 
 		// The player is shooting left down
 		else if (entity.controlVars.shootLeftDown)
-			bulletVelocity = glm::vec3{ -0.2828f , 0, 0.2828f };
+			bulletVelocity = glm::vec3{ -7.07f , 0, 7.07f };
 
 		entity.controlVars.shootRightDown = false;
 		entity.controlVars.shootRight = false;
