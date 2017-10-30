@@ -7,7 +7,7 @@
 // (c) 2017 Media Design School
 //
 // Description  : Per entity movement settings.
-// Author       : Lance Chaney
+// Author       : Lance Chaney Jack Mair
 // Mail         : lance.cha7337@mediadesign.school.nz
 //
 
@@ -20,6 +20,10 @@ struct ControlComponent {
 	float orientationSensitivity;
 	bool worldSpaceMove;
 
+	double lastFiringTime; // Keeps track of the last time the entity fired
+	double firingSpeed; // The time allowed before the entity can fire again
+	
+	// Triggers for which direction the player is firing
 	bool shootLeftDown;
 	bool shootDown;
 	bool shootRightDown;

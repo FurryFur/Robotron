@@ -19,6 +19,7 @@
 #include <glm\gtx\rotate_vector.hpp>
 
 class Scene;
+class Clock;
 class Entity;
 
 class Enemy03ControlSystem {
@@ -26,7 +27,7 @@ public:
 	Enemy03ControlSystem(Scene& scene);
 
 	// Updates the entities position from input
-	void update(Entity&, float deltaTick);
+	void update(Entity&, float deltaTick, Clock& clock);
 
 private:
 	Scene& m_scene;

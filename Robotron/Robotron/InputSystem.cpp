@@ -17,14 +17,16 @@
 
 #include "KeyObserver.h"
 #include "Scene.h"
+#include "Clock.h"
 #include "Utils.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\gtc\matrix_transform.hpp>
 
-InputSystem::InputSystem(GLFWwindow* window, Scene& scene)
+InputSystem::InputSystem(GLFWwindow* window, Scene& scene, Clock& clock)
 	: m_window{ window }
 	, m_scene{ scene }
+	, m_clock{ clock }
 {
 	// Register input system as a listener for keyboard events
 	glfwSetWindowUserPointer(window, this);
@@ -49,43 +51,67 @@ void InputSystem::keyCallback(int key, int scancode, int action, int mods)
 		return;
 	}
 
-	if (key == 321 && action == GLFW_PRESS) {
-		shootLeftDown = true;
+	if (key == 321) {
+		if(action == GLFW_PRESS)
+			shootLeftDown = true;
+		if(action == GLFW_RELEASE)
+			shootLeftDown = false;
 		return;
 	}
 
-	if (key == 322 && action == GLFW_PRESS) {
-		shootDown = true;
+	if (key == 322) {
+		if (action == GLFW_PRESS)
+			shootDown = true;
+		if (action == GLFW_RELEASE)
+			shootDown = false;
 		return;
 	}
 
-	if (key == 323 && action == GLFW_PRESS) {
-		shootRightDown = true;
+	if (key == 323) {
+		if (action == GLFW_PRESS)
+			shootRightDown = true;
+		if (action == GLFW_RELEASE)
+			shootRightDown = false;
 		return;
 	}
 
-	if (key == 324 && action == GLFW_PRESS) {
-		shootLeft = true;
+	if (key == 324) {
+		if (action == GLFW_PRESS)
+			shootLeft = true;
+		if (action == GLFW_RELEASE)
+			shootLeft = false;
 		return;
 	}
 
-	if (key == 326 && action == GLFW_PRESS) {
-		shootRight = true;
+	if (key == 326) {
+		if (action == GLFW_PRESS)
+			shootRight = true;
+		if (action == GLFW_RELEASE)
+			shootRight = false;
 		return;
 	}
 
-	if (key == 327 && action == GLFW_PRESS) {
-		shootLeftUp = true;
+	if (key == 327) {
+		if (action == GLFW_PRESS)
+			shootLeftUp = true;
+		if (action == GLFW_RELEASE)
+			shootLeftUp = false;
 		return;
 	}
 
-	if (key == 328 && action == GLFW_PRESS) {
-		shootUp = true;
+	if (key == 328) {
+		if (action == GLFW_PRESS)
+			shootUp = true;
+		if (action == GLFW_RELEASE)
+			shootUp = false;
 		return;
 	}
 
-	if (key == 329 && action == GLFW_PRESS) {
-		shootRightUp = true;
+	if (key == 329) {
+		if (action == GLFW_PRESS)
+			shootRightUp = true;
+		if (action == GLFW_RELEASE)
+			shootRightUp = false;
 		return;
 	}
 
@@ -140,31 +166,30 @@ void InputSystem::update(Entity& entity)
 		}
 	}
 
-	//Update any inputs to fire the player made.
+	// Triggers when the player presses a key to shoot.
 	if (shootRight || shootLeft || shootDown || shootUp
 		|| shootRightUp || shootRightDown || shootLeftUp || shootLeftDown)
 	{
+		// Find the player object in the scene
 		for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
 			{
-				m_scene.getEntity(i).controlVars.shootLeftDown = shootLeftDown;
-				m_scene.getEntity(i).controlVars.shootDown = shootDown;
-				m_scene.getEntity(i).controlVars.shootRightDown = shootRightDown;
-				m_scene.getEntity(i).controlVars.shootLeft = shootLeft;
-				m_scene.getEntity(i).controlVars.shootRight = shootRight;
-				m_scene.getEntity(i).controlVars.shootLeftUp = shootLeftUp;
-				m_scene.getEntity(i).controlVars.shootUp = shootUp;
-				m_scene.getEntity(i).controlVars.shootRightUp = shootRightUp;
-
-				shootLeftDown = false;
-				shootDown = false;
-				shootRightDown = false;
-				shootLeft = false;
-				shootRight = false;
-				shootLeftUp = false;
-				shootUp = false;
-				shootRightUp = false;
+				// Check to see if the player has not shot too recently
+				if (m_scene.getEntity(i).controlVars.lastFiringTime + m_scene.getEntity(i).controlVars.firingSpeed <= m_clock.GetCurTime())
+				{
+					m_scene.getEntity(i).controlVars.lastFiringTime = m_clock.GetCurTime();
+					
+					// Triggers the player object to fire a bullet in the direction pressed by the player
+					m_scene.getEntity(i).controlVars.shootLeftDown = shootLeftDown;
+					m_scene.getEntity(i).controlVars.shootDown = shootDown;
+					m_scene.getEntity(i).controlVars.shootRightDown = shootRightDown;
+					m_scene.getEntity(i).controlVars.shootLeft = shootLeft;
+					m_scene.getEntity(i).controlVars.shootRight = shootRight;
+					m_scene.getEntity(i).controlVars.shootLeftUp = shootLeftUp;
+					m_scene.getEntity(i).controlVars.shootUp = shootUp;
+					m_scene.getEntity(i).controlVars.shootRightUp = shootRightUp;
+				}
 				break;
 			}
 		}

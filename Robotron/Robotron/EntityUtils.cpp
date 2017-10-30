@@ -119,6 +119,7 @@ Entity& EntityUtils::createEnemyShooter(Scene& scene, const glm::mat4& transform
 	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.accelerationWeight = 1;
 	entity.controlVars.worldSpaceMove = true;
+	entity.controlVars.firingSpeed = 1.0f;
 
 	return entity;
 }
@@ -196,6 +197,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.controlVars.maxMoveSpeed = 8;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
+	entity.controlVars.firingSpeed = 0.4f;
 
 	return entity;
 }
