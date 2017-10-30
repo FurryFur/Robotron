@@ -107,7 +107,7 @@ void Level::spawnEnemies(int levelType)
 	// Start off with basic levels
 	if (m_levelNum == 0)
 	{
-		shooterCount = 2;
+		zombieCount = 2;
 
 	}
 	else if (m_levelNum == 1)
