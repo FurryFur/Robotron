@@ -63,14 +63,12 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	glm::vec3 axis = GLMUtils::limitVec(entity.input.axis, 1);
 	if (!entity.controlVars.worldSpaceMove)
 		axis = entity.transform * glm::vec4{ axis, 0 }; // Convert movement to local coordinates
-	entity.physics.velocity = maxMoveSpeed * axis;
+	glm::vec3 velocity = maxMoveSpeed * axis;
+	entity.physics.velocity = velocity;
 	if (axis != glm::vec3{ 0,0,0 })
-		entity.aiVariables.previousVelocity = entity.physics.velocity;
-	if (((pos + entity.physics.velocity).x < 20.0f) && ((pos + entity.physics.velocity).x > -20.0f))
-		pos.x += entity.physics.velocity.x;
-	if (((pos + entity.physics.velocity).z < 20.0f) && ((pos + entity.physics.velocity).z > -20.0f))
-		pos.z += entity.physics.velocity.z;
-
+		entity.aiVariables.previousVelocity = velocity;
+	if ((pos.x >= 20.0f || pos.x <= -20.0f || pos.z >= 20.0f || pos.z <= -20.0f))
+		entity.physics.velocity = glm::normalize(glm::vec3{ -pos.x, 0, -pos.z }) * 10.0f;
 
 	// Rotation
 	// Prevent elevation going past 90 degrees
