@@ -56,7 +56,7 @@ Entity& EntityUtils::createEnemyZombie(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_ZOMBIE
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
-	entity.aiVariables.score = 10;
+	entity.aiVariables.score = 5;
 	entity.aiVariables.lives = 1;
 
 	entity.transform = transform;
@@ -82,8 +82,8 @@ Entity& EntityUtils::createEnemySnake(Scene& scene, const glm::mat4& transform, 
 	
 	entity.aiVariables.positionInQueue = positionInQueue;
 
-	entity.aiVariables.score = 10;
-	entity.aiVariables.lives = 3;
+	entity.aiVariables.score = 5;
+	entity.aiVariables.lives = 1;
 
 	entity.transform = transform;
 
@@ -177,7 +177,8 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 	entity.playerStats.lives = 3;
 	entity.playerStats.score = 0;
-	
+	entity.playerStats.extraLifeThreshhold = 1000;
+
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();

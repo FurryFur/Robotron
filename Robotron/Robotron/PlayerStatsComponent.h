@@ -16,7 +16,8 @@
 struct PlayerStatsComponent {
 	int score;
 	// Keeps track of the players score until they get a new life. Refreshes when they do.
-	int scoreLives;
+	int extraLifeTrack;
+	int extraLifeThreshhold;
 	int lives;
 	bool isRespawning;
 	double deathTime;

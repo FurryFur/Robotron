@@ -75,7 +75,7 @@ void PlayerBulletSystem::update(Entity& entity)
 					if (m_scene.getEntity(j).hasComponentsAny(COMPONENT_PLAYER_CONTROL))
 					{
 						m_scene.getEntity(j).playerStats.score += m_scene.getEntity(i).aiVariables.score;
-						m_scene.getEntity(j).playerStats.scoreLives += m_scene.getEntity(i).aiVariables.score;
+						m_scene.getEntity(j).playerStats.extraLifeTrack += m_scene.getEntity(i).aiVariables.score;
 					}
 				}
 

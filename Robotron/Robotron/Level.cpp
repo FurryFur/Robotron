@@ -321,7 +321,7 @@ void Level::initalizeNextLevel()
 				if (m_scene.getEntity(i).aiVariables.lifePickUp != true)
 				{
 					m_scene.getEntity(i).aiVariables.followEntity->playerStats.score += m_scene.getEntity(i).aiVariables.score;
-					m_scene.getEntity(i).aiVariables.followEntity->playerStats.scoreLives += m_scene.getEntity(i).aiVariables.score;
+					m_scene.getEntity(i).aiVariables.followEntity->playerStats.extraLifeTrack += m_scene.getEntity(i).aiVariables.score;
 				}
 				else
 					++m_scene.getEntity(i).aiVariables.followEntity->playerStats.lives;
@@ -400,9 +400,13 @@ void Level::process(float deltaTick, Clock& clock)
 			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).playerStats.score));
 
 			// Check that the player has enough score to get an extra life
-			if (m_scene.getEntity(i).playerStats.scoreLives > 1000)
+			if (m_scene.getEntity(i).playerStats.extraLifeTrack >= m_scene.getEntity(i).playerStats.extraLifeThreshhold)
 			{
-				m_scene.getEntity(i).playerStats.scoreLives -= 1000;
+				// Reset the tracker.
+				m_scene.getEntity(i).playerStats.extraLifeTrack = 0;
+				// Increase the threshold by 500 every time it is reached
+				m_scene.getEntity(i).playerStats.extraLifeThreshhold += 500;
+				// Increase the player's life by 1.
 				++m_scene.getEntity(i).playerStats.lives;
 			}
 		}
