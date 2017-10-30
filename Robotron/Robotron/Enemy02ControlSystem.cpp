@@ -86,7 +86,7 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 				break;
 		}
 
-		entity.controlVars.maxMoveSpeed = 30 / (tailLength / 2.666f);
+		entity.controlVars.maxMoveSpeed = 22.857f / tailLength + 7.142f;
 	}
 	else {
 		acceleration = seekWithArrival(followPosition, glm::vec3{ entity.transform[3] }, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
