@@ -15,7 +15,7 @@ using namespace std::chrono;
 
 NetworkServerSystem::NetworkServerSystem(Scene& scene)
 	: NetworkSystem(scene)
-	, m_packetInterval{ 25 }
+	, m_packetInterval{ 500 }
 	, m_willSendPcktThisFrame{ true }
 {
 	m_socket.initialise(8456);
@@ -89,7 +89,7 @@ void NetworkServerSystem::beginFrame()
 
 void NetworkServerSystem::update(Entity& entity, float deltaTick)
 {
-	std::int32_t& id = entity.network.id;
+	std::int32_t id = entity.network.id;
 	bool isNewEntity = entity.network.isNewEntity;
 
 	// Detect and handle entity destruction
@@ -120,6 +120,7 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 		entity.network.isNewEntity = false;
 
 		// Create remote procedure calls to inform clients of new entity creation
+		id = entity.network.id;
 		std::unique_ptr<RemoteProcedureCall> rpc;
 		if (entity.hasComponents(COMPONENT_PLAYER_CONTROL)) {
 			// TODO: Replace this
@@ -159,15 +160,16 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 
 void NetworkServerSystem::handleEntityDestruction(Entity& entity)
 {
-	if (!entity.hasComponents() && entity.network.id > -1) {
-		if (m_netEntities.at(entity.network.id) == nullptr)
+	std::int32_t id = entity.network.id;
+	if (!entity.hasComponents() && id >= 0) {
+		if (!m_netEntities.at(id))
 			return;
 
-		auto rpc = std::make_unique<RPCDestroyGhost>(entity.network.id);
+		auto rpc = std::make_unique<RPCDestroyGhost>(id);
 		bufferRpc(std::move(rpc));
 
 		// Stop tracking entity on the server
-		m_netEntities.at(entity.network.id) = nullptr;
+		m_netEntities.at(id) = nullptr;
 	}
 }
 

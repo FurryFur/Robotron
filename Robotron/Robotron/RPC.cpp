@@ -90,7 +90,7 @@ RPCDestroyGhost::RPCDestroyGhost(std::int32_t entityNetId)
 
 void RPCDestroyGhost::execute(std::vector<Entity*>& netEntities)
 {
-	if (m_entityNetId >= 0 && m_entityNetId < netEntities.size()) {
+	if (0 <= m_entityNetId && m_entityNetId < netEntities.size()) {
 		Entity* netEntity = netEntities.at(m_entityNetId);
 		if (netEntity) {
 			netEntity->destroy();
@@ -132,7 +132,7 @@ void RPCCreatePlayerGhost::execute(std::vector<Entity*>& netEntities)
 	Scene* scene = Scene::getCurrentScene();
 	if (scene) {
 		// Destroy existing entities with the same id before creating new ones
-		if (m_entityNetId > 0 && m_entityNetId < netEntities.size()) {
+		if (0 <= m_entityNetId && m_entityNetId < netEntities.size()) {
 			Entity* existingEntity = netEntities.at(m_entityNetId);
 			if (existingEntity)
 				existingEntity->destroy();
@@ -172,7 +172,7 @@ void RPCCreateGhost::execute(std::vector<Entity*>& netEntities)
 	Scene* scene = Scene::getCurrentScene();
 	if (scene) {
 		// Destroy existing entities with the same id before creating new ones
-		if (m_entityNetId > 0 && m_entityNetId < netEntities.size()) {
+		if (0 <= m_entityNetId && m_entityNetId < netEntities.size()) {
 			Entity* existingEntity = netEntities.at(m_entityNetId);
 			if (existingEntity)
 				existingEntity->destroy();
