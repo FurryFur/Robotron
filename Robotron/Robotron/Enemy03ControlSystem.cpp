@@ -46,7 +46,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 		return;
 	
 	// Set the target position out of scope.
-	glm::vec3 targetsPosition = glm::vec3{ 100, 100, 100 };
+	glm::vec3 targetPosition = glm::vec3{ 100, 100, 100 };
 	glm::vec3 targetsVelocity;
 	glm::vec3 targetsPreviousVelocity;
 	float targetsMoveSpeed;
@@ -57,10 +57,10 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL) 					                                           //its a player object
-			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetsPosition - currentPosition)     //it is the closet player to the target
+			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
 			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 40)								                  //the player is within the enemys aggro range
 		{
-			targetsPosition = { m_scene.getEntity(i).transform[3].x, m_scene.getEntity(i).transform[3].y, m_scene.getEntity(i).transform[3].z };
+			targetPosition = { m_scene.getEntity(i).transform[3].x, entity.transform[3].y, m_scene.getEntity(i).transform[3].z };
 			targetsVelocity = m_scene.getEntity(i).physics.velocity;
 			targetsPreviousVelocity = m_scene.getEntity(i).aiVariables.previousVelocity;
 			targetsMoveSpeed = m_scene.getEntity(i).controlVars.maxMoveSpeed;
@@ -73,11 +73,12 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 	if (targetFound)
 	{
 		// Pursue to the target if above a certain distance away from them.
-		if (glm::length(glm::vec2{ targetsPosition.x, targetsPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) > 15)
-			acceleration = seekWithArrival(targetsPosition, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
+		if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) > 15) {
+			acceleration = seekWithArrival(targetPosition, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
+		}
 		// Avade from the target if too close to a player.
-		else if (glm::length(glm::vec2{ targetsPosition.x, targetsPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) < 5)
-			acceleration = evade(targetsPosition, targetsVelocity, targetsMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
+		else if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) < 5)
+			acceleration = evade(targetPosition, targetsVelocity, targetsMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
 		// Find all the closest Enemy01 neighbours and store them in a vector.
@@ -101,7 +102,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 			Entity& bullet = EntityUtils::createEnemyBullet(m_scene,
 				glm::translate({}, glm::vec3(entity.transform[3]))
 				* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
-			glm::vec3 bulletVelocity = ((targetsPosition - glm::vec3(entity.transform[3]) + entity.physics.velocity) / (glm::length(targetsPosition - glm::vec3(entity.transform[3])) + entity.physics.velocity)) * 10.0f;
+			glm::vec3 bulletVelocity = ((targetPosition - glm::vec3(entity.transform[3]) + entity.physics.velocity) / (glm::length(targetPosition - glm::vec3(entity.transform[3])) + entity.physics.velocity)) * 10.0f;
 			bullet.physics.velocity = bulletVelocity;
 		}
 	}

@@ -62,17 +62,17 @@ glm::vec3 seekWithArrival(glm::vec3 targetPosition, glm::vec3 currentPosition, g
 	// Determine the steering vector from the current veloctiy to the desired velocity.
 	glm::vec3 steering = desiredVelocity - currentVelocity;
 
-	//RenderSystem::drawDebugArrow(currentPosition, desiredVelocity, glm::length(desiredVelocity) * 10.0f, { 1.0f, 1.0f, 0.0f });
-	//RenderSystem::drawDebugArrow(currentPosition, steering, glm::length(steering) * 100.0f, { 1.0f, 1.0f, 0.0f });
+	//RenderSystem::drawDebugArrow(currentPosition, desiredVelocity, glm::length(desiredVelocity), { 1.0f, 1.0f, 0.0f });
+	//RenderSystem::drawDebugArrow(currentPosition, steering, glm::length(steering), { 1.0f, 1.0f, 1.0f });
 
 	return steering;
 }
 
 // Returns an acceleration to move to a move to pursue a target
-glm::vec3 pursue(glm::vec3 targetsPosition, glm::vec3 targetsVelocity, float targetsMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
+glm::vec3 pursue(glm::vec3 targetPosition, glm::vec3 targetsVelocity, float targetsMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
 {
-	float T = glm::length(glm::vec2{ targetsPosition.x - currentPosition.x, targetsPosition.z - currentPosition.z }) / targetsMoveSpeed;
-	glm::vec3 futurePosition = targetsPosition + targetsVelocity * T;
+	float T = glm::length(glm::vec2{ targetPosition.x - currentPosition.x, targetPosition.z - currentPosition.z }) / targetsMoveSpeed;
+	glm::vec3 futurePosition = targetPosition + targetsVelocity * T;
 	
 	futurePosition.y = currentPosition.y;
 
@@ -80,10 +80,10 @@ glm::vec3 pursue(glm::vec3 targetsPosition, glm::vec3 targetsVelocity, float tar
 }
 
 // Returns an acceleration to move to a move to pursue a target
-glm::vec3 evade(glm::vec3 targetsPosition, glm::vec3 targetsVelocity, float targetsMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
+glm::vec3 evade(glm::vec3 targetPosition, glm::vec3 targetsVelocity, float targetsMoveSpeed, glm::vec3 currentPosition, glm::vec3 currentVelocity, float maxMoveSpeed)
 {
-	float T = glm::length(glm::vec2{ targetsPosition.x - currentPosition.x, targetsPosition.z - currentPosition.z }) / targetsMoveSpeed;
-	glm::vec3 futurePosition = targetsPosition + targetsVelocity * (T/2.0f);
+	float T = glm::length(glm::vec2{ targetPosition.x - currentPosition.x, targetPosition.z - currentPosition.z }) / targetsMoveSpeed;
+	glm::vec3 futurePosition = targetPosition + targetsVelocity * (T/2.0f);
 
 	futurePosition.y = currentPosition.y;
 
@@ -270,8 +270,11 @@ glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::
 
 void steer(Entity& entity, const glm::vec3& steeringAcceleration)
 {
+	// Weight the acceleration according to entities acceleration weight
+	entity.physics.acceleration = steeringAcceleration * entity.controlVars.accelerationWeight;
+
 	// Limit the steering acceleration.
-	entity.physics.acceleration = GLMUtils::limitVec<glm::vec3>(steeringAcceleration, entity.controlVars.maxAcceleration);
+	entity.physics.acceleration = GLMUtils::limitVec<glm::vec3>(entity.physics.acceleration, entity.controlVars.maxAcceleration);
 
 	// Bounce of the boundraies of the walls
 	glm::vec3 position = entity.transform[3];

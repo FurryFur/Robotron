@@ -159,16 +159,15 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 
 void NetworkServerSystem::handleEntityDestruction(Entity& entity)
 {
-	std::int32_t& id = entity.network.id;
-	if (!entity.hasComponents() && id > -1) {
-		if (m_netEntities.at(id) == nullptr)
+	if (!entity.hasComponents() && entity.network.id > -1) {
+		if (m_netEntities.at(entity.network.id) == nullptr)
 			return;
 
-		auto rpc = std::make_unique<RPCDestroyGhost>(id);
+		auto rpc = std::make_unique<RPCDestroyGhost>(entity.network.id);
 		bufferRpc(std::move(rpc));
 
 		// Stop tracking entity on the server
-		m_netEntities.at(id) = nullptr;
+		m_netEntities.at(entity.network.id) = nullptr;
 	}
 }
 

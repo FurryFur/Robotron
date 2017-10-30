@@ -54,6 +54,7 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 		 && m_scene.getEntity(i).aiVariables.positionInQueue ==  followNumber - 1)
 		{
 			followPosition = m_scene.getEntity(i).transform[3];
+			followPosition.y = entity.transform[3].y; // Keep enemy on same plane
 			followNumber = m_scene.getEntity(i).aiVariables.positionInQueue;
 			followEntity = &m_scene.getEntity(i);
 			break;
