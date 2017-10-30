@@ -58,55 +58,17 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 		}
 	}
 
-	glm::vec3 Acc;
+	glm::vec3 acceleration;
 	//Wander around the map if the first in the queue
 	if (followNumber == entity.aiVariables.positionInQueue)
 	{
-		entity.controlVars.moveSpeed = 0.15f;
-		Acc = wander(entity);
+		acceleration = wander(entity);
 	}
 	else {
-		Acc = seekWithArrival(followPosition, glm::vec3{ entity.transform[3] }, entity.physics.velocity, entity.controlVars.moveSpeed);
+		acceleration = seekWithArrival(followPosition, glm::vec3{ entity.transform[3] }, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 	}
 
-	// Limit the steering acceleration.
-	if (glm::length(Acc) > 0.25f)
-		Acc = GLMUtils::limitVec<glm::vec3>(Acc, 0.25f);
-
-	// Add the acceleration to the velocity.
-	glm::vec3 newVelocity = glm::vec3{ entity.physics.velocity.x + Acc.x * deltaTick , 0, entity.physics.velocity.z + Acc.z * deltaTick };
-	entity.physics.velocity += Acc * deltaTick;
-
-	//const float kDebugScale = 100;
-	//glm::vec3 position = glm::vec3(entity.transform[3]);
-	//RenderSystem::drawDebugArrow(position, position + entity.physics.velocity * kDebugScale);
-	//RenderSystem::drawDebugArrow(position + entity.physics.velocity * kDebugScale, Acc, glm::length(Acc) * kDebugScale);
-	//RenderSystem::drawDebugArrow(m_scene, position, desiredVelocity, glm::length(desiredVelocity) * kDebugScale);
-
-	glm::vec4 newPosition = entity.transform[3] + glm::vec4{ newVelocity, 0 };
-	if (newPosition.x > 20.0f || newPosition.x < -20.0f)
-	{
-		newVelocity.x *= -1;
-		entity.aiVariables.wanderPosition.x *= -1;
-		if (newPosition.x > 20.0f)
-			entity.transform[3].x = 20.0f;
-		else
-			entity.transform[3].x = -20.0f;
-	}
-
-	if (newPosition.z > 20.0f || newPosition.z < -20.0f)
-	{
-		newVelocity.z *= -1;
-		entity.aiVariables.wanderPosition.z *= -1;
-		if (newPosition.z > 20.0f)
-			entity.transform[3].z = 20.0f;
-		else
-			entity.transform[3].z = -20.0f;
-	}
-
-	// Add the velocity to the position of the enemy.
-	entity.physics.velocity = newVelocity;
-	entity.transform[3] += glm::vec4{ entity.physics.velocity, 0 };
+	steer(entity, acceleration);
 
 	return;
 }

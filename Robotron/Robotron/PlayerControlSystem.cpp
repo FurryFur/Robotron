@@ -16,6 +16,7 @@
 
 #include "PlayerControlSystem.h"
 
+#include "ControlComponent.h"
 #include "PlayerControlComponent.h"
 #include "EntityUtils.h"
 #include "GLUtils.h"
@@ -46,7 +47,7 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	if (!entity.hasComponents(kMovableMask) && !entity.hasComponents(kMovableCamMask))
 		return;
 
-	float moveSpeed = entity.controlVars.moveSpeed;
+	float maxMoveSpeed = entity.controlVars.maxMoveSpeed;
 	float orientationSensitivity = entity.controlVars.orientationSensitivity;
 
 	float deltaAzimuth = -orientationSensitivity * entity.input.orientationDelta.x;
@@ -63,7 +64,7 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	glm::vec3 axis = GLMUtils::limitVec(entity.input.axis, 1);
 	if (!entity.controlVars.worldSpaceMove)
 		axis = entity.transform * glm::vec4{ axis, 0 }; // Convert movement to local coordinates
-	entity.physics.velocity = moveSpeed * axis;
+	entity.physics.velocity = maxMoveSpeed * axis;
 	if (axis != glm::vec3{ 0,0,0 })
 		entity.aiVariables.previousVelocity = entity.physics.velocity;
 	if (((pos + entity.physics.velocity).x < 20.0f) && ((pos + entity.physics.velocity).x > -20.0f))

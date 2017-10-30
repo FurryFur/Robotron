@@ -25,11 +25,9 @@ Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/dessert-floor.png");
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.maxMoveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 0, 1 };
 
 	return entity;
 }
@@ -37,7 +35,7 @@ Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
 Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_MODEL 
-	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
+	                                  | COMPONENT_TRANSFORM);
 
 	entity.transform = transform;
 
@@ -45,25 +43,18 @@ Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& transform)
 
 	setDefaultInputBindings(entity.inputMap);
 
-	entity.controlVars.moveSpeed = 0.1f;
-	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.maxMoveSpeed = 0.2f;
+	entity.controlVars.maxAcceleration = 1.0f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
 
-Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createEnemyZombie(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-	                                  | COMPONENT_LOGIC | COMPONENT_ZOMBIE
+	                                  | COMPONENT_ZOMBIE
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-
-	entity.physics = {};
-	entity.physics.velocity = { 0.0f, 0.0f, 0.0f };
-	entity.aiVariables = {};
-	entity.playerStats = {};
 
 	entity.aiVariables.score = 10;
 	entity.aiVariables.lives = 3;
@@ -75,25 +66,18 @@ Entity& EntityUtils::createEnemy01(Scene& scene, const glm::mat4& transform)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.14f;
-	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.maxMoveSpeed = 10.0f;
+	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
 
-Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int positionInQueue)
+Entity& EntityUtils::createEnemySnake(Scene& scene, const glm::mat4& transform, int positionInQueue)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
-	                                  | COMPONENT_LOGIC | COMPONENT_SNAKE
+	                                  | COMPONENT_SNAKE
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-
-	entity.physics = {};
-	entity.physics.velocity = { 0.0f, 0.0f, 0.0f };
-	entity.aiVariables = {};
-	entity.playerStats = {};
 	
 	entity.aiVariables.positionInQueue = positionInQueue;
 
@@ -107,25 +91,18 @@ Entity& EntityUtils::createEnemy02(Scene& scene, const glm::mat4& transform, int
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
 
-	entity.controlVars.moveSpeed = 0.2f;
-	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.maxMoveSpeed = 10.0f;
+	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
 
-Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createEnemyShooter(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
-	                                  | COMPONENT_LOGIC | COMPONENT_ENEMY_SHOOTER
+	                                  | COMPONENT_ENEMY_SHOOTER
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-
-	entity.physics = {};
-	entity.physics.velocity = {0.0f, 0.0f, 0.0f};
-	entity.aiVariables = {};
-	entity.playerStats = {};
 
 	entity.transform = transform;
 
@@ -136,11 +113,9 @@ Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.14f;
-	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.maxMoveSpeed = 10.0f;
+	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
@@ -148,14 +123,9 @@ Entity& EntityUtils::createEnemy03(Scene& scene, const glm::mat4& transform)
 Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-	                                  | COMPONENT_LOGIC | COMPONENT_SCOREPICKUP
+	                                  | COMPONENT_SCOREPICKUP
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
-	entity.physics = {};
-	entity.physics.velocity = { 0.0f, 0.0f, 0.0f };
-	entity.aiVariables = {};
-	entity.playerStats = {};
-	
 	entity.transform = transform;
 
 	// TODO: Fix weird integer bool assignment!!!
@@ -165,67 +135,31 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.2f;
-	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.maxMoveSpeed = 30.0f;
+	entity.controlVars.maxAcceleration = 100.0f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
 
 Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-	                                  | COMPONENT_LOGIC | COMPONENT_SCOREPICKUP
-	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-
-	entity.physics = {};
-	entity.physics.velocity = { 0.0f, 0.0f, 0.0f };
-	entity.aiVariables = {};
-	entity.playerStats = {};
+	Entity& entity = createScorePickUp01(scene, transform);
 
 	entity.aiVariables.score = 20;
-	entity.transform = transform;
 
 	entity.model = GLPrimitives::getPyramidModel();
-
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
-
-	entity.controlVars.moveSpeed = 0.2f;
-	entity.controlVars.orientationSensitivity = 0.05f;
-	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
 
 Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-	                                  | COMPONENT_LOGIC | COMPONENT_SCOREPICKUP
-	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-
-	entity.physics = {};
-	entity.physics.velocity = { 0.0f, 0.0f, 0.0f };
-	entity.aiVariables = {};
-	entity.playerStats = {};
+	Entity& entity = createScorePickUp01(scene, transform);
 
 	entity.aiVariables.lifePickUp = true;
-	entity.transform = transform;
 
 	entity.model = GLPrimitives::getCubeModel();
-
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
-
-	entity.controlVars.moveSpeed = 0.2f;
-	entity.controlVars.orientationSensitivity = 0.05f;
-	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
@@ -235,12 +169,8 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL 
 	                                  | COMPONENT_INPUT_MAP | COMPONENT_MODEL
-	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC
+	                                  | COMPONENT_TRANSFORM
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-
-	entity.physics = {};
-	entity.aiVariables = {};
-
 	entity.playerStats.lives = 3;
 	entity.playerStats.score = 0;
 	
@@ -258,11 +188,9 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.inputMap.forwardBtnMap = GLFW_KEY_W;
 	entity.inputMap.backwardBtnMap = GLFW_KEY_S;
 
-	entity.controlVars.moveSpeed = 0.12f;
+	entity.controlVars.maxMoveSpeed = 0.12f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
@@ -270,13 +198,9 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-	                                  | COMPONENT_LOGIC | COMPONENT_PLAYERBULLET
+	                                  | COMPONENT_PLAYERBULLET
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
-	entity.physics = {};
-	entity.aiVariables = {};
-	entity.playerStats = {};
-	
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();
@@ -284,11 +208,9 @@ Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.12f;
-	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.maxMoveSpeed = 10.0f;
+	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
@@ -296,12 +218,8 @@ Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform
 Entity& EntityUtils::createEnemyBullet(Scene& scene, const glm::mat4& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-		| COMPONENT_LOGIC | COMPONENT_ENEMYBULLET
+		| COMPONENT_ENEMYBULLET
 		| COMPONENT_NETWORK | COMPONENT_PHYSICS);
-
-	entity.physics = {};
-	entity.aiVariables = {};
-	entity.playerStats = {};
 
 	entity.transform = transform;
 
@@ -310,11 +228,9 @@ Entity& EntityUtils::createEnemyBullet(Scene& scene, const glm::mat4& transform)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.moveSpeed = 0.12f;
-	entity.controlVars.orientationSensitivity = 0.05f;
+	entity.controlVars.maxMoveSpeed = 10.0f;
+	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.worldSpaceMove = true;
-
-	entity.logicVars.rotationAxis = glm::vec3{ 0, 1, 0 };
 
 	return entity;
 }
@@ -389,7 +305,7 @@ Entity& EntityUtils::createCylinder(Scene& scene, float radius, float height, co
 
 	setDefaultInputBindings(entity.inputMap);
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.maxMoveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -409,7 +325,7 @@ Entity& EntityUtils::createPyramid(Scene& scene, const glm::mat4& transform)
 
 	setDefaultInputBindings(entity.inputMap);
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.maxMoveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -429,7 +345,7 @@ Entity& EntityUtils::createCube(Scene& scene, const glm::mat4 & transform)
 
 	setDefaultInputBindings(entity.inputMap);
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.maxMoveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 
@@ -443,7 +359,7 @@ Entity& EntityUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm:
 	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_INPUT 
 	                                  | COMPONENT_CAMERA | COMPONENT_TRANSFORM);
 
-	entity.controlVars.moveSpeed = 0.1f;
+	entity.controlVars.maxMoveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.005f;
 	entity.controlVars.worldSpaceMove = false;
 

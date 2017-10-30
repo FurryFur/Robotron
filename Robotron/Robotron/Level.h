@@ -32,6 +32,7 @@
 #include "ScorePickUpSystem.h"
 #include "PlayerBulletSystem.h"
 #include "EnemyBulletSystem.h"
+#include "PhysicsSystem.h"
 
 #include "TextLabel.h"
 
@@ -74,6 +75,7 @@ private:
 	ScorePickUpSystem m_scorePickUpSystem;
 	PlayerBulletSystem m_playerbulletsystem;
 	EnemyBulletSystem m_enemybulletsystem;
+	PhysicsSystem m_physicsSystem;
 	std::unique_ptr<NetworkSystem> m_networkSystem;
 
 	TextLabel m_playerHealth;

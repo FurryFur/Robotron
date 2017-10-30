@@ -25,53 +25,60 @@ bool Entity::hasComponents() const
 	return m_componentMask != 0;
 }
 
+bool Entity::matches(size_t lhsComponentMask, size_t rhsComponentMask)
+{
+	return (lhsComponentMask & rhsComponentMask) == rhsComponentMask;
+}
+
+bool Entity::matchesAny(size_t lhsComponentMask, size_t rhsComponentMask)
+{
+	return (lhsComponentMask & rhsComponentMask) > 0;
+}
+
 void Entity::addComponents(size_t componentMask)
 {
-	if ((componentMask & COMPONENT_TRANSFORM) == COMPONENT_TRANSFORM) {
+	if (matches(componentMask, COMPONENT_TRANSFORM)) {
 		m_componentMask |= COMPONENT_TRANSFORM;
 		transform = {};
 	}
-	if ((componentMask & COMPONENT_PHYSICS) == COMPONENT_PHYSICS) {
+	if (matches(componentMask, COMPONENT_PHYSICS)) {
 		m_componentMask |= COMPONENT_PHYSICS;
 		physics = {};
 	}
-	if ((componentMask & COMPONENT_MODEL) == COMPONENT_MODEL) {
+	if (matches(componentMask, COMPONENT_MODEL)) {
 		m_componentMask |= COMPONENT_MODEL;
 		model = {};
 	}
-	if ((componentMask & COMPONENT_CAMERA) == COMPONENT_CAMERA) {
+	if (matches(componentMask, COMPONENT_CAMERA)) {
 		m_componentMask |= COMPONENT_CAMERA;
 	}
-	if ((componentMask & COMPONENT_PLAYER_CONTROL) == COMPONENT_PLAYER_CONTROL) {
+	if (matches(componentMask, COMPONENT_PLAYER_CONTROL)) {
 		m_componentMask |= COMPONENT_PLAYER_CONTROL;
 		playerStats = {};
 		controlVars = {};
 	}
-	if ((componentMask & COMPONENT_INPUT) == COMPONENT_INPUT) {
+	if (matches(componentMask, COMPONENT_INPUT)) {
 		m_componentMask |= COMPONENT_INPUT;
 		input = {};
 	}
-	if ((componentMask & COMPONENT_INPUT_MAP) == COMPONENT_INPUT_MAP) {
+	if (matches(componentMask, COMPONENT_INPUT_MAP)) {
 		m_componentMask |= COMPONENT_INPUT_MAP;
 		inputMap = {};
 	}
-	if ((componentMask & COMPONENT_LOGIC) == COMPONENT_LOGIC) {
+	if (matches(componentMask, COMPONENT_LOGIC)) {
 		m_componentMask |= COMPONENT_LOGIC;
 		logicVars = {};
 	}
-	if ((componentMask & COMPONENT_ZOMBIE) == COMPONENT_ZOMBIE) {
+	if (matches(componentMask, COMPONENT_ZOMBIE)) {
 		m_componentMask |= COMPONENT_ZOMBIE;
-		aiVariables = {};
 	}
-	if ((componentMask & COMPONENT_SNAKE) == COMPONENT_SNAKE) {
+	if (matches(componentMask, COMPONENT_SNAKE)) {
 		m_componentMask |= COMPONENT_SNAKE;
-		aiVariables = {};
 	}
-	if ((componentMask & COMPONENT_ENEMY_SHOOTER) == COMPONENT_ENEMY_SHOOTER) {
+	if (matches(componentMask, COMPONENT_ENEMY_SHOOTER)) {
 		m_componentMask |= COMPONENT_ENEMY_SHOOTER;
-		aiVariables = {};
 	}
-	if ((componentMask & COMPONENT_NETWORK) == COMPONENT_NETWORK) {
+	if (matches(componentMask, COMPONENT_NETWORK)) {
 		m_componentMask |= COMPONENT_NETWORK;
 		// network.id should be left alone as a non-negative value in combination
 		// with an isNewEntity=true indicates to the network that an entity has
@@ -79,14 +86,22 @@ void Entity::addComponents(size_t componentMask)
 		network.isNewEntity = true;
 		network.priority = 999;
 	}
-	if ((componentMask & COMPONENT_SCOREPICKUP) == COMPONENT_SCOREPICKUP) {
+	if (matches(componentMask, COMPONENT_SCOREPICKUP)) {
 		m_componentMask |= COMPONENT_SCOREPICKUP;
 	}
-	if ((componentMask & COMPONENT_PLAYERBULLET) == COMPONENT_PLAYERBULLET) {
+	if (matches(componentMask, COMPONENT_PLAYERBULLET)) {
 		m_componentMask |= COMPONENT_PLAYERBULLET;
 	}
-	if ((componentMask & COMPONENT_ENEMYBULLET) == COMPONENT_ENEMYBULLET) {
+	if (matches(componentMask, COMPONENT_ENEMYBULLET)) {
 		m_componentMask |= COMPONENT_ENEMYBULLET;
+	}
+
+	if (matchesAny(componentMask, COMPONENT_ZOMBIE, COMPONENT_SNAKE, 
+	                              COMPONENT_ENEMY_SHOOTER, COMPONENT_SCOREPICKUP, 
+	                              COMPONENT_PLAYERBULLET, COMPONENT_ENEMYBULLET)) {
+		aiVariables = {};
+		aiVariables.wanderPosition = { 0, 1, 0 };
+		controlVars = {};
 	}
 }
 

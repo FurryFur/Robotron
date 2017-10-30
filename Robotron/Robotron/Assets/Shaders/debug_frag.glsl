@@ -45,7 +45,7 @@ void main(void)
 	else
 		normal = -normalize(i.normal);
 
-	vec3 color = texture(colorSampler, i.texCoord).rgb;
+	vec3 color = debugColor;
 
 	// Direct Lighting variables
 	vec3 viewDir = normalize(i.viewDir);

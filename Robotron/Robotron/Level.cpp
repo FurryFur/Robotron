@@ -16,6 +16,7 @@ Level::Level(GLFWwindow* window)
 	, m_scorePickUpSystem(m_scene)
 	, m_playerbulletsystem(m_scene)
 	, m_enemybulletsystem(m_scene)
+	, m_physicsSystem(m_scene)
 	, m_playerScore("Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
 	, m_playerHealth("Health: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
 {
@@ -150,7 +151,7 @@ void Level::spawnEnemies(int levelType)
 		if (randomInt(0, 1) == 0)
 			randZ += 25;
 
-		Entity& enemy = EntityUtils::createEnemy01(m_scene,
+		Entity& enemy = EntityUtils::createEnemyZombie(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
 		enemy.addComponents(COMPONENT_NETWORK);
 	}
@@ -164,12 +165,12 @@ void Level::spawnEnemies(int levelType)
 		{
 			if (-19.0f + i < 20.0f)
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f + i }), i);
 			}
 			else
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f}), i);
 			}
 		}
@@ -180,12 +181,12 @@ void Level::spawnEnemies(int levelType)
 
 			if (19.0f - i < 20.0f)
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f - i }), i);
 			}
 			else
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f}), i);
 			}
 		}
@@ -195,12 +196,12 @@ void Level::spawnEnemies(int levelType)
 		{
 			if (-19.0f + i < 20.0f)
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -19.0f + i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
 			}
 			else
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ -19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
 			}
 		}
@@ -210,12 +211,12 @@ void Level::spawnEnemies(int levelType)
 		{
 			if (19.0f - i < 20.0f)
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ 19.0f - i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
 			}
 			else
 			{
-				EntityUtils::createEnemy02(m_scene,
+				EntityUtils::createEnemySnake(m_scene,
 					glm::translate({}, glm::vec3{ 19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
 			}
 		}
@@ -232,7 +233,7 @@ void Level::spawnEnemies(int levelType)
 		if (randomInt(0, 1) == 0)
 			randZ += 25;
 	
-		EntityUtils::createEnemy03(m_scene,
+		EntityUtils::createEnemyShooter(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
 	}
 
@@ -406,6 +407,8 @@ void Level::process(float deltaTick, Clock& clock)
 		m_scorePickUpSystem.update(entity, deltaTick);
 		m_playerbulletsystem.update(entity);
 		m_enemybulletsystem.update(entity);
+		m_physicsSystem.update(entity, deltaTick);
+		m_networkSystem->update(entity, deltaTick);
 		m_renderSystem.update(entity);
 		m_networkSystem->update(entity, deltaTick);
 	}

@@ -57,8 +57,5 @@ void EnemyBulletSystem::update(Entity& entity)
 		return;
 	}
 
-	// Move in a straight line based on velocity.
-	entity.transform[3] += glm::vec4{ entity.physics.velocity, 0 };
-
 	return;
 }

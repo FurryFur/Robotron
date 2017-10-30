@@ -177,6 +177,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClCompile Include="NetworkClientSystem.cpp" />
     <ClCompile Include="NetworkComponent.cpp" />
     <ClCompile Include="Packet.cpp" />
+    <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="PlayerBulletSystem.cpp" />
     <ClCompile Include="PlayerControlSystem.cpp" />
     <ClCompile Include="NetworkServerSystem.cpp" />
@@ -205,6 +206,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GhostSnapshot.h" />
+    <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="StreamableEvictQueue.h" />
     <ClInclude Include="GameplayLogicSystem.h" />
     <ClInclude Include="GLMUtils.h" />
@@ -226,7 +228,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PhysicsComponent.h" />
     <ClInclude Include="PlayerBulletSystem.h" />
-    <ClInclude Include="PlayerControlComponent.h" />
+    <ClInclude Include="ControlComponent.h" />
     <ClInclude Include="PlayerControlSystem.h" />
     <ClInclude Include="NetworkSystem.h" />
     <ClInclude Include="PlayerInfo.h" />

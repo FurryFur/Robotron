@@ -1,5 +1,9 @@
 #pragma once
 
+#include "PhysicsComponent.h"
+
+#include <glm\glm.hpp>
+
 #include <cstdint>
 
 struct NetworkComponent {
@@ -20,4 +24,6 @@ struct NetworkComponent {
 	// This priority will slowly accumulate the longer an entity
 	// goes without having a snapshot sent out.
 	int priority;
+
+	//glm::mat4 transformError;
 };

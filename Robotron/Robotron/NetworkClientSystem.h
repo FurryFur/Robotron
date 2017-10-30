@@ -22,7 +22,7 @@ private:
 	void destroyIfExists(size_t entityNetID);
 
 	std::uint32_t m_lastSeqNumSeen;
-	std::vector<std::unique_ptr<GhostSnapshot>> m_ghostSnapshots;
+	//std::vector<std::unique_ptr<GhostSnapshot>> m_ghostSnapshots;
 	sockaddr_in m_serverAddress;
 };
 
