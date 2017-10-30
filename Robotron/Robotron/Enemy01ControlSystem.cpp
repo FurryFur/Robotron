@@ -47,7 +47,7 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 		return;
 	
 	// Set the target position out of scope.
-	glm::vec3 targetsPosition  = glm::vec3{100, 100, 100};
+	glm::vec3 targetPosition  = glm::vec3{100, 100, 100};
 	glm::vec3 targetsVelocity;
 	float targetsMoveSpeed;
 	glm::vec3 currentPosition = glm::vec3{ entity.transform[3].x,  entity.transform[3].y,  entity.transform[3].z};
@@ -57,10 +57,10 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)          						                               //its a player object
-		 && glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetsPosition - currentPosition)     //it is the closet player to the target
+		 && glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
 		 && glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 30)								                  //the player is within the enemys aggro range
 		{
-			targetsPosition = { m_scene.getEntity(i).transform[3].x, m_scene.getEntity(i).transform[3].y, m_scene.getEntity(i).transform[3].z};
+			targetPosition = { m_scene.getEntity(i).transform[3].x, entity.transform[3].y, m_scene.getEntity(i).transform[3].z};
 			targetsVelocity = m_scene.getEntity(i).physics.velocity;
 			targetsMoveSpeed = m_scene.getEntity(i).controlVars.maxMoveSpeed;
 			targetFound = true;
@@ -72,7 +72,7 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 	if (targetFound)
 	{
 		// Add a pursue acceleration to the culmative acceleration.
-		acceleration = pursue(targetsPosition, targetsVelocity, targetsMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
+		acceleration = pursue(targetPosition, targetsVelocity, targetsMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
 		// Find all the closest Enemy01 neighbours and store them in a vector.

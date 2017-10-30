@@ -53,6 +53,7 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 		 && m_scene.getEntity(i).aiVariables.positionInQueue ==  followNumber - 1)
 		{
 			followPosition = m_scene.getEntity(i).transform[3];
+			followPosition.y = entity.transform[3].y; // Keep enemy on same plane
 			followNumber = m_scene.getEntity(i).aiVariables.positionInQueue;
 			break;
 		}
@@ -66,6 +67,7 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 	}
 	else {
 		acceleration = seekWithArrival(followPosition, glm::vec3{ entity.transform[3] }, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
+		//RenderSystem::drawDebugArrow(entity.transform[3], followPosition, { 0, 0, 1 });
 	}
 
 	steer(entity, acceleration);
