@@ -84,6 +84,24 @@ public:
 	void destroy();
 
 private:
+	// Returns true if ALL the specified components are present 
+	// in the entity.
+	template<typename ...ComponentTs>
+	static bool matches(size_t componentMask, size_t first, ComponentTs... rest);
+
+	// Returns true if ALL the components in the supplied component 
+	// mask are present in the entity.
+	static bool matches(size_t lhsComponentMask, size_t rhsComponentMask);
+
+	// Returns true if ANY of the specified components are present
+	// in the entity.
+	template<typename ...ComponentTs>
+	static bool matchesAny(size_t componentMask, size_t first, ComponentTs... rest);
+
+	// Returns true if ANY of the components in the supplied component
+	// mask are present in the entity.
+	static bool matchesAny(size_t lhsComponentMask, size_t rhsComponentMask);
+
 	size_t m_componentMask;
 };
 
@@ -104,4 +122,16 @@ inline void Entity::addComponents(size_t first, ComponentTs... rest)
 {
 	addComponents(first);
 	addComponents(rest...);
+}
+
+template<typename ...ComponentTs>
+inline bool Entity::matches(size_t componentMask, size_t first, ComponentTs ...rest)
+{
+	return matches(componentMask, first) && matches(componentMask, rest...);
+}
+
+template<typename ...ComponentTs>
+inline bool Entity::matchesAny(size_t componentMask, size_t first, ComponentTs ...rest)
+{
+	return matchesAny(componentMask, first) || matchesAny(componentMask, rest...);
 }

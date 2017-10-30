@@ -17,7 +17,8 @@ Level::Level(GLFWwindow* window)
 	, m_playerbulletsystem(m_scene)
 	, m_enemybulletsystem(m_scene)
 	, m_physicsSystem(m_scene)
-	, m_label("Basic Game", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	, m_playerScore("Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	, m_playerHealth("Health: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
 {
 	Scene::makeSceneCurrent(&m_scene);
 
@@ -75,27 +76,14 @@ Level::Level(GLFWwindow* window)
 	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
 	m_renderSystem.setCamera(&cameraEntity);
 
-	m_label.setPosition(glm::vec2(10.0f, 10.0f));
-	m_label.setColor(glm::vec3(1.0f, 1.0f, 0.0f));
-	m_label.setText("cavaavhell");
+	// Set the UI position, scale, colour
+	m_playerHealth.setPosition(glm::vec2(10.0f, 10.0f));
+	m_playerHealth.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+	m_playerHealth.setScale(0.5f);
 
-
-
-	// Create all the snake enemy types in the scene.
-	float randcoord = randomReal<float>(9.0f, 17.0f);
-	for (int i = 0; i < 8; ++i)
-	{
-		if (-19.0f + i < 20.0f)
-		{
-			EntityUtils::createEnemySnake(m_scene,
-				glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f + i }), i);
-		}
-		else
-		{
-			EntityUtils::createEnemySnake(m_scene,
-				glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f }), i);
-		}
-	}
+	m_playerScore.setPosition(glm::vec2(10.0f, 40.0f));
+	m_playerScore.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+	m_playerScore.setScale(0.5f);
 }
 
 
@@ -305,14 +293,17 @@ void Level::initalizeNextLevel()
 	// Cycle over all the entities in the scene
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		// Delete all score pickups and update the players score.
+		// Delete all score pickups and update the players score by the ones following the player.
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_SCOREPICKUP))
 		{
 			// Increase the player's score value.
 			if (m_scene.getEntity(i).aiVariables.followEntity != NULL)
 			{
 				if (m_scene.getEntity(i).aiVariables.lifePickUp != true)
+				{
 					m_scene.getEntity(i).aiVariables.followEntity->playerStats.score += m_scene.getEntity(i).aiVariables.score;
+					m_scene.getEntity(i).aiVariables.followEntity->playerStats.scoreLives += m_scene.getEntity(i).aiVariables.score;
+				}
 				else
 					++m_scene.getEntity(i).aiVariables.followEntity->playerStats.lives;
 			}
@@ -380,6 +371,25 @@ void Level::respawnDeadPlayers(Clock& clock)
 
 void Level::process(float deltaTick, Clock& clock)
 {	
+	// Cycle over all objects in the scene and find the player object
+	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
+	{
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+		{
+			// Update the UI with the player score and health.
+			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).playerStats.lives));
+			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).playerStats.score));
+
+			// Check that the player has enough score to get an extra life
+			if (m_scene.getEntity(i).playerStats.scoreLives > 1000)
+			{
+				m_scene.getEntity(i).playerStats.scoreLives -= 1000;
+				++m_scene.getEntity(i).playerStats.lives;
+			}
+		}
+	}
+
+	
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
@@ -425,7 +435,8 @@ void Level::process(float deltaTick, Clock& clock)
 		}
 	}
 
-	m_label.Render();
+	m_playerScore.Render();
+	m_playerHealth.Render();
 
 	// Do operations that should happen at the end of the frame.
 	m_networkSystem->endFrame();

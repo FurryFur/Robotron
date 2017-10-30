@@ -22,7 +22,7 @@ double newTime = 0.0;
 
 int main()
 {
-	//// Init combined Window and OpenGL context.
+	// Init combined Window and OpenGL context.
 	GLFWwindow* window = GLUtils::initOpenGL();
 
 	Game game(window);

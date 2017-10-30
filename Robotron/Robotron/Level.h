@@ -78,7 +78,8 @@ private:
 	PhysicsSystem m_physicsSystem;
 	std::unique_ptr<NetworkSystem> m_networkSystem;
 
-	TextLabel m_label;
+	TextLabel m_playerHealth;
+	TextLabel m_playerScore;
 
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	int m_levelNum;

@@ -66,8 +66,8 @@ Entity& EntityUtils::createEnemyZombie(Scene& scene, const glm::mat4& transform)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.maxMoveSpeed = 8.0f;
-	entity.controlVars.maxAcceleration = 1.0f;
+	entity.controlVars.maxMoveSpeed = 10.0f;
+	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.worldSpaceMove = true;
 
 	return entity;
@@ -92,7 +92,7 @@ Entity& EntityUtils::createEnemySnake(Scene& scene, const glm::mat4& transform, 
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
 
 	entity.controlVars.maxMoveSpeed = 10.0f;
-	entity.controlVars.maxAcceleration = 1.0f;
+	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.worldSpaceMove = true;
 
 	return entity;
@@ -114,7 +114,7 @@ Entity& EntityUtils::createEnemyShooter(Scene& scene, const glm::mat4& transform
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
 	entity.controlVars.maxMoveSpeed = 10.0f;
-	entity.controlVars.maxAcceleration = 1.0f;
+	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.worldSpaceMove = true;
 
 	return entity;
@@ -135,8 +135,8 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.maxMoveSpeed = 10.0f;
-	entity.controlVars.maxAcceleration = 1.0f;
+	entity.controlVars.maxMoveSpeed = 30.0f;
+	entity.controlVars.maxAcceleration = 100.0f;
 	entity.controlVars.worldSpaceMove = true;
 
 	return entity;
@@ -144,42 +144,22 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 
 Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-	                                  | COMPONENT_SCOREPICKUP
-	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
+	Entity& entity = createScorePickUp01(scene, transform);
 
 	entity.aiVariables.score = 20;
-	entity.transform = transform;
 
 	entity.model = GLPrimitives::getPyramidModel();
-
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
-
-	entity.controlVars.maxMoveSpeed = 10.0f;
-	entity.controlVars.maxAcceleration = 1.0f;
-	entity.controlVars.worldSpaceMove = true;
 
 	return entity;
 }
 
 Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform)
 {
-	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
-	                                  | COMPONENT_SCOREPICKUP
-	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
+	Entity& entity = createScorePickUp01(scene, transform);
 
 	entity.aiVariables.lifePickUp = true;
-	entity.transform = transform;
 
 	entity.model = GLPrimitives::getCubeModel();
-
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
-
-	entity.controlVars.maxMoveSpeed = 10.0f;
-	entity.controlVars.maxAcceleration = 1.0f;
-	entity.controlVars.worldSpaceMove = true;
 
 	return entity;
 }
@@ -191,10 +171,6 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_INPUT_MAP | COMPONENT_MODEL
 	                                  | COMPONENT_TRANSFORM
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-
-	entity.physics = {};
-	entity.aiVariables = {};
-
 	entity.playerStats.lives = 3;
 	entity.playerStats.score = 0;
 	
