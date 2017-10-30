@@ -57,7 +57,7 @@ Entity& EntityUtils::createEnemyZombie(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 
 	entity.aiVariables.score = 10;
-	entity.aiVariables.lives = 3;
+	entity.aiVariables.lives = 1;
 
 	entity.transform = transform;
 

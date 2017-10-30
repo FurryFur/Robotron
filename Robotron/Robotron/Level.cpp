@@ -104,28 +104,47 @@ void Level::spawnEnemies(int levelType)
 	int score2PickUpCount = m_levelNum + randomInt(-4, -2);
 	int healthPickUpCount = 0;
 
-
-	// Spawn Zombies level type
-	if (levelType == 0)
+	// Start off with basic levels
+	if (m_levelNum == 0)
 	{
-		zombieCount = 2 + m_levelNum + randomInt(0, 2);
+		zombieCount = 2;
+
+	}
+	else if (m_levelNum == 1)
+	{
+		zombieCount = 3;
+		score1PickUpCount = 2;
+	}
+	else if (m_levelNum == 2)
+	{
+		snakePartsCount = 8 + m_levelNum + randomInt(0, 2);
+		zombieCount = 3;
+		score1PickUpCount = 4;
+		int healthPickUpCount = 1;
+	}
+	// Spawn Zombies level type
+	else if (levelType == 0)
+	{
+		zombieCount = 4 + m_levelNum + randomInt(0, 2);
 	}
 	// Spawn mixed level type
 	else if (levelType == 1)
 	{
 		zombieCount = m_levelNum + randomInt(1, 2);
-		shooterCount = m_levelNum + randomInt(-4, -2);
-		snakePartsCount = 8 + m_levelNum + randomInt(0, 2);
+		shooterCount = randomInt(0, 2);
+		snakePartsCount = 8 + m_levelNum + randomInt(-4, 2);
 	}
 	// Spawn shooter level type
 	else if (levelType == 2)
 	{
-		shooterCount = 2 + m_levelNum + randomInt(0, 2);
+		shooterCount = 2 + randomInt(0, 2);
+		zombieCount = m_levelNum + randomInt(0, 2);
 	}
 	// Spawn snake level type
 	else if (levelType == 3)
 	{
-		snakePartsCount = 16 + m_levelNum + randomInt(0, 2);
+		zombieCount = m_levelNum/2 + randomInt(0, 2);
+		snakePartsCount = 16 + m_levelNum/2 + randomInt(0, 2);
 	}
 	// Spawn bonus level type
 	else if (levelType == 4)
