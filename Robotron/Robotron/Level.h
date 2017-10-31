@@ -47,7 +47,7 @@
 class Level
 {
 public:
-	Level(GLFWwindow* window);
+	Level(GLFWwindow* window, Clock& clock);
 	~Level();
 
 	// Increases the level count of the game and spawns the next enemies.

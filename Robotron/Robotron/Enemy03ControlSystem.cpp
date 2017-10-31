@@ -22,6 +22,7 @@
 #include "Utils.h"
 #include "AIUtils.h"
 #include "Scene.h"
+#include "Clock.h"
 #include "Entity.h"
 #include "EntityUtils.h"
 #include "RenderSystem.h"
@@ -39,7 +40,7 @@ Enemy03ControlSystem::Enemy03ControlSystem(Scene& scene)
 }
 
 //the ai movement behavious for enemy03s
-void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
+void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 {
 	// Check that the entity is an Enemy03 object before proceeding.
 	if (!entity.hasComponents(COMPONENT_ENEMY_SHOOTER))
@@ -95,14 +96,28 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick)
 		if (nearbyNeighbours.size() > 0)
 			acceleration += flock(nearbyNeighbours, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
-		// Occasionally shoot a bullet at the player
-		// Create the bullet and apply the velocity.
-		if (randomInt(0, 50) == 1)
+
+		// Shoot a bullet at the player
+		// Check to see if the entity has not shot too recently
+		if (entity.controlVars.lastFiringTime + entity.controlVars.firingSpeed <= clock.GetCurTime())
 		{
+			// Update the last entites last shot time
+			entity.controlVars.lastFiringTime = clock.GetCurTime();
+			entity.controlVars.firingSpeed = randomReal<double>(1.0f, 1.2f);
+			
 			Entity& bullet = EntityUtils::createEnemyBullet(m_scene,
 				glm::translate({}, glm::vec3(entity.transform[3]))
 				* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
-			glm::vec3 bulletVelocity = ((targetPosition - glm::vec3(entity.transform[3]) + entity.physics.velocity) / (glm::length(targetPosition - glm::vec3(entity.transform[3])) + entity.physics.velocity)) * 10.0f;
+			
+			//Find a position to shoot at where the player will be
+			float T = (glm::length(glm::vec2{ targetPosition.x - currentPosition.x, targetPosition.z - currentPosition.z }) / targetsMoveSpeed) / 2;
+			glm::vec3 firingPosition = targetPosition + targetsVelocity * T;
+
+			firingPosition.y = currentPosition.y;
+			
+			glm::vec3 bulletVelocity = ((firingPosition - glm::vec3(entity.transform[3])) / (glm::length(firingPosition - glm::vec3(entity.transform[3])))) * 10.0f;
+
+			bulletVelocity.y = 0.0f;
 			bullet.physics.velocity = bulletVelocity;
 		}
 	}

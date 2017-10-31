@@ -411,7 +411,7 @@ void Game::process(float deltaTick)
 	else if (s_gameState == GAME)
 	{
 		if (m_level == NULL)
-			m_level = std::make_unique<Level>(m_window);
+			m_level = std::make_unique<Level>(m_window, m_clock);
 
 		m_level->process(deltaTick, m_clock);
 

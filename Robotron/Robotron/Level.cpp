@@ -5,11 +5,11 @@
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window)
+Level::Level(GLFWwindow* window, Clock& clock)
 	: m_scene{}
 	, m_renderSystem(window, m_scene)
 	, m_playerControlSystem(m_scene)
-	, m_inputSystem(window, m_scene)
+	, m_inputSystem(window, m_scene, clock)
 	, m_enemy01ControlSystem(m_scene)
 	, m_enemy02ControlSystem(m_scene)
 	, m_enemy03ControlSystem(m_scene)
@@ -355,6 +355,7 @@ void Level::initalizeNextLevel()
 	spawnEnemies(randomNum);
 }
 
+// Check atleast one enemy is alive. If return false, trigger next level to start.
 bool Level::checkEnemiesAlive()
 {
 	// Cycle through all the entites in the scene.
@@ -426,7 +427,7 @@ void Level::process(float deltaTick, Clock& clock)
 		m_playerControlSystem.update(entity, clock);
 		m_enemy01ControlSystem.update(entity, deltaTick);
 		m_enemy02ControlSystem.update(entity, deltaTick);
-		m_enemy03ControlSystem.update(entity, deltaTick);
+		m_enemy03ControlSystem.update(entity, deltaTick, clock);
 		m_scorePickUpSystem.update(entity, deltaTick);
 		m_playerbulletsystem.update(entity);
 		m_enemybulletsystem.update(entity);
