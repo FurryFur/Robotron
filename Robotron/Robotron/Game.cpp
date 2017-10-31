@@ -115,6 +115,7 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 			// The mouse is within the start button click
 			if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == STARTDOWN)
 			{
+				Game::s_buttonState = NOBUTTONDOWN;
 				Game::s_gameState = GAME;
 			}
 		}
@@ -128,6 +129,7 @@ Game::Game(GLFWwindow* window)
 {
 	m_clock.Process();
 	m_window = window;
+	m_displayGameOverText = false;
 
 	glfwSetMouseButtonCallback(window, &glfwGetMouseButtonCallBack);
 
@@ -222,6 +224,21 @@ Game::Game(GLFWwindow* window)
 	start.setPosition(glm::vec2(637.0f, 112.0f));
 	start.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 	m_uiLobbyLabels.push_back(start);
+
+	// Create the game over text label
+	TextLabel gameOverMan("Game over man, game over!", "Assets/Fonts/NYCTALOPIATILT.TTF");
+	gameOverMan.setScale(0.8f);
+	gameOverMan.setPosition(glm::vec2(100.0f, 612.0f));
+	gameOverMan.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+	m_uiGameOverLabels.push_back(gameOverMan);
+
+	// Create the final score text label
+	TextLabel finalScore("Final Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF");
+	finalScore.setScale(0.8f);
+	finalScore.setPosition(glm::vec2(100.0f, 562.0f));
+	finalScore.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+	m_uiGameOverLabels.push_back(finalScore);
+
 }
 
 
@@ -311,6 +328,14 @@ void Game::renderMenuScreens()
 		for (unsigned int i = 0; i < Game::m_uiLobbyLabels.size(); ++i)
 		{
 			m_uiLobbyLabels.at(i).Render();
+		}
+		// Render the game over labels only after the player has returned from the game
+		if (m_displayGameOverText == true)
+		{
+			for (unsigned int i = 0; i < Game::m_uiGameOverLabels.size(); ++i)
+			{
+				m_uiGameOverLabels.at(i).Render();
+			}
 		}
 	}
 
@@ -410,13 +435,37 @@ void Game::process(float deltaTick)
 	// The game is in the gameplay screen.
 	else if (s_gameState == GAME)
 	{
-		if (m_level == NULL)
+		// Create a level if one does not exist
+		if (m_level == nullptr)
 			m_level = std::make_unique<Level>(m_window, m_clock);
 
+		// Process the level
 		m_level->process(deltaTick, m_clock);
 
+		// Check if all enemies are dead and spawn new ones if so
 		if (!m_level->checkEnemiesAlive())
 			m_level->triggerNextLevel();
+
+		// Check if all players are dead and return to lobby if so
+		if (!m_level->checkPlayersAlive())
+		{
+			// Trigger the game over text to dispay and update it
+			m_uiGameOverLabels.at(1).setText("Final Score: " + std::to_string(m_level->getPlayerScore()));
+			m_displayGameOverText = true;
+			// Return to lobby
+			s_gameState = LOBBY;
+
+			// Register input system as a listener for keyboard events
+			glfwSetWindowUserPointer(m_window, this);
+			auto keyFunc = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+				Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
+				game->keyCallback(key, scancode, action, mods);
+			};
+			glfwSetKeyCallback(m_window, keyFunc);
+			
+			// Reset the level
+			m_level.reset(nullptr);
+		}
 	}
 
 	//m_mousePosLabel.setText("X: " + std::to_string(s_mousePosX) + " Y: " + std::to_string(s_mousePosY));

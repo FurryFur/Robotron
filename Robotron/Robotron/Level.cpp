@@ -162,13 +162,13 @@ void Level::spawnEnemies(int levelType)
 	// Create all the zombie enemy types in the scene.
 	for (int i = 0; i < zombieCount; ++i)
 	{
-		float randX = randomReal<float>(-20.0f, -5.0f);
+		float randX = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randX += 25;
+			randX += 30;
 
-		float randZ = randomReal<float>(-20.0f, -5.0f);
+		float randZ = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randZ += 25;
+			randZ += 30;
 
 		Entity& enemy = EntityUtils::createEnemyZombie(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
@@ -244,13 +244,13 @@ void Level::spawnEnemies(int levelType)
 	// Create all the shooter enemy types in the scene.
 	for (int i = 0; i < shooterCount; ++i)
 	{
-		float randX = randomReal<float>(-20.0f, -5.0f);
+		float randX = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randX += 25;
+			randX += 30;
 	
-		float randZ = randomReal<float>(-20.0f, -5.0f);
+		float randZ = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randZ += 25;
+			randZ += 30;
 	
 		EntityUtils::createEnemyShooter(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
@@ -259,13 +259,13 @@ void Level::spawnEnemies(int levelType)
 	// Create ScorePickups01
 	for (int i = 0; i < score1PickUpCount; ++i)
 	{
-		float randX = randomReal<float>(-20.0f, -5.0f);
+		float randX = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randX += 25;
+			randX += 30;
 	
-		float randZ = randomReal<float>(-20.0f, -5.0f);
+		float randZ = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randZ += 25;
+			randZ += 30;
 	
 		Entity& enemy = EntityUtils::createScorePickUp01(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
@@ -275,13 +275,13 @@ void Level::spawnEnemies(int levelType)
 	// Create ScorePickups02
 	for (int i = 0; i < score2PickUpCount; ++i)
 	{
-		float randX = randomReal<float>(-20.0f, -5.0f);
+		float randX = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randX += 25;
+			randX += 30;
 
-		float randZ = randomReal<float>(-20.0f, -5.0f);
+		float randZ = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randZ += 25;
+			randZ += 30;
 
 		Entity& enemy = EntityUtils::createScorePickUp02(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
@@ -291,13 +291,13 @@ void Level::spawnEnemies(int levelType)
 	// Create Health Pickups
 	for (int i = 0; i < healthPickUpCount; ++i)
 	{
-		float randX = randomReal<float>(-20.0f, -5.0f);
+		float randX = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randX += 25;
+			randX += 30;
 
-		float randZ = randomReal<float>(-20.0f, -5.0f);
+		float randZ = randomReal<float>(-20.0f, -10.0f);
 		if (randomInt(0, 1) == 0)
-			randZ += 25;
+			randZ += 30;
 
 		Entity& enemy = EntityUtils::createHealthPickUp(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
@@ -364,6 +364,19 @@ bool Level::checkEnemiesAlive()
 		// Return true when the first entity is found with an enemy tag.
 		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ZOMBIE, COMPONENT_SNAKE,
 			COMPONENT_ENEMY_SHOOTER))
+			return true;
+	}
+
+	return false;
+}
+
+// Check atleast one player is still alive. If return false, trigger the game to end.
+bool Level::checkPlayersAlive()
+{
+	// Cycle through all the entites in the scene.
+	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
+	{
+		if(m_scene.getEntity(i).playerStats.lives > 0)
 			return true;
 	}
 
@@ -502,4 +515,14 @@ void Level::processSetUpPhase()
 void Level::triggerNextLevel()
 {
 	m_inSetupPhase = true;
+}
+
+int Level::getPlayerScore()
+{
+	// Cycle through all the entites in the scene.
+	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
+	{
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+			return m_scene.getEntity(i).playerStats.score;
+	}
 }

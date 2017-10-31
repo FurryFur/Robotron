@@ -61,8 +61,11 @@ void Entity::addComponents(size_t componentMask)
 	}
 	if (matches(componentMask, COMPONENT_PLAYER_CONTROL)) {
 		m_componentMask |= COMPONENT_PLAYER_CONTROL;
-		playerStats = {};
 		controlVars = {};
+	}
+	if (matches(componentMask, COMPONENT_PLAYER)) {
+		m_componentMask |= COMPONENT_PLAYER;
+		playerStats = {};
 	}
 	if (matches(componentMask, COMPONENT_INPUT)) {
 		m_componentMask |= COMPONENT_INPUT;
