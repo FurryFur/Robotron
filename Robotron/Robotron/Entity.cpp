@@ -25,6 +25,11 @@ bool Entity::hasComponents() const
 	return m_componentMask != 0;
 }
 
+bool Entity::hadComponentsPrev(size_t componentMask) const
+{
+	return (m_componentMaskPrev & componentMask) == componentMask;
+}
+
 bool Entity::matches(size_t lhsComponentMask, size_t rhsComponentMask)
 {
 	return (lhsComponentMask & rhsComponentMask) == rhsComponentMask;
@@ -37,6 +42,8 @@ bool Entity::matchesAny(size_t lhsComponentMask, size_t rhsComponentMask)
 
 void Entity::addComponents(size_t componentMask)
 {
+	size_t tmp = m_componentMask;
+
 	if (matches(componentMask, COMPONENT_TRANSFORM)) {
 		m_componentMask |= COMPONENT_TRANSFORM;
 		transform = {};
@@ -103,9 +110,27 @@ void Entity::addComponents(size_t componentMask)
 		aiVariables.wanderPosition = { 0, 1, 0 };
 		controlVars = {};
 	}
+
+	if (tmp != m_componentMask)
+		m_componentMaskPrev = tmp;
+}
+
+void Entity::removeComponents(size_t componentMask)
+{
+	size_t tmp = m_componentMask;
+
+	m_componentMask &= (~componentMask);
+
+	if (tmp != m_componentMask)
+		m_componentMaskPrev = tmp;
 }
 
 void Entity::destroy()
 {
+	size_t tmp = m_componentMask;
+
 	m_componentMask = 0;
+
+	if (tmp != m_componentMask)
+		m_componentMaskPrev = tmp;
 }

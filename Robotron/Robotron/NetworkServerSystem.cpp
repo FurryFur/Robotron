@@ -15,7 +15,8 @@ using namespace std::chrono;
 
 NetworkServerSystem::NetworkServerSystem(Scene& scene)
 	: NetworkSystem(scene)
-	, m_packetInterval{ 500 }
+	, m_packetInterval{ 25 }
+
 	, m_willSendPcktThisFrame{ true }
 {
 	m_socket.initialise(8456);
@@ -160,16 +161,18 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 
 void NetworkServerSystem::handleEntityDestruction(Entity& entity)
 {
-	std::int32_t id = entity.network.id;
-	if (!entity.hasComponents() && id >= 0) {
-		if (!m_netEntities.at(id))
-			return;
+	if (!entity.hasComponents() && entity.hadComponentsPrev(COMPONENT_NETWORK)) {
+		std::int32_t id = entity.network.id;
+		if (0 <= id && id < m_netEntities.size()) {
+			if (!m_netEntities.at(id))
+				return;
 
-		auto rpc = std::make_unique<RPCDestroyGhost>(id);
-		bufferRpc(std::move(rpc));
+			auto rpc = std::make_unique<RPCDestroyGhost>(id);
+			bufferRpc(std::move(rpc));
 
-		// Stop tracking entity on the server
-		m_netEntities.at(id) = nullptr;
+			// Stop tracking entity on the server
+			m_netEntities.at(id) = nullptr;
+		}
 	}
 }
 
@@ -181,6 +184,17 @@ void NetworkServerSystem::endFrame()
 
 		selectGhostSnapshots(m_sendPacket.ghostSnapshotBuffer, m_netEntities,
 		                     m_sendPacket.ghostSnapshotBuffer.getMaxSize());
+
+		for (size_t i = 0; i < m_netEntities.size(); ++i) {
+			if (m_netEntities.at(i)) {
+				for (size_t j = i + 1; j < m_netEntities.size(); ++j) {
+					if (m_netEntities.at(j)) {
+						if (m_netEntities.at(j)->network.id == m_netEntities.at(i)->network.id)
+							std::cout << "ERROR: SERVER CONTAINS DUPLICATE NETWORK IDs" << std::endl;
+					}
+				}
+			}
+		}
 
 		// Send packet to clients
 		broadcastToClients(m_sendPacket);

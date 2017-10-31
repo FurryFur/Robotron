@@ -175,7 +175,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_INPUT_MAP | COMPONENT_MODEL
 	                                  | COMPONENT_TRANSFORM
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-	entity.playerStats.lives = 3;
+	entity.playerStats.lives = 300000;
 	entity.playerStats.score = 0;
 	entity.playerStats.extraLifeThreshhold = 1000;
 
@@ -290,12 +290,14 @@ Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const glm::mat4&
 
 	entity.transform = transform;
 	entity.network.id = entityNetId;
+
 	return entity;
 }
 
 Entity & EntityUtils::createPlayerGhost(Scene& scene, const glm::mat4& transform, std::int32_t entityNetId)
 {
 	Entity& entity = createPlayer(scene, transform);
+	entity.removeComponents(COMPONENT_PLAYER_CONTROL);
 	entity.network.id = entityNetId;
 	return entity;
 }
