@@ -41,12 +41,21 @@ void NetworkClientSystem::beginFrame()
 		std::uint32_t bufferOffset = std::min((seqNumRecvd - m_lastSeqNumSeen - 1),
 			(static_cast<std::uint32_t>(rpcGroups.size() - 1)));
 
-		// Execute RPCs received from server
-		for (int i = bufferOffset; i >= 0; --i) {
-			RPCGroup& rpcGroup = rpcGroups.at(i);
-			for (auto& rpc : rpcGroup.getRpcs()) {
-				rpc->execute(m_netEntities);
+		// Ignore out of order RPCs
+		bool updateLastSeqNum = false;
+		if (seqNumRecvd == m_lastSeqNumSeen + 1 || bufferOffset >= m_recvPacket.rpcGroupBuffer.size() - 1) {
+			// Execute RPCs received from server
+			for (int i = bufferOffset; i >= 0; --i) {
+				RPCGroup& rpcGroup = rpcGroups.at(i);
+				for (auto& rpc : rpcGroup.getRpcs()) {
+					rpc->execute(m_netEntities);
+				}
 			}
+			if (seqNumRecvd > m_lastSeqNumSeen)
+				updateLastSeqNum = true;
+		} else {
+			// TODO: Add logging here
+			std::cout << "INFO: The client received an out of order packet" << std::endl;
 		}
 
 		if (seqNumRecvd > m_lastSeqNumSeen) {
@@ -89,7 +98,8 @@ void NetworkClientSystem::beginFrame()
 			}
 
 			// Update the last sequence number seen from the server
-			m_lastSeqNumSeen = seqNumRecvd;
+			if (updateLastSeqNum)
+				m_lastSeqNumSeen = seqNumRecvd;
 		}
 	}
 }

@@ -55,6 +55,13 @@ void NetworkServerSystem::receiveAndProcess()
 		std::uint32_t seqNumRecvd = m_recvPacket.sequenceNum;
 		std::uint32_t bufferOffset = std::min((seqNumRecvd - seqNumSeen - 1),
 			                                  (static_cast<std::uint32_t>(m_recvPacket.rpcGroupBuffer.size() - 1)));
+
+		// Ignore out of order RPCs
+		if (seqNumRecvd > seqNumSeen + 1 && bufferOffset < m_recvPacket.rpcGroupBuffer.size() - 1) {
+			// TODO: Add logging here
+			std::cout << "INFO: Server received and out of order packet" << std::endl;
+			continue;
+		}
 		
 		// Execute RPCs received from client
 		for (int i = bufferOffset; i >= 0; --i) {
