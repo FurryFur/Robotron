@@ -185,17 +185,6 @@ void NetworkServerSystem::endFrame()
 		selectGhostSnapshots(m_sendPacket.ghostSnapshotBuffer, m_netEntities,
 		                     m_sendPacket.ghostSnapshotBuffer.getMaxSize());
 
-		for (size_t i = 0; i < m_netEntities.size(); ++i) {
-			if (m_netEntities.at(i)) {
-				for (size_t j = i + 1; j < m_netEntities.size(); ++j) {
-					if (m_netEntities.at(j)) {
-						if (m_netEntities.at(j)->network.id == m_netEntities.at(i)->network.id)
-							std::cout << "ERROR: SERVER CONTAINS DUPLICATE NETWORK IDs" << std::endl;
-					}
-				}
-			}
-		}
-
 		// Send packet to clients
 		broadcastToClients(m_sendPacket);
 
