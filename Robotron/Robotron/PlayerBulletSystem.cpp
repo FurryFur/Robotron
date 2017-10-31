@@ -60,7 +60,7 @@ void PlayerBulletSystem::update(Entity& entity)
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ZOMBIE, COMPONENT_SNAKE,
-			   COMPONENT_ENEMY_SHOOTER)
+			   COMPONENT_ENEMY_SHOOTER, COMPONENT_ENEMYBULLET)
 			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 1)
 		{
 			// Destroy the bullet.

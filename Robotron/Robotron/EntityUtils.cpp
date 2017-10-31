@@ -140,9 +140,9 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
 
-	entity.controlVars.maxMoveSpeed = 30.0f;
+	entity.controlVars.maxMoveSpeed = 20.0f;
 	entity.controlVars.maxAcceleration = 100.0f;
-	entity.controlVars.accelerationWeight = 1;
+	entity.controlVars.accelerationWeight = 2.0f;
 	entity.controlVars.worldSpaceMove = true;
 
 	return entity;

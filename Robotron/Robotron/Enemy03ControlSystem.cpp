@@ -99,7 +99,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 
 		// Shoot a bullet at the player
 		// Check to see if the entity has not shot too recently
-		if (entity.controlVars.lastFiringTime + entity.controlVars.firingSpeed <= clock.GetCurTime())
+		if (entity.controlVars.lastFiringTime + entity.controlVars.firingSpeed <= clock.GetCurTime() && targetPosition.y == 1)
 		{
 			// Update the last entites last shot time
 			entity.controlVars.lastFiringTime = clock.GetCurTime();
