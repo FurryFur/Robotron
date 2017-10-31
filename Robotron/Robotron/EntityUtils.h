@@ -67,7 +67,7 @@ namespace EntityUtils {
 
 	// Creates a  Player (currently a unit sphere), centered at the origin, with the specified 
 	// transform;
-	Entity& createPlayer(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createPlayer(Scene& scene, const glm::mat4& transform = glm::mat4{ 1 });
 
 	// Creates a  Player Bullet (currently a unit sphere), centered at the origin, with the specified 
 	// transform;

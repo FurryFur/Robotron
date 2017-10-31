@@ -44,7 +44,8 @@ Level::Level(GLFWwindow* window, Clock& clock)
 		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 1.0f }));
 
 	Entity& player = EntityUtils::createPlayer(m_scene,
-		glm::translate({}, glm::vec3{ 0.0f, 50.0f, 0.0f }));
+		glm::scale({}, glm::vec3{ 4.0f, 4.0f, 4.0f })
+		+ glm::translate({}, glm::vec3{ 0.0f, 50.0f, 0.0f }));
 	player.addComponents(COMPONENT_NETWORK);
 
 	spawnEnemies(0);
@@ -290,7 +291,7 @@ void Level::spawnEnemies(int levelType)
 	
 		Entity& enemy = EntityUtils::createScorePickUp01(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
-			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+			* glm::scale({}, glm::vec3{ 0.4f, 0.4f, 0.4f }));
 	}
 
 	// Create ScorePickups02
@@ -306,7 +307,7 @@ void Level::spawnEnemies(int levelType)
 
 		Entity& enemy = EntityUtils::createScorePickUp02(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
-			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+			* glm::scale({}, glm::vec3{ 0.6f, 0.6f, 0.6f }));
 	}
 
 	// Create Health Pickups
@@ -322,7 +323,7 @@ void Level::spawnEnemies(int levelType)
 
 		Entity& enemy = EntityUtils::createHealthPickUp(m_scene,
 			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
-			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+			* glm::scale({}, glm::vec3{ 0.4f, 0.4f, 0.4f }));
 	}
 }
 
