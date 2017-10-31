@@ -14,11 +14,11 @@
 #pragma once
 
 struct PlayerStatsComponent {
-	int score;
-	// Keeps track of the players score until they get a new life. Refreshes when they do.
-	int extraLifeTrack;
-	int extraLifeThreshhold;
-	int lives;
-	bool isRespawning;
-	double deathTime;
+	int score; // The current score of the player
+	int extraLifeTrack; // Keeps track of the players score until they get a new life. Refreshes when they do.
+	int extraLifeThreshhold; // How many points the player needs to get another life
+	int lives; // The current number of lives the player has
+	bool isRespawning; // Is true when they are dead and will respawn
+	double deathTime; // The time it takes for them to respawn
+	bool isPlayer; // A flag to tell systems that the entity is a player
 };

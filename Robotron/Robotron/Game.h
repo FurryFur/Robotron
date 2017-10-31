@@ -74,11 +74,14 @@ private:
 	std::vector <TextLabel> m_uiMainMenuLabels;
 	std::vector <TextLabel> m_uiHostSetupLabels;
 	std::vector <TextLabel> m_uiLobbyLabels;
+	std::vector <TextLabel> m_uiGameOverLabels;
 
 	std::unique_ptr<Level> m_level;
 	
 	std::string m_serverName;
 	TextLabel m_serverNameInput;
+
+	bool m_displayGameOverText;
 
 	//TextLabel m_mousePosLabel;
 };

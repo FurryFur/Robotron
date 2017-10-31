@@ -42,6 +42,7 @@
 
 #include <cmath>
 #include <memory>
+#include <vector>
 
 #pragma once
 class Level
@@ -54,8 +55,12 @@ public:
 	void initalizeNextLevel();
 	// Returns true if there are still alive enemies in the level.
 	bool checkEnemiesAlive();
+	// Returns true if there are still alive players in the level.
+	bool checkPlayersAlive();
 	void process(float _fDeltaTick, Clock& clock);
 	void triggerNextLevel();
+	// Get the player's score
+	int getPlayerScore();
 
 private:
 	
