@@ -447,7 +447,6 @@ void Level::process(float deltaTick, Clock& clock)
 		m_physicsSystem.update(entity, deltaTick);
 		m_networkSystem->update(entity, deltaTick);
 		m_renderSystem.update(entity);
-		m_networkSystem->update(entity, deltaTick);
 	}
 
 	if (m_inSetupPhase)
@@ -477,8 +476,8 @@ void Level::process(float deltaTick, Clock& clock)
 	m_playerHealth.Render();
 
 	// Do operations that should happen at the end of the frame.
-	m_networkSystem->endFrame();
 	m_renderSystem.endRender();
+	m_networkSystem->endFrame();
 }
 
 // Handles the animation between levels. The player flies up, level spawns. And they desend in the centre of the screen.

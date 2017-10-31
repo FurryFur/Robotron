@@ -72,6 +72,11 @@ public:
 	// Returns true if this entity has any components
 	bool hasComponents() const;
 
+	bool hadComponentsPrev(size_t componentMask) const;
+
+	template<typename ...ComponentTs>
+	bool hadComponentsPrev(size_t first, ComponentTs... rest) const;
+
 	// Adds multiple components to the entity
 	template<typename ...ComponentTs>
 	void addComponents(size_t first, ComponentTs... rest);
@@ -80,6 +85,15 @@ public:
 	// A mask can also be specified to add more than one entity at
 	// a time i.e. (COMPONENT_NETWORK | COMPONENT_TRANSFORM).
 	void addComponents(size_t componentMask);
+
+	// Removes a component from the entity.
+	// A mask can also be specified to remove more than one entity at
+	// a time i.e. (COMPONENT_NETWORK | COMPONENT_TRANSFORM).
+	void removeComponents(size_t componentMask);
+
+	// Removes multiple components from the entity
+	template<typename ...ComponentTs>
+	void removeComponents(size_t first, ComponentTs... rest);
 
 	// Destroys the entity
 	void destroy();
@@ -104,6 +118,7 @@ private:
 	static bool matchesAny(size_t lhsComponentMask, size_t rhsComponentMask);
 
 	size_t m_componentMask;
+	size_t m_componentMaskPrev;
 };
 
 template<typename ...ComponentTs>
@@ -119,10 +134,33 @@ inline bool Entity::hasComponentsAny(size_t first, ComponentTs ...rest) const
 }
 
 template<typename ...ComponentTs>
+inline bool Entity::hadComponentsPrev(size_t first, ComponentTs ...rest) const
+{
+	return hadComponentsPrev(first) && hadComponentsPrev(rest...);
+}
+
+template<typename ...ComponentTs>
 inline void Entity::addComponents(size_t first, ComponentTs... rest)
 {
+	size_t tmp = m_componentMask;
+
 	addComponents(first);
 	addComponents(rest...);
+
+	if (tmp != m_componentMask)
+		m_componentMaskPrev = tmp;
+}
+
+template<typename ...ComponentTs>
+inline void Entity::removeComponents(size_t first, ComponentTs ...rest)
+{
+	size_t tmp = m_componentMask;
+
+	removeComponents(first);
+	removeComponents(rest...);
+
+	if (tmp != m_componentMask)
+		m_componentMaskPrev = tmp;
 }
 
 template<typename ...ComponentTs>

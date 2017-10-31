@@ -94,6 +94,7 @@ void RPCDestroyGhost::execute(std::vector<Entity*>& netEntities)
 		Entity* netEntity = netEntities.at(m_entityNetId);
 		if (netEntity) {
 			netEntity->destroy();
+			netEntities.at(m_entityNetId) = nullptr;
 		}
 	}
 }
@@ -129,16 +130,29 @@ RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId,
 
 void RPCCreatePlayerGhost::execute(std::vector<Entity*>& netEntities)
 {
+	if (m_entityNetId < 0) {
+		// TODO: Add logging here
+		std::cout << "ERROR: Trying to execute an RPC with a negative network entity id" << std::endl;
+		return;
+	}
+
 	Scene* scene = Scene::getCurrentScene();
 	if (scene) {
 		// Destroy existing entities with the same id before creating new ones
 		if (0 <= m_entityNetId && m_entityNetId < netEntities.size()) {
 			Entity* existingEntity = netEntities.at(m_entityNetId);
-			if (existingEntity)
+			if (existingEntity) {
 				existingEntity->destroy();
+				netEntities.at(m_entityNetId) = nullptr;
+			}
 		}
 
 		Entity& newEntity = EntityUtils::createPlayerGhost(*scene, m_transform, m_entityNetId);
+
+		// Add entity to network system tracking
+		if (m_entityNetId >= netEntities.size())
+			netEntities.resize(m_entityNetId + 1);
+		netEntities.at(m_entityNetId) = &newEntity;
 	}
 	else {
 		// TODO: Add logging here
@@ -169,16 +183,31 @@ RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId,
 
 void RPCCreateGhost::execute(std::vector<Entity*>& netEntities)
 {
+	if (m_entityNetId < 0) {
+		// TODO: Add logging here
+		std::cout << "ERROR: Trying to execute an RPC with a negative network entity id" << std::endl;
+		return;
+	}
+
 	Scene* scene = Scene::getCurrentScene();
 	if (scene) {
 		// Destroy existing entities with the same id before creating new ones
 		if (0 <= m_entityNetId && m_entityNetId < netEntities.size()) {
 			Entity* existingEntity = netEntities.at(m_entityNetId);
-			if (existingEntity)
+			if (existingEntity) {
 				existingEntity->destroy();
+				netEntities.at(m_entityNetId) = nullptr;
+				std::cout << "INFO: Overwritting entity with network id: " << m_entityNetId << std::endl;
+			}
 		}
 
 		Entity& newEntity = EntityUtils::createGhost(*scene, m_modelId, m_transform, m_entityNetId);
+
+		// Add entity to network system tracking
+		if (m_entityNetId >= netEntities.size())
+			netEntities.resize(m_entityNetId + 1);
+		netEntities.at(m_entityNetId) = &newEntity;
+		
 	} else {
 		// TODO: Add logging here
 		std::cout << "Warning: Could not execute RPC Create Ghost. Missing scene, "
@@ -209,7 +238,7 @@ void RPCRecordInput::execute(std::vector<Entity*>& netEntities)
 {
 	if (m_entityNetId < 0) {
 		// TODO: Do logging here
-		std::cout << "Warning: Server received an RPC with an unassigned network ID" << std::endl;
+		std::cout << "Warning: Received an RPC with an unassigned network ID" << std::endl;
 	}
 
 	if (m_entityNetId < netEntities.size()) {

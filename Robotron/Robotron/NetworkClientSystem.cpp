@@ -103,33 +103,9 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 
 	// TODO: Add logging here
 	if (id < 0) {
-		std::cout << "Error: Entity with unassigned network id seen by client" << std::endl;
+		//std::cout << "Error: Entity with unassigned network id seen by client" << std::endl;
 		return;
 	}
-
-	// Make sure we don't try to access an out of range element
-	if (id >= m_netEntities.size())
-		m_netEntities.resize(id + 1);
-
-	// Detect new entities
-	if (!m_netEntities.at(id))
-		m_netEntities.at(id) = &entity;
-
-	// Update ghost snapshots
-	//if (id < m_ghostSnapshots.size() && m_ghostSnapshots.at(id)) {
-	//	glm::mat4& transform = m_ghostSnapshots.at(id)->transform;
-	//	PhysicsComponent& physics = m_ghostSnapshots.at(id)->physics;
-	//	if (entity.hasComponents(COMPONENT_TRANSFORM)) {
-	//		// TODO: Add delta tick here
-	//		// Lerp transform component to latest snapshot
-	//		entity.transform = transform;
-	//	}
-	//	if (entity.hasComponents(COMPONENT_PHYSICS)) {
-	//		// Lerp physics component to latest snapshot
-	//		entity.physics.velocity = physics.velocity;
-	//		entity.physics.acceleration = physics.acceleration;
-	//	}
-	//}
 
 	// Send input updates to server
 	if (entity.hasComponents(COMPONENT_INPUT)) {
