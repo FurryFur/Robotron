@@ -18,6 +18,7 @@
 #include "KeyObserver.h"
 #include "Scene.h"
 #include "Clock.h"
+#include "Level.h"
 #include "Utils.h"
 
 #include <GLFW\glfw3.h>

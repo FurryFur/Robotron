@@ -22,10 +22,13 @@ Level::Level(GLFWwindow* window, Clock& clock)
 {
 	Scene::makeSceneCurrent(&m_scene);
 
+	m_inputSystem.registerKeyObserver(this);
+
 	m_window = window;
 	m_levelNum = 0;
 	m_inSetupPhase = false;
 	m_descendingPlayers = true;
+	m_drawConnectPlayerStats = false;
 
 	std::string strServerMode;
 	std::cout << "Run in server mode: ";
@@ -84,6 +87,24 @@ Level::Level(GLFWwindow* window, Clock& clock)
 	m_playerScore.setPosition(glm::vec2(10.0f, 40.0f));
 	m_playerScore.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 	m_playerScore.setScale(0.5f);
+
+	int numOfPlayers = 0;
+	// Cycle over all the entities in the scene and find the total number of players
+	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
+	{
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
+			++numOfPlayers;
+	}
+	// Create text labels for each player
+	for (size_t i = 0; i < numOfPlayers; ++i)
+	{
+
+		TextLabel playerInfo("Player", "Assets/Fonts/NYCTALOPIATILT.TTF");
+		playerInfo.setScale(0.3f);
+		playerInfo.setPosition(glm::vec2(1030.0f, 770.0f - (i * 15)));
+		playerInfo.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+		m_statsScreenLabels.push_back(playerInfo);
+	}
 }
 
 
@@ -330,7 +351,7 @@ void Level::initalizeNextLevel()
 		}
 
 		// Move the player back to the centre point of the level
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 		{
 			m_scene.getEntity(i).transform[3].x = 0.0f;
 			m_scene.getEntity(i).transform[3].z = 0.0f;
@@ -403,7 +424,8 @@ void Level::respawnDeadPlayers(Clock& clock)
 }
 
 void Level::process(float deltaTick, Clock& clock)
-{	
+{		
+	int playerNum = 0;
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
@@ -424,7 +446,16 @@ void Level::process(float deltaTick, Clock& clock)
 				++m_scene.getEntity(i).playerStats.lives;
 			}
 		}
+
+		// Update all the players stats only if the flag to render them is true.
+		if (m_drawConnectPlayerStats && m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
+		{
+			m_statsScreenLabels.at(playerNum).setText("Player " + std::to_string(playerNum + 1)
+			+ "Lives: " + std::to_string(m_scene.getEntity(i).playerStats.lives)
+			+ "Score: " + std::to_string(m_scene.getEntity(i).playerStats.score));
+		}
 	}
+
 
 	
 	// Do any operations that should only happen once per frame.
@@ -453,6 +484,13 @@ void Level::process(float deltaTick, Clock& clock)
 	{
 		++m_setUpTick;
 		processSetUpPhase();
+	}
+
+	// Draw all the player stats only if the flag is set to true.
+	if (m_drawConnectPlayerStats)
+	{
+		for (size_t i = 0; i < m_statsScreenLabels.size(); ++i)
+			m_statsScreenLabels.at(i).Render();
 	}
 
 	// When respawning, players spawn above the level.
@@ -509,6 +547,21 @@ void Level::processSetUpPhase()
 			m_inSetupPhase = false;
 			m_setUpTick = 0;
 		}
+	}
+}
+
+void Level::keyCallback(int key, int scancode, int action, int mods)
+{
+	// Tab key was pressed
+	if (key == 258) {
+		if (action == GLFW_PRESS)
+		{
+			if (m_drawConnectPlayerStats == true)
+				m_drawConnectPlayerStats = false;
+			else
+				m_drawConnectPlayerStats = true;
+		}
+		return;
 	}
 }
 

@@ -33,7 +33,7 @@
 #include "PlayerBulletSystem.h"
 #include "EnemyBulletSystem.h"
 #include "PhysicsSystem.h"
-
+#include "KeyObserver.h"
 #include "TextLabel.h"
 
 #include <GLFW\glfw3.h>
@@ -45,7 +45,7 @@
 #include <vector>
 
 #pragma once
-class Level
+class Level : public IKeyObserver
 {
 public:
 	Level(GLFWwindow* window, Clock& clock);
@@ -61,7 +61,6 @@ public:
 	void triggerNextLevel();
 	// Get the player's score
 	int getPlayerScore();
-
 private:
 	
 	// Respawn players a moment after death time if they still have lives left. 
@@ -86,10 +85,16 @@ private:
 	TextLabel m_playerHealth;
 	TextLabel m_playerScore;
 
+	std::vector<TextLabel> m_statsScreenLabels;
+
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	int m_levelNum;
 	bool m_inSetupPhase;
 	bool m_descendingPlayers;
 	int m_setUpTick = 0;
+	bool m_drawConnectPlayerStats;
+
+	// Inherited via IKeyObserver
+	virtual void keyCallback(int key, int scancode, int action, int mods) override;
 };
 

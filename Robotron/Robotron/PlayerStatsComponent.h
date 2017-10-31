@@ -20,5 +20,4 @@ struct PlayerStatsComponent {
 	int lives; // The current number of lives the player has
 	bool isRespawning; // Is true when they are dead and will respawn
 	double deathTime; // The time it takes for them to respawn
-	bool isPlayer; // A flag to tell systems that the entity is a player
 };

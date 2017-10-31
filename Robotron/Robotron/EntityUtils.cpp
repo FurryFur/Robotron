@@ -181,7 +181,6 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.playerStats.lives = 30000;
 	entity.playerStats.score = 0;
 	entity.playerStats.extraLifeThreshhold = 1000;
-	entity.playerStats.isPlayer = true;
 	entity.transform = transform;
 
 	entity.model = GLPrimitives::getSphereModel();
