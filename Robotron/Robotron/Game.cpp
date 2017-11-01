@@ -16,6 +16,7 @@
 
 GameState Game::s_gameState = MAINMENU;
 ButtonState Game::s_buttonState = NOBUTTONDOWN;
+bool Game::s_buttonClicked = false;
 
 double Game::s_mousePosX = 0.0f;
 double Game::s_mousePosY = 0.0f;
@@ -30,18 +31,21 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 		{
 			if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 450 && Game::s_mousePosY <= 495)
 			{
+				Game::s_buttonClicked = true;
 				Game::s_buttonState = JOINDOWN;
 			}
 
 			// The mouse is within the host button click
 			else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 550 && Game::s_mousePosY <= 595)
 			{
+				Game::s_buttonClicked = true;
 				Game::s_buttonState = HOSTDOWN;
 			}
 
 			// The mouse is within the quit button click
 			else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
 			{
+				Game::s_buttonClicked = true;
 				Game::s_buttonState = QUITDOWN;
 			}
 		}
@@ -51,6 +55,7 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 			// The mouse is within the back button click
 			if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
 			{
+				Game::s_buttonClicked = true;
 				Game::s_buttonState = BACKDOWN;
 			}
 		}
@@ -60,11 +65,13 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 			// The mouse is within the back button click
 			if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
 			{
+				Game::s_buttonClicked = true;
 				Game::s_buttonState = BACKDOWN;
 			}
 			// The mouse is within the start button click
 			if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
 			{
+				Game::s_buttonClicked = true;
 				Game::s_buttonState = STARTDOWN;
 			}
 		}
@@ -124,18 +131,48 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 	}
 }
 
-Game::Game(GLFWwindow* window)
+Game::Game(GLFWwindow* window, Audio audio)
 	: m_serverNameInput("", "Assets/Fonts/NYCTALOPIATILT.TTF")
 	, m_userNameInput("", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	, m_menuScene{}
+	, m_renderSystem(window, m_menuScene)
 {
 	m_clock.Process();
 	m_window = window;
 	m_displayGameOverText = false;
+	m_audio = audio;
 
 	glfwSetMouseButtonCallback(window, &glfwGetMouseButtonCallBack);
 
-	//m_mousePosLabel.setPosition(glm::vec2(10.0f, 10.0f));
-	//m_mousePosLabel.setColor(glm::vec3(0.8f, 0.8F, 0.8f));
+	// Create the skybox
+	Entity& skybox = EntityUtils::createSkybox(m_menuScene, {
+		"Assets/Textures/envmap_violentdays/violentdays_rt.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_lf.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_up.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_dn.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_bk.tga",
+		"Assets/Textures/envmap_violentdays/violentdays_ft.tga",
+	});
+
+	Texture irradianceMap = GLUtils::loadCubeMapFaces({
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c00.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c01.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c02.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c03.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c04.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c05.bmp",
+	});
+
+	Texture radianceMap = GLUtils::loadDDSTexture("Assets/Textures/envmap_violentdays/violentdays_pmrem.dds");
+
+	// Set skybox as environment map for reflections
+	// The skybox only has one colormap texture so use this as the reflection map.
+	m_renderSystem.setRadianceMap(radianceMap.id);
+	m_renderSystem.setIrradianceMap(irradianceMap.id);
+
+	// Setup the camera
+	Entity& cameraEntity = EntityUtils::createCamera(m_menuScene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
+	m_renderSystem.setCamera(&cameraEntity);
 
 	// Register input system as a listener for keyboard events
 	glfwSetWindowUserPointer(window, this);
@@ -169,7 +206,7 @@ Game::Game(GLFWwindow* window)
 	m_uiMainMenuLabels.push_back(quit);
 
 	// Create the main menu controls text
-	TextLabel controls("Move: WASD      Shoot: Numpad", "Assets/Fonts/NYCTALOPIATILT.TTF");
+	TextLabel controls("Move: WASD      Shoot: 8 Directions on Numpad", "Assets/Fonts/NYCTALOPIATILT.TTF");
 	controls.setScale(0.5f);
 	controls.setPosition(glm::vec2(10.0f, 10.0f));
 	controls.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
@@ -309,6 +346,9 @@ void Game::keyCallback(int key, int scancode, int action, int mods)
 			else if (key < 255)
 			{
 				m_userName += key;
+				// Limit the size of the username to 10 characters
+				if(m_userName.size() > 10)
+					m_userName = m_userName.substr(0, m_userName.size() - 1);
 				m_userNameInput.setText(m_userName);
 			}
 		}
@@ -328,8 +368,14 @@ void Game::executeOneFrame()
 
 void Game::renderMenuScreens()
 {
-	glDepthMask(GL_TRUE);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glDepthMask(GL_TRUE);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Render the entities in the menu scene
+	m_renderSystem.beginRender();
+
+	// Update all the entities using all the systems.
+	for (size_t i = 0; i < m_menuScene.getEntityCount(); ++i)
+		m_renderSystem.update(m_menuScene.getEntity(i));
 
 	// Render the main menu screen.
 	if (s_gameState == MAINMENU)
@@ -369,7 +415,8 @@ void Game::renderMenuScreens()
 		}
 	}
 
-	glfwSwapBuffers(m_window);
+	m_renderSystem.endRender();
+	//glfwSwapBuffers(m_window);
 }
 
 void Game::process(float deltaTick)
@@ -384,6 +431,12 @@ void Game::process(float deltaTick)
 	// The Game is currently in the main menu. Here the player can search for a lobby by clicking join or host a lobby.
 	if (s_gameState == MAINMENU)
 	{
+		if (s_buttonClicked == true)
+		{
+			m_audio.playButtonClick();
+			s_buttonClicked = false;
+		}
+		
 		// The mouse is within the join button click
 		if (s_mousePosX >= 635.0f && s_mousePosX <= 780.0f && s_mousePosY >= 450.0f && s_mousePosY <= 495.0f)
 		{

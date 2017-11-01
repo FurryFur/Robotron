@@ -14,18 +14,23 @@
 
 #include "GLUtils.h"
 #include "Game.h"
+#include "Audio.h"
 
 #include <GLFW\glfw3.h>
-
 double oldTime = 0.0;
 double newTime = 0.0;
 
 int main()
 {
+	
 	// Init combined Window and OpenGL context.
 	GLFWwindow* window = GLUtils::initOpenGL();
 
-	Game game(window);
+	Audio audio;
+
+	Game game(window, audio);
+
+	audio.playBgMusic();
 
 	while (!glfwWindowShouldClose(window)) {		
 		// Execute a from of the game.

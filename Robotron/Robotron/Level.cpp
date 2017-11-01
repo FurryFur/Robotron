@@ -383,7 +383,7 @@ bool Level::checkPlayersAlive()
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if(m_scene.getEntity(i).playerStats.playerInfo.lives > 0)
+		if(m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).playerStats.playerInfo.lives > 0)
 			return true;
 	}
 

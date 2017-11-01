@@ -189,7 +189,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS
 									  | COMPONENT_PLAYER);
 
-	entity.playerStats.playerInfo.lives = 30000;
+	entity.playerStats.playerInfo.lives = 1;
 	entity.playerStats.playerInfo.score = 0;
 	entity.playerStats.extraLifeThreshhold = 1000;
 	entity.transform = transform;
