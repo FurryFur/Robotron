@@ -159,6 +159,9 @@
     <ClCompile Include="PhysicsSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ClientInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene.h">
@@ -325,6 +328,12 @@
     </ClInclude>
     <ClInclude Include="ControlComponent.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerInfo.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="LobbyEventListener.h">
+      <Filter>Header Files\Networking</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

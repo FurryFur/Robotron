@@ -20,6 +20,20 @@
 #include <string>
 #include <functional>
 
+// Converts a sockaddr_in to a human readable string
+inline std::string toString(sockaddr_in _sockAddress)
+{
+	//INET_ADDRSTRLEN - maximum length for IPv4 addresses
+	char _pcAddress[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &_sockAddress.sin_addr, _pcAddress, INET_ADDRSTRLEN);
+
+	std::string _strAddress = _pcAddress;
+	std::string _strPort = std::to_string(ntohs(_sockAddress.sin_port));
+	std::string _strAddressPort = _strAddress + ':' + _strPort;
+
+	return _strAddressPort;
+}
+
 namespace std {
 	template <>
 	struct hash<sockaddr_in> {
@@ -36,6 +50,11 @@ inline bool operator==(const sockaddr_in& lhs, const sockaddr_in& rhs)
 {
 	return lhs.sin_addr.S_un.S_addr == rhs.sin_addr.S_un.S_addr
 		&& lhs.sin_port == rhs.sin_port;
+}
+
+inline bool operator!=(const sockaddr_in& lhs, const sockaddr_in& rhs)
+{
+	return !(lhs == rhs);
 }
 
 class CSocket

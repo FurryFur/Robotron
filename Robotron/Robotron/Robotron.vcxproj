@@ -159,6 +159,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
   <ItemGroup>
     <ClCompile Include="AIUtils.cpp" />
     <ClCompile Include="BufferStream.cpp" />
+    <ClCompile Include="ClientInfo.cpp" />
     <ClCompile Include="Clock.cpp" />
     <ClCompile Include="Enemy01ControlSystem.cpp" />
     <ClCompile Include="Enemy02ControlSystem.cpp" />
@@ -206,7 +207,9 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GhostSnapshot.h" />
+    <ClInclude Include="LobbyEventListener.h" />
     <ClInclude Include="PhysicsSystem.h" />
+    <ClInclude Include="ServerInfo.h" />
     <ClInclude Include="StreamableEvictQueue.h" />
     <ClInclude Include="GameplayLogicSystem.h" />
     <ClInclude Include="GLMUtils.h" />

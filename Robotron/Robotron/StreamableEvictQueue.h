@@ -30,6 +30,9 @@ public:
 	// Returns the item at position i
 	T& at(std::uint16_t i);
 
+	// Returns the item at position i
+	const T& at(std::uint16_t i) const;
+
 	// Clears the queue
 	void clear();
 
@@ -63,6 +66,12 @@ inline T& StreamableEvictQueue<T, maxSize>::front()
 
 template<typename T, std::uint16_t maxSize>
 inline T& StreamableEvictQueue<T, maxSize>::at(std::uint16_t i)
+{
+	return m_queue.at(i);
+}
+
+template<typename T, std::uint16_t maxSize>
+inline const T & StreamableEvictQueue<T, maxSize>::at(std::uint16_t i) const
 {
 	return m_queue.at(i);
 }

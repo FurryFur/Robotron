@@ -301,6 +301,7 @@ Entity & EntityUtils::createPlayerGhost(Scene& scene, const glm::mat4& transform
 {
 	Entity& entity = createPlayer(scene, transform);
 	entity.removeComponents(COMPONENT_PLAYER_CONTROL);
+	entity.removeComponents(COMPONENT_INPUT_MAP);
 	entity.network.id = entityNetId;
 	return entity;
 }

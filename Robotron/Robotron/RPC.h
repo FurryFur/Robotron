@@ -102,7 +102,7 @@ public:
 	OutBufferStream& serialize(OutBufferStream&) const;
 	InBufferStream& deserialize(InBufferStream&);
 
-	const std::vector<std::unique_ptr<RemoteProcedureCall>>& getRpcs();
+	const std::vector<std::unique_ptr<RemoteProcedureCall>>& getRpcs() const;
 
 private:
 	std::vector<std::unique_ptr<RemoteProcedureCall>> m_rpcs;

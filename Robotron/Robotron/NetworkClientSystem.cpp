@@ -6,6 +6,7 @@
 #include "Entity.h"
 #include "GhostSnapshot.h"
 #include "RPC.h"
+#include "NetworkServerSystem.h"
 
 #include <glm\gtx\matrix_interpolation.hpp>
 #include <glm\gtx\compatibility.hpp>
@@ -18,94 +19,46 @@
 NetworkClientSystem::NetworkClientSystem(Scene& scene)
 	: NetworkSystem(scene)
 	, m_lastSeqNumSeen{ 0 }
+	, m_clientState{ CLIENT_STATE_NO_SERVER }
 {
 	m_socket.initialise(4567);
 	allocateRecvBuffer();
 
+	broadcastForServers();
+
 	// TODO: Add broadcast to find servers
-	inet_pton(AF_INET, "127.0.0.1", &m_serverAddress.sin_addr);
-	m_serverAddress.sin_port = htons(8456);
-	m_serverAddress.sin_family = AF_INET;
+	//inet_pton(AF_INET, "127.0.0.1", &m_serverAddress.sin_addr);
+	//m_serverAddress.sin_port = htons(8456);
+	//m_serverAddress.sin_family = AF_INET;
 }
 
 void NetworkClientSystem::beginFrame()
 {
 	sockaddr_in address;
 	while (receiveData(m_recvPacket, address)) {
-		auto& ghostSnapshots = m_recvPacket.ghostSnapshotBuffer;
-		auto& rpcGroups = m_recvPacket.rpcGroupBuffer;
-
-		// Get figure out which remote procedure calls we got from the server
-		// that we haven't seen before.
-		std::uint32_t seqNumRecvd = m_recvPacket.sequenceNum;
-		std::uint32_t bufferOffset = std::min((seqNumRecvd - m_lastSeqNumSeen - 1),
-			(static_cast<std::uint32_t>(rpcGroups.size() - 1)));
-
-		// Ignore out of order RPCs
-		bool updateLastSeqNum = false;
-		if (seqNumRecvd == m_lastSeqNumSeen + 1 || bufferOffset >= m_recvPacket.rpcGroupBuffer.size() - 1) {
-			// Execute RPCs received from server
-			for (int i = bufferOffset; i >= 0; --i) {
-				RPCGroup& rpcGroup = rpcGroups.at(i);
-				for (auto& rpc : rpcGroup.getRpcs()) {
-					rpc->execute(m_netEntities);
-				}
-			}
-			if (seqNumRecvd > m_lastSeqNumSeen)
-				updateLastSeqNum = true;
-		} else {
-			// TODO: Add logging here
-			std::cout << "INFO: The client received an out of order packet" << std::endl;
-		}
-
-		if (seqNumRecvd > m_lastSeqNumSeen) {
-			// Save ghost snapshots when new data received
-			for (std::uint16_t i = 0; i < ghostSnapshots.size(); ++i) {
-				GhostSnapshot& ghostSnapshot = ghostSnapshots.at(i);
-				std::int32_t id = ghostSnapshot.entityNetId;
-
-				// TODO: Add logging here
-				if (id < 0) {
-					std::cout << "Error: Ghost Snapshot with unassigned network id received by client" << std::endl;
-					return;
-				}
-
-				// Record ghost snapshot
-				if (id < m_netEntities.size()) {
-					Entity* entity = m_netEntities.at(id);
-					if (entity) {
-						// WARNING: May produce unexpected results for transform matrices containing scale
-						//glm::mat4 m1rot = extractMatrixRotation(m1);
-						//glm::mat4 dltRotation = m2 * transpose(m1rot);
-						//vec3 dltAxis;
-						//T dltAngle;
-						//axisAngle(dltRotation, dltAxis, dltAngle);
-						//entity->network.transformError = glm::interpolate(entity->transform, ghostSnapshot.transform);
-						entity->transform = ghostSnapshot.transform;
-						entity->physics = ghostSnapshot.physics;
-					} else {
-						// TODO: Add logging here
-						std::cout << "Warning: Client received snapshot of deleted ghost" << std::endl;
-					}
-				}
-
-				// Make sure we don't try to access an out of range element
-				//if (id >= m_ghostSnapshots.size())
-				//	m_ghostSnapshots.resize(id + 1);
-
-				//// Record new snapshot
-				//m_ghostSnapshots.at(id) = std::make_unique<GhostSnapshot>(ghostSnapshot);
-			}
-
-			// Update the last sequence number seen from the server
-			if (updateLastSeqNum)
-				m_lastSeqNumSeen = seqNumRecvd;
+		switch (m_clientState)
+		{
+		case CLIENT_STATE_NO_SERVER:
+		case CLIENT_STATE_JOINING:
+			handleServerJoinPackets(m_recvPacket, address);
+			break;
+		case CLIENT_STATE_IN_LOBBY:
+		case CLIENT_STATE_IN_GAME:
+			handleGamePackets(m_recvPacket, address);
+			break;
+		default:
+			break;
 		}
 	}
+
+	NetworkSystem::beginFrame();
 }
 
 void NetworkClientSystem::update(Entity& entity, float deltaTick)
 {
+	if (m_clientState != CLIENT_STATE_IN_GAME)
+		return;
+
 	if (!entity.hasComponents(COMPONENT_NETWORK, COMPONENT_TRANSFORM))
 		return;
 
@@ -125,20 +78,168 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 
 void NetworkClientSystem::endFrame()
 {
-	m_sendPacket.sequenceNum = m_curSeqenceNum;
+	if (m_willSendPcktThisFrame) {
+		m_sendPacket.packetType = PACKET_TYPE_NORMAL;
+		m_sendPacket.sequenceNum = m_curSeqenceNum;
 
-	sendData(m_sendPacket, m_serverAddress);
+		sendData(m_sendPacket, m_serverAddress);
+	}
 
 	NetworkSystem::endFrame();
 }
 
-void NetworkClientSystem::destroyIfExists(size_t entityNetID)
+bool NetworkClientSystem::isInGame()
 {
-	if (entityNetID < m_netEntities.size()) {
-		Entity* ghost = m_netEntities.at(entityNetID);
-		if (ghost) {
-			m_scene.destroyEntity(*ghost);
-			m_netEntities.at(entityNetID) = nullptr;
+	return m_clientState == CLIENT_STATE_IN_GAME;
+}
+
+void NetworkClientSystem::broadcastForServers()
+{
+	m_clientState = CLIENT_STATE_NO_SERVER;
+	
+	Packet broadcastPacket;
+	broadcastPacket.packetType = PACKET_TYPE_BROADCAST;
+
+	m_socket.enableBroadcast();
+	m_socket.setRemoteAddress(INADDR_BROADCAST);
+	m_socket.setRemotePort(NetworkServerSystem::s_kDefaultServerPort);
+
+	sockaddr_in address;
+	inet_pton(AF_INET, "255.255.255.255", &address.sin_addr);
+	address.sin_family = AF_INET;
+	address.sin_addr.S_un.S_addr = INADDR_BROADCAST;
+
+	for (int i = 0; i < 10; i++) //Just try  a series of 10 ports to detect a runmning server; this is needed since we are testing multiple servers on the same local machine
+	{
+		address.sin_port = htons(NetworkServerSystem::s_kDefaultServerPort + i);
+		// TODO: Add logging here
+		std::cout << "INFO: Sending broadcast packet to address: " << toString(address) << std::endl;
+		sendData(broadcastPacket, address);
+	}
+
+	m_socket.disableBroadcast();
+}
+
+void NetworkClientSystem::joinServer(const sockaddr_in& address)
+{
+	m_clientState = CLIENT_STATE_JOINING;
+
+	m_serverAddress = address;
+
+	Packet joinResq;
+	joinResq.packetType = PACKET_TYPE_JOIN_REQUEST;
+	// TODO: Add username from UI input
+	joinResq.username = "Client Username Goes Here";
+	sendData(joinResq, address);
+}
+
+void NetworkClientSystem::handleServerJoinPackets(const Packet& packet, const sockaddr_in& address)
+{
+	switch (packet.packetType)
+	{
+	case PACKET_TYPE_NORMAL:
+		handleGamePackets(packet, address);
+	case PACKET_TYPE_BROADCAST_RESPONSE:
+		// If we receive a broadcast response from a server in this mode, simple inform the 
+		// lobby event listener.
+		//m_lobbyEventListener.handleBroadcastResponse(packet.serverName, address);
+
+		std::cout << "Received broadcast response from server: " 
+		          << packet.serverName << ", at address: " << toString(address)
+		          << std::endl;
+
+		// TODO: Remove auto join, replace with lobby
+		std::cout << "Attempting to auto join server: " << packet.serverName 
+		          << std::endl;
+		joinServer(address);
+
+		break;
+	case PACKET_TYPE_JOIN_RESPONSE:
+		if (packet.joinAccepted) {
+			// TODO: Change this back to CLIENT_STATE_IN_LOBBY once lobby is working
+			// m_clientState = CLIENT_STATE_IN_LOBBY;
+			// For now just jump straight into the game
+			m_clientState = CLIENT_STATE_IN_GAME;
+
+			std::cout << "Received join accept from server at address: " 
+			          << toString(address) << std::endl;
+			//m_lobbyEventListener.handleJoinAccepted();
+		} else {
+			m_clientState = CLIENT_STATE_NO_SERVER;
+
+			std::cout << "Received join reject from server at address: " 
+			          << toString(address) << std::endl;
+			//m_lobbyEventListener.handleJoinRejected();
 		}
+		break;
+	default:
+		break;
+	}
+}
+
+void NetworkClientSystem::handleGamePackets(const Packet& packet, const sockaddr_in& address)
+{
+	if (address != m_serverAddress) {
+		// TODO: Add logging here
+		std::cout << "INFO: Received packet from unknown host" << std::endl;
+		return;
+	}
+
+	auto& ghostSnapshots = packet.ghostSnapshotBuffer;
+	auto& rpcGroups = packet.rpcGroupBuffer;
+
+	// Get figure out which remote procedure calls we got from the server
+	// that we haven't seen before.
+	std::uint32_t seqNumRecvd = packet.sequenceNum;
+	std::uint32_t bufferOffset = std::min((seqNumRecvd - m_lastSeqNumSeen - 1),
+		(static_cast<std::uint32_t>(rpcGroups.size() - 1)));
+
+	// Ignore out of order RPCs
+	bool updateLastSeqNum = false;
+	if (seqNumRecvd == m_lastSeqNumSeen + 1 || bufferOffset >= packet.rpcGroupBuffer.size() - 1) {
+		// Execute RPCs received from server
+		for (int i = bufferOffset; i >= 0; --i) {
+			const RPCGroup& rpcGroup = rpcGroups.at(i);
+			for (auto& rpc : rpcGroup.getRpcs()) {
+				rpc->execute(m_netEntities);
+			}
+		}
+		if (seqNumRecvd > m_lastSeqNumSeen)
+			updateLastSeqNum = true;
+	}
+	else {
+		// TODO: Add logging here
+		std::cout << "INFO: The client received an out of order packet" << std::endl;
+	}
+
+	if (seqNumRecvd > m_lastSeqNumSeen) {
+		// Save ghost snapshots when new data received
+		for (std::uint16_t i = 0; i < ghostSnapshots.size(); ++i) {
+			const GhostSnapshot& ghostSnapshot = ghostSnapshots.at(i);
+			std::int32_t id = ghostSnapshot.entityNetId;
+
+			// TODO: Add logging here
+			if (id < 0) {
+				std::cout << "Error: Ghost Snapshot with unassigned network id received by client" << std::endl;
+				return;
+			}
+
+			// Record ghost snapshot
+			if (id < m_netEntities.size()) {
+				Entity* entity = m_netEntities.at(id);
+				if (entity) {
+					entity->transform = ghostSnapshot.transform;
+					entity->physics = ghostSnapshot.physics;
+				}
+				else {
+					// TODO: Add logging here
+					std::cout << "Warning: Client received snapshot of deleted ghost" << std::endl;
+				}
+			}
+		}
+
+		// Update the last sequence number seen from the server
+		if (updateLastSeqNum)
+			m_lastSeqNumSeen = seqNumRecvd;
 	}
 }

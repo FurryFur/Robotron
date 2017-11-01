@@ -30,6 +30,9 @@ public:
 	// Returns a referece to the item at position i
 	T& at(std::uint16_t i);
 
+	// Returns a referece to the item at position i
+	const T& at(std::uint16_t i) const;
+
 	// Clears the vector
 	void clear();
 
@@ -79,6 +82,12 @@ inline T& StreamableVector<T, maxSize>::back()
 
 template<typename T, std::uint16_t maxSize>
 inline T& StreamableVector<T, maxSize>::at(std::uint16_t i)
+{
+	return m_vector.at(i);
+}
+
+template<typename T, std::uint16_t maxSize>
+inline const T& StreamableVector<T, maxSize>::at(std::uint16_t i) const
 {
 	return m_vector.at(i);
 }

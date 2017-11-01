@@ -8,12 +8,16 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
-#include <chrono>
 #include <queue>
 
 class Scene;
 class Entity;
 struct Packet;
+
+enum ServerState {
+	SERVER_STATE_LOBBY_MODE,
+	SERVER_STATE_IN_GAME
+};
 
 class EntityPriorityComparitor {
 public:
@@ -23,6 +27,7 @@ public:
 	}
 };
 
+
 class NetworkServerSystem : public NetworkSystem {
 public:
 	NetworkServerSystem(Scene&);
@@ -30,21 +35,22 @@ public:
 	virtual void beginFrame() override;
 	virtual void update(Entity&, float deltaTick) override;
 	virtual void endFrame() override;
+	virtual bool isInGame() override;
 
+	void startGame();
+
+	static const USHORT s_kDefaultServerPort;
 private:
-	// The time at which the last packet was sent
-	std::chrono::time_point<std::chrono::high_resolution_clock> m_tLastPacketSent;
-
-	// The interval between sending packets to clients
-	std::chrono::milliseconds m_packetInterval;
-
-	bool m_willSendPcktThisFrame;
-
 	std::unordered_map<sockaddr_in, ClientInfo> m_clients;
+	ServerState m_serverState;
 
 	using SnapshotBufT = decltype(m_sendPacket.ghostSnapshotBuffer);
 
-	void receiveAndProcess();
+	void handleGamePackets(const Packet&, const sockaddr_in& address);
+	void handleLobbyPackets(const Packet&, const sockaddr_in& address);
+	void handleBroadcastPacket(const Packet&, const sockaddr_in& address);
+	void handleJoinPacket(const Packet&, const sockaddr_in& address);
+	void addToNetworking(Entity& entity);
 
 	void broadcastToClients(const Packet& packet);
 

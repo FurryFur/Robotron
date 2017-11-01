@@ -9,9 +9,13 @@
 #include <memory>
 #include <cstdint>
 
+using namespace std::chrono;
+using namespace std::chrono_literals;
+
 NetworkSystem::NetworkSystem(Scene& scene)
 	: m_scene{ scene }
 	, m_curSeqenceNum{ 0 }
+	, m_packetInterval{ 25ms }
 {
 	// Startup windows sockets:
 	WSADATA wsaData;
@@ -25,11 +29,26 @@ NetworkSystem::NetworkSystem(Scene& scene)
 	m_sendPacket.rpcGroupBuffer.emplace();
 }
 
+void NetworkSystem::beginFrame()
+{
+	// Decide whether we will send out packets this frame or not
+	auto now = high_resolution_clock::now();
+	auto dtLastPacketSent = now - m_tLastPacketSent;
+	if (dtLastPacketSent >= m_packetInterval) {
+		m_willSendPcktThisFrame = true;
+		m_tLastPacketSent = now;
+	} else {
+		m_willSendPcktThisFrame = false;
+	}
+}
+
 void NetworkSystem::endFrame()
 {
-	++m_curSeqenceNum;
-	// New RPC group for new sequence number
-	m_sendPacket.rpcGroupBuffer.emplace();
+	if (m_willSendPcktThisFrame) {
+		++m_curSeqenceNum;
+		// New RPC group for new sequence number
+		m_sendPacket.rpcGroupBuffer.emplace();
+	}
 }
 
 void NetworkSystem::sendData(const Packet& packet, const sockaddr_in& address)

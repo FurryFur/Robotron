@@ -58,7 +58,7 @@ InBufferStream& RPCGroup::deserialize(InBufferStream& ibs)
 	return ibs;
 }
 
-const std::vector<std::unique_ptr<RemoteProcedureCall>>& RPCGroup::getRpcs()
+const std::vector<std::unique_ptr<RemoteProcedureCall>>& RPCGroup::getRpcs() const
 {
 	return m_rpcs;
 }
@@ -148,6 +148,15 @@ void RPCCreatePlayerGhost::execute(std::vector<Entity*>& netEntities)
 		}
 
 		Entity& newEntity = EntityUtils::createPlayerGhost(*scene, m_transform, m_entityNetId);
+	
+		// TODO: Conditionally add the player controller if the username matches the clients username
+		// newEntity.addComponents(COMPONENT_PLAYER_CONTROL);
+		newEntity.addComponents(COMPONENT_INPUT_MAP);
+		newEntity.inputMap.mouseInputEnabled = false;
+		newEntity.inputMap.leftBtnMap = GLFW_KEY_A;
+		newEntity.inputMap.rightBtnMap = GLFW_KEY_D;
+		newEntity.inputMap.forwardBtnMap = GLFW_KEY_W;
+		newEntity.inputMap.backwardBtnMap = GLFW_KEY_S;
 
 		// Add entity to network system tracking
 		if (m_entityNetId >= netEntities.size())

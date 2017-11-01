@@ -47,7 +47,7 @@ Level::Level(GLFWwindow* window, Clock& clock)
 		glm::translate({}, glm::vec3{ 0.0f, 50.0f, 0.0f }));
 	player.addComponents(COMPONENT_NETWORK);
 
-	spawnEnemies(0);
+	//spawnEnemies(0);
 
 	// Create the skybox
 	Entity& skybox = EntityUtils::createSkybox(m_scene, {
@@ -480,7 +480,7 @@ void Level::process(float deltaTick, Clock& clock)
 		m_renderSystem.update(entity);
 	}
 
-	if (m_inSetupPhase)
+	if (m_inSetupPhase && m_networkSystem->isInGame())
 	{
 		++m_setUpTick;
 		processSetUpPhase();
