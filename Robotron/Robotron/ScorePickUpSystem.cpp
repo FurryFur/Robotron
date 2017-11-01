@@ -76,6 +76,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 	// Apply the seek and flock AI if target aquired.
 	if (entity.aiVariables.followEntity != NULL)
 	{
+		entity.controlVars.maxMoveSpeed = 20.0f;
 		// Add a pursue acceleration to the culmative acceleration.
 		acceleration = followLeader(glm::vec3(entity.aiVariables.followEntity->transform[3]), entity.aiVariables.followEntity->physics.velocity, entity.aiVariables.followEntity->aiVariables.previousVelocity, glm::vec3(entity.transform[3]), entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
@@ -96,7 +97,10 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 	}
 	// If no player to follow, just wander.
 	else
+	{
+		entity.controlVars.maxMoveSpeed = 5.0f;
 		acceleration = wander(entity);
+	}
 
 	steer(entity, acceleration);
 
