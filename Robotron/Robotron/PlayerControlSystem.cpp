@@ -156,5 +156,7 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
 
 		bullet.physics.velocity = bulletVelocity;
+
+
 	}
 }
