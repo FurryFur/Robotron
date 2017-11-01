@@ -78,10 +78,11 @@ private:
 
 	std::unique_ptr<Level> m_level;
 	
-	std::string m_serverName;
-	TextLabel m_serverNameInput;
-
-	bool m_displayGameOverText;
+	std::string m_serverName; // the name of the server
+	TextLabel m_serverNameInput; // displays the servername
+	std::string m_userName; // the username of the player
+	TextLabel m_userNameInput; //displays the suervername
+	bool m_displayGameOverText; // flags wether the player reach the menu screen via a game over
 
 	//TextLabel m_mousePosLabel;
 };

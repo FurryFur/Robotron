@@ -126,6 +126,7 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 
 Game::Game(GLFWwindow* window)
 	: m_serverNameInput("", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	, m_userNameInput("", "Assets/Fonts/NYCTALOPIATILT.TTF")
 {
 	m_clock.Process();
 	m_window = window;
@@ -143,6 +144,11 @@ Game::Game(GLFWwindow* window)
 		game->keyCallback(key, scancode, action, mods);
 	};
 	glfwSetKeyCallback(window, keyFunc);
+
+	//Username input text label;
+	m_userNameInput.setPosition(glm::vec2(650.0f, 412.0f));
+	m_userNameInput.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+	m_userNameInput.setScale(0.5f);
 
 	// Create the main menu join text
 	TextLabel join("Join", "Assets/Fonts/NYCTALOPIATILT.TTF");
@@ -190,6 +196,12 @@ Game::Game(GLFWwindow* window)
 	credits.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 	m_uiMainMenuLabels.push_back(credits);
 
+	// Create the main menu enter username text
+	TextLabel enterUsername("Enter a username: ", "Assets/Fonts/NYCTALOPIATILT.TTF");
+	enterUsername.setPosition(glm::vec2(330.0f, 412.0f));
+	enterUsername.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+	enterUsername.setScale(0.5f);
+	m_uiMainMenuLabels.push_back(enterUsername);
 
 	// Create the host setup host text
 	TextLabel enter("Enter a server name: ", "Assets/Fonts/NYCTALOPIATILT.TTF");
@@ -283,6 +295,23 @@ void Game::keyCallback(int key, int scancode, int action, int mods)
 				m_serverNameInput.setText(m_serverName);
 			}
 		}
+
+		// Keyboard commands during the Host Setup Screen.
+		if (s_gameState == MAINMENU)
+		{
+			// Delete characters of the server name if backspace pressed.
+			if (key == 259)
+			{
+				m_userName = m_userName.substr(0, m_userName.size() - 1);
+				m_userNameInput.setText(m_userName);
+			}
+			// Input all other keyboard buttons as characters in the server name.
+			else if (key < 255)
+			{
+				m_userName += key;
+				m_userNameInput.setText(m_userName);
+			}
+		}
 	}
 
 	for (auto& observer : s_keyObservers)
@@ -308,6 +337,7 @@ void Game::renderMenuScreens()
 		for (unsigned int i = 0; i < Game::m_uiMainMenuLabels.size(); ++i)
 		{
 			m_uiMainMenuLabels.at(i).Render();
+			m_userNameInput.Render();
 		}
 
 		//m_mousePosLabel.Render();
@@ -437,7 +467,7 @@ void Game::process(float deltaTick)
 	{
 		// Create a level if one does not exist
 		if (m_level == nullptr)
-			m_level = std::make_unique<Level>(m_window, m_clock);
+			m_level = std::make_unique<Level>(m_window, m_clock, m_userName);
 
 		// Process the level
 		m_level->process(deltaTick, m_clock);

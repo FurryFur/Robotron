@@ -60,7 +60,7 @@ Entity& EntityUtils::createEnemyZombie(Scene& scene, const glm::mat4& transform)
 	entity.aiVariables.score = 5;
 	entity.aiVariables.lives = 1;
 
-	float pi = M_PI_2;
+	float pi = static_cast<float>(M_PI_2);
 	entity.transform = transform * glm::rotate(glm::mat4{}, pi, glm::vec3{ 1.0f, 0.0f, 0.0f });
 
 	entity.model = GLPrimitives::getSphereModel();
@@ -89,7 +89,7 @@ Entity& EntityUtils::createEnemySnake(Scene& scene, const glm::mat4& transform, 
 	entity.aiVariables.score = 5;
 	entity.aiVariables.lives = 1;
 
-	float pi = M_PI_2;
+	float pi = static_cast<float>(M_PI_2);
 	entity.transform = transform * glm::rotate(glm::mat4{}, pi, glm::vec3{ 1.0f, 0.0f, 0.0f });
 
 	entity.model = GLPrimitives::getSphereModel();
@@ -112,7 +112,7 @@ Entity& EntityUtils::createEnemyShooter(Scene& scene, const glm::mat4& transform
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_ENEMY_SHOOTER
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-	float pi = M_PI_2;
+	float pi = static_cast<float>(M_PI_2);
 	entity.transform = transform * glm::rotate(glm::mat4{}, pi, glm::vec3{ 1.0f, 0.0f, 0.0f });
 
 	entity.aiVariables.score = 10;
@@ -188,8 +188,9 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_TRANSFORM
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS
 									  | COMPONENT_PLAYER);
-	entity.playerStats.lives = 30000;
-	entity.playerStats.score = 0;
+
+	entity.playerStats.playerInfo.lives = 30000;
+	entity.playerStats.playerInfo.score = 0;
 	entity.playerStats.extraLifeThreshhold = 1000;
 	entity.transform = transform;
 
