@@ -77,6 +77,7 @@ void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr
 	}
 
 	// Update the last sequence number seen from the client
+	// TODO: Handle out of order packets similar to client side
 	if (seqNumRecvd > seqNumSeen)
 		clientIt->second.lastSeqNumSeen = seqNumRecvd;
 }

@@ -171,6 +171,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClCompile Include="GhostSnapshot.cpp" />
     <ClCompile Include="GLPrimitives.cpp" />
     <ClCompile Include="GLUtils.cpp" />
+    <ClCompile Include="InputComponent.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />

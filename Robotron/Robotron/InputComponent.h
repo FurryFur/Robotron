@@ -30,10 +30,26 @@ struct InputComponent {
 	bool btn3Down;
 	bool btn4Down;
 
+	// Triggers for which direction the player is firing
+	bool shootLeftDown;
+	bool shootDown;
+	bool shootRightDown;
+	bool shootLeft;
+	bool shootRight;
+	bool shootLeftUp;
+	bool shootUp;
+	bool shootRightUp;
+
 	// These represent buttons that are currently down
 	// std::array<bool, 4> btnsDown;
 	// These represent action buttons that have been pressed and have
 	// not yet been handled. These should be set to false once the action
 	// has been handled.
 	// std::array<bool, 4> actionBtnsPressed;
+
+	OutBufferStream& serialize(OutBufferStream&) const;
+	InBufferStream& deserialize(InBufferStream&);
 };
+
+OutBufferStream& operator<<(OutBufferStream&, const InputComponent&);
+InBufferStream& operator>>(InBufferStream&, InputComponent&);

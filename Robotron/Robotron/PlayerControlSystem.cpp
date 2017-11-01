@@ -103,52 +103,52 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	//Fire player bullets if they are set to fire
 	// Check which way the player is firing and shoot in that direction.
 	// Create a bullet on the player shooting right
-	if (entity.controlVars.shootRight || entity.controlVars.shootLeft || entity.controlVars.shootDown || entity.controlVars.shootUp
-	 || entity.controlVars.shootRightUp || entity.controlVars.shootRightDown || entity.controlVars.shootLeftUp || entity.controlVars.shootLeftDown)
+	if (entity.input.shootRight || entity.input.shootLeft || entity.input.shootDown || entity.input.shootUp
+	 || entity.input.shootRightUp || entity.input.shootRightDown || entity.input.shootLeftUp || entity.input.shootLeftDown)
 	{
 		glm::vec3 bulletVelocity;
 		// The player is shooting right
-		if (entity.controlVars.shootRight)
+		if (entity.input.shootRight)
 			bulletVelocity = glm::vec3{ 10.0f, 0.0f, entity.physics.velocity.z };
 
 		// The player is shooting left
-		else if (entity.controlVars.shootLeft)
+		else if (entity.input.shootLeft)
 			bulletVelocity = glm::vec3{ -10.0f, 0.0f, entity.physics.velocity.z };
 
 		// The player is shooting down.
-		else if (entity.controlVars.shootDown)
+		else if (entity.input.shootDown)
 			bulletVelocity = glm::vec3{ entity.physics.velocity.x, 0.0f, 10.0f };
 
 		// The player is shooting up.
-		else if (entity.controlVars.shootUp)
+		else if (entity.input.shootUp)
 			bulletVelocity = glm::vec3{ entity.physics.velocity.x, 0.0f, -10.0f };
 
 		// The player is shooting right up
-		else if (entity.controlVars.shootRightUp)
+		else if (entity.input.shootRightUp)
 			bulletVelocity = glm::vec3{ 7.07f , 0, -7.07f };
 
 		// The player is shooting right down
-		else if (entity.controlVars.shootRightDown)
+		else if (entity.input.shootRightDown)
 			bulletVelocity = glm::vec3{ 7.07f , 0, 7.07f };
 
 		// The player is shooting left up
-		else if (entity.controlVars.shootLeftUp)
+		else if (entity.input.shootLeftUp)
 			bulletVelocity = glm::vec3{ -7.07f , 0, -7.07f };
 
 		// The player is shooting left down
-		else if (entity.controlVars.shootLeftDown)
+		else if (entity.input.shootLeftDown)
 			bulletVelocity = glm::vec3{ -7.07f , 0, 7.07f };
 
-		entity.controlVars.shootRightDown = false;
-		entity.controlVars.shootRight = false;
-		entity.controlVars.shootRightUp = false;
+		entity.input.shootRightDown = false;
+		entity.input.shootRight = false;
+		entity.input.shootRightUp = false;
 
-		entity.controlVars.shootLeft = false;
-		entity.controlVars.shootLeftUp = false;
-		entity.controlVars.shootLeftDown = false;
+		entity.input.shootLeft = false;
+		entity.input.shootLeftUp = false;
+		entity.input.shootLeftDown = false;
 
-		entity.controlVars.shootUp = false;
-		entity.controlVars.shootDown = false;
+		entity.input.shootUp = false;
+		entity.input.shootDown = false;
 
 		// Create the bullet and apply the velocity.
 		Entity& bullet = EntityUtils::createPlayerBullet(m_scene,

@@ -171,27 +171,22 @@ void InputSystem::update(Entity& entity)
 	if (shootRight || shootLeft || shootDown || shootUp
 		|| shootRightUp || shootRightDown || shootLeftUp || shootLeftDown)
 	{
-		// Find the player object in the scene
-		for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
+		if (entity.hasComponents(COMPONENT_PLAYER, COMPONENT_INPUT, COMPONENT_INPUT_MAP))
 		{
-			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+			// Check to see if the player has not shot too recently
+			if (entity.playerStats.lastFiringTime + entity.playerStats.firingSpeed <= m_clock.GetCurTime())
 			{
-				// Check to see if the player has not shot too recently
-				if (m_scene.getEntity(i).controlVars.lastFiringTime + m_scene.getEntity(i).controlVars.firingSpeed <= m_clock.GetCurTime())
-				{
-					m_scene.getEntity(i).controlVars.lastFiringTime = m_clock.GetCurTime();
+				entity.playerStats.lastFiringTime = m_clock.GetCurTime();
 					
-					// Triggers the player object to fire a bullet in the direction pressed by the player
-					m_scene.getEntity(i).controlVars.shootLeftDown = shootLeftDown;
-					m_scene.getEntity(i).controlVars.shootDown = shootDown;
-					m_scene.getEntity(i).controlVars.shootRightDown = shootRightDown;
-					m_scene.getEntity(i).controlVars.shootLeft = shootLeft;
-					m_scene.getEntity(i).controlVars.shootRight = shootRight;
-					m_scene.getEntity(i).controlVars.shootLeftUp = shootLeftUp;
-					m_scene.getEntity(i).controlVars.shootUp = shootUp;
-					m_scene.getEntity(i).controlVars.shootRightUp = shootRightUp;
-				}
-				break;
+				// Triggers the player object to fire a bullet in the direction pressed by the player
+				entity.input.shootLeftDown = shootLeftDown;
+				entity.input.shootDown = shootDown;
+				entity.input.shootRightDown = shootRightDown;
+				entity.input.shootLeft = shootLeft;
+				entity.input.shootRight = shootRight;
+				entity.input.shootLeftUp = shootLeftUp;
+				entity.input.shootUp = shootUp;
+				entity.input.shootRightUp = shootRightUp;
 			}
 		}
 	}

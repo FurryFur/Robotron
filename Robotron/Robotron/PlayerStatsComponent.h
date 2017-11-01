@@ -20,4 +20,6 @@ struct PlayerStatsComponent {
 	int lives; // The current number of lives the player has
 	bool isRespawning; // Is true when they are dead and will respawn
 	double deathTime; // The time it takes for them to respawn
+	double lastFiringTime; // Keeps track of the last time the entity fired
+	double firingSpeed; // The time allowed before the entity can fire again
 };
