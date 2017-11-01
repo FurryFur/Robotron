@@ -32,6 +32,7 @@ int main()
 
 	audio.playBgMusic();
 
+
 	while (!glfwWindowShouldClose(window)) {		
 		// Execute a from of the game.
 		game.executeOneFrame();
