@@ -23,6 +23,7 @@
 #include "Scene.h"
 #include "Entity.h"
 #include "Clock.h"
+#include "Utils.h"
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -48,6 +49,8 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 		return;
 
 	float maxMoveSpeed = entity.controlVars.maxMoveSpeed;
+	float maxAcceleration = entity.controlVars.maxAcceleration;
+	float damping = entity.controlVars.damping;
 	float orientationSensitivity = entity.controlVars.orientationSensitivity;
 
 	float deltaAzimuth = -orientationSensitivity * entity.input.orientationDelta.x;
@@ -64,12 +67,18 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	glm::vec3 axis = GLMUtils::limitVec(entity.input.axis, 1);
 	if (!entity.controlVars.worldSpaceMove)
 		axis = entity.transform * glm::vec4{ axis, 0 }; // Convert movement to local coordinates
-	glm::vec3 velocity = maxMoveSpeed * axis;
-	entity.physics.velocity = velocity;
-	if (axis != glm::vec3{ 0,0,0 })
-		entity.aiVariables.previousVelocity = velocity;
+	glm::vec3 acceleration = maxAcceleration * axis;
+	if (axis != glm::vec3{ 0,0,0 }) {
+		// TODO: Move this out of the player controller or place in physics component
+		entity.aiVariables.previousVelocity = entity.physics.velocity;
+		acceleration = acceleration - glm::length(acceleration) * entity.physics.velocity / maxMoveSpeed;
+	} else
+		acceleration = -damping * entity.physics.velocity;
+	// Keep player in level
 	if ((pos.x >= 20.0f || pos.x <= -20.0f || pos.z >= 20.0f || pos.z <= -20.0f))
-		entity.physics.velocity = glm::normalize(glm::vec3{ -pos.x, 0, -pos.z }) * 10.0f;
+		entity.physics.acceleration = -glm::vec3{ pos.x, 0, pos.z };
+	else
+		entity.physics.acceleration = acceleration;
 
 	// Rotation
 	// Prevent elevation going past 90 degrees
@@ -156,7 +165,7 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 		entity.input.shootUp = false;
 		entity.input.shootDown = false;
 
-		// Create the bullet and apply the velocity.
+		// Create the bullet and apply the acceleration.
 		Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
 			glm::translate({}, glm::vec3(entity.transform[3]))
 			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));

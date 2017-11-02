@@ -77,8 +77,20 @@ namespace EntityUtils {
 	// transform;
 	Entity& createEnemyBullet(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
 
+	void setModelEnemyZombie(Entity&);
+	void setModelEnemySnake(Entity&);
+	void setModelEnemyShooter(Entity&);
+	void setModelScorePickup01(Entity&);
+	void setModelScorePickUp02(Entity&);
+	void setModelHealthPickUp(Entity&);
+	void setModelPlayer(Entity&);
+	void setModelPlayerBullet(Entity&);
+	void setModelEnemyBullet(Entity&);
+
+	// Create a simple dummy entity that will be controlled by a remote controller
 	Entity& createGhost(Scene&, ModelID, const glm::mat4& transform, std::int32_t entityNetId);
 
+	// Create local player object that will have it's inputs sent to a remote controller
 	Entity& createPlayerGhost(Scene&, const glm::mat4& transform, std::int32_t entityNetId);
 
 	// Creates a cylinder with the specified radius and height.

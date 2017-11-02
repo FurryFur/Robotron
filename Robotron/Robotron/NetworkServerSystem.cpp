@@ -187,9 +187,16 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 			entity.transform);
 	}
 	else if (entity.hasComponents(COMPONENT_SCOREPICKUP)) {
-		// TODO: Add different pickup types
-		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_1,
-			entity.transform);
+		if (entity.aiVariables.lifePickUp) {
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_HEALTH_PICKUP,
+				entity.transform);
+		} else if (entity.aiVariables.score > 10) {
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_2,
+				entity.transform);
+		} else {
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_1,
+				entity.transform);
+		}
 	}
 	else {
 		rpc = nullptr;

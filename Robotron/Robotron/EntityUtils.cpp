@@ -63,12 +63,7 @@ Entity& EntityUtils::createEnemyZombie(Scene& scene, const glm::mat4& transform)
 	float pi = static_cast<float>(M_PI_2);
 	entity.transform = transform * glm::rotate(glm::mat4{}, pi, glm::vec3{ 1.0f, 0.0f, 0.0f });
 
-	entity.model = GLPrimitives::getSphereModel();
-
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/blackhole.jpg");
-	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
-	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
+	setModelEnemyZombie(entity);
 
 	entity.controlVars.maxMoveSpeed = 10.0f;
 	entity.controlVars.maxAcceleration = 20.0f;
@@ -92,12 +87,7 @@ Entity& EntityUtils::createEnemySnake(Scene& scene, const glm::mat4& transform, 
 	float pi = static_cast<float>(M_PI_2);
 	entity.transform = transform * glm::rotate(glm::mat4{}, pi, glm::vec3{ 1.0f, 0.0f, 0.0f });
 
-	entity.model = GLPrimitives::getSphereModel();
-
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
-	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
-	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
+	setModelEnemySnake(entity);
 
 	entity.controlVars.maxMoveSpeed = 15;
 	entity.controlVars.maxAcceleration = 100;
@@ -117,12 +107,8 @@ Entity& EntityUtils::createEnemyShooter(Scene& scene, const glm::mat4& transform
 
 	entity.aiVariables.score = 10;
 	entity.aiVariables.lives = 3;
-	entity.model = GLPrimitives::getSphereModel();
 
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/coral.jpg");
-	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
-	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
+	setModelEnemyShooter(entity);
 
 	entity.controlVars.maxMoveSpeed = 10.0f;
 	entity.controlVars.maxAcceleration = 10.0f;
@@ -141,14 +127,9 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 
 	entity.transform = transform;
 
-	// TODO: Fix weird integer bool assignment!!!
 	entity.aiVariables.score = 10;
-	entity.model = GLPrimitives::getPyramidModel();
 
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/green.jpg");
-	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+	setModelScorePickup01(entity);
 
 	entity.controlVars.maxMoveSpeed = 20.0f;
 	entity.controlVars.maxAcceleration = 100.0f;
@@ -164,7 +145,7 @@ Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transfor
 
 	entity.aiVariables.score = 20;
 
-	entity.model = GLPrimitives::getPyramidModel();
+	setModelScorePickUp02(entity);
 
 	return entity;
 }
@@ -175,7 +156,7 @@ Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform
 
 	entity.aiVariables.lifePickUp = true;
 
-	entity.model = GLPrimitives::getCubeModel();
+	setModelHealthPickUp(entity);
 
 	return entity;
 }
@@ -194,17 +175,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.playerStats.extraLifeThreshhold = 1000;
 	entity.transform = transform * glm::scale(glm::mat4{}, { 5.0f, 5.0f, 5.0f }); // Scale the player model up by default
 
-	entity.model = ModelUtils::loadModel("Assets/Models/spaceship/space_ship.obj");
-
-
-	for (size_t i = 0; i < entity.model.materials.size(); ++i)
-	{
-		entity.model.materials.at(i).shaderParams.glossiness = 1.0f;
-	}
-
-
-	// Replace default texture
-	//entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
+	setModelPlayer(entity);
 
 	entity.inputMap = {};
 	entity.inputMap.mouseInputEnabled = false;
@@ -214,6 +185,8 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.inputMap.backwardBtnMap = GLFW_KEY_S;
 
 	entity.controlVars.maxMoveSpeed = 8;
+	entity.controlVars.maxAcceleration = 20;
+	entity.controlVars.damping = 1;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 	entity.controlVars.firingSpeed = 0.5f;
@@ -229,12 +202,7 @@ Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform
 
 	entity.transform = transform;
 
-	entity.model = GLPrimitives::getSphereModel();
-
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/purple.png");
-	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+	setModelPlayerBullet(entity);
 
 	entity.controlVars.maxMoveSpeed = 10.0f;
 	entity.controlVars.maxAcceleration = 10.0f;
@@ -251,12 +219,7 @@ Entity& EntityUtils::createEnemyBullet(Scene& scene, const glm::mat4& transform)
 
 	entity.transform = transform;
 
-	entity.model = GLPrimitives::getSphereModel();
-
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/red.png");
-	entity.model.materials.at(0).shaderParams.glossiness = 0.5f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+	setModelEnemyBullet(entity);
 
 	entity.controlVars.maxMoveSpeed = 10.0f;
 	entity.controlVars.maxAcceleration = 10.0f;
@@ -264,6 +227,96 @@ Entity& EntityUtils::createEnemyBullet(Scene& scene, const glm::mat4& transform)
 	entity.controlVars.worldSpaceMove = true;
 
 	return entity;
+}
+
+void EntityUtils::setModelEnemyZombie(Entity& entity)
+{
+	entity.model = GLPrimitives::getSphereModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/blackhole.jpg");
+	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
+}
+
+void EntityUtils::setModelEnemySnake(Entity& entity)
+{
+	entity.model = GLPrimitives::getSphereModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
+	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
+}
+
+void EntityUtils::setModelEnemyShooter(Entity& entity)
+{
+	entity.model = GLPrimitives::getSphereModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/coral.jpg");
+	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
+}
+
+void EntityUtils::setModelScorePickup01(Entity& entity)
+{
+	entity.model = GLPrimitives::getPyramidModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/green.jpg");
+	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+}
+
+void EntityUtils::setModelScorePickUp02(Entity& entity)
+{
+	entity.model = GLPrimitives::getPyramidModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/green.jpg");
+	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+}
+
+void EntityUtils::setModelHealthPickUp(Entity& entity)
+{
+	entity.model = GLPrimitives::getCubeModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/green.jpg");
+	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+}
+
+void EntityUtils::setModelPlayer(Entity& entity)
+{
+	entity.model = ModelUtils::loadModel("Assets/Models/spaceship/space_ship.obj");
+
+	for (size_t i = 0; i < entity.model.materials.size(); ++i)
+	{
+		entity.model.materials.at(i).shaderParams.glossiness = 1.0f;
+	}
+}
+
+void EntityUtils::setModelPlayerBullet(Entity& entity)
+{
+	entity.model = GLPrimitives::getSphereModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/purple.png");
+	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+}
+
+void EntityUtils::setModelEnemyBullet(Entity& entity)
+{
+	entity.model = GLPrimitives::getSphereModel();
+
+	// Replace default texture
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/red.png");
+	entity.model.materials.at(0).shaderParams.glossiness = 0.5f;
+	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
 }
 
 Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const glm::mat4& transform, std::int32_t entityNetId)
@@ -276,36 +329,28 @@ Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const glm::mat4&
 		// TODO: Replace all these with calls to a create model functions.
 		// That way we can easily change the models and textures used in a single location.
 	case MODEL_PLAYER_BULLET:
-		entity.model = GLPrimitives::getSphereModel();
-		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		setModelPlayerBullet(entity);
 		break;
 	case MODEL_ENEMY_BULLET:
-		entity.model = GLPrimitives::getSphereModel();
-		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		setModelEnemyBullet(entity);
 		break;
 	case MODEL_ENEMY_ZOMBIE:
-		entity.model = GLPrimitives::getSphereModel();
-		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		setModelEnemyZombie(entity);
 		break;
 	case MODEL_ENEMY_SNAKE:
-		entity.model = GLPrimitives::getSphereModel();
-		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
+		setModelEnemySnake(entity);
 		break;
 	case MODEL_ENEMY_SHOOTER:
-		entity.model = GLPrimitives::getSphereModel();
-		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		setModelEnemyShooter(entity);
 		break;
 	case MODEL_SCORE_PICKUP_1:
-		entity.model = GLPrimitives::getSphereModel();
-		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		setModelScorePickup01(entity);
 		break;
 	case MODEL_SCORE_PICKUP_2:
-		entity.model = GLPrimitives::getPyramidModel();
-		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		setModelScorePickUp02(entity);
 		break;
 	case MODEL_HEALTH_PICKUP:
-		entity.model = GLPrimitives::getCubeModel();
-		entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture4.jpg");
+		setModelHealthPickUp(entity);
 		break;
 	default:
 		// TODO: Add logging here.
