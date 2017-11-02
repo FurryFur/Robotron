@@ -424,20 +424,9 @@ void Game::renderMenuScreens()
 	//glfwSwapBuffers(m_window);
 }
 
-void Game::updateNetwork(float deltaTick)
-{
-	m_networkSystem->beginFrame();
-	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
-		m_networkSystem->update(m_scene.getEntity(i), deltaTick);
-	m_networkSystem->endFrame();
-}
-
 void Game::process(float deltaTick)
 {
-	//If the lobby exists update it
-	if  (m_networkSystem != nullptr)
-		updateNetwork(deltaTick);
-	
+
 	// If not in the game state read the coordinates of the mouse and render the menu
 	if (s_gameState != GAME)
 	{
@@ -556,7 +545,7 @@ void Game::process(float deltaTick)
 				m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_scene, m_userName);
 
 			// Process the level
-			m_level->process(deltaTick, m_clock);
+			m_level->process(deltaTick, m_clock, *m_networkSystem);
 
 			// Check if all enemies are dead and spawn new ones if so
 			if (!m_level->checkEnemiesAlive())
@@ -595,7 +584,7 @@ void Game::process(float deltaTick)
 				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName);
 
 			// Process the level
-			m_dummyLevel->process(deltaTick, m_clock);
+			m_dummyLevel->process(deltaTick, m_clock, *m_networkSystem);
 
 			// Check if all players are dead and return to lobby if so
 			//if (!m_dummyLevel->checkPlayersAlive())

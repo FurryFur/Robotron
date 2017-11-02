@@ -35,6 +35,7 @@
 #include "TextLabel.h"
 #include "Audio.h"
 #include "PlayerStatsMenu.h"
+#include "NetworkSystem.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
@@ -57,7 +58,7 @@ public:
 	bool checkEnemiesAlive();
 	// Returns true if there are still alive players in the level.
 	bool checkPlayersAlive();
-	void process(float _fDeltaTick, Clock& clock);
+	void process(float deltaTick, Clock& clock, NetworkSystem& networkSystem);
 	void triggerNextLevel();
 	// Get the player's score
 	int getPlayerScore();

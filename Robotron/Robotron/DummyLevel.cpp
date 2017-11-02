@@ -16,6 +16,7 @@ DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::stri
 	, m_playerScore("Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
 	, m_playerHealth("Health: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
 	, m_playerStatsMenu(m_scene)
+	, m_physicsSystem(m_scene)
 {
 	Scene::makeSceneCurrent(&m_scene);
 	m_inputSystem.registerKeyObserver(this);
@@ -81,7 +82,7 @@ DummyLevel::~DummyLevel()
 {
 }
 
-void DummyLevel::process(float deltaTick, Clock& clock)
+void DummyLevel::process(float deltaTick, Clock& clock, NetworkSystem& networkSystem)
 {
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
@@ -97,11 +98,14 @@ void DummyLevel::process(float deltaTick, Clock& clock)
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
+	networkSystem.beginFrame();
 
 	// Update all the entities using all the systems.
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
 		Entity& entity = m_scene.getEntity(i);
 		m_inputSystem.update(entity);
+		m_physicsSystem.update(entity, deltaTick);
+		networkSystem.update(entity, deltaTick);
 		m_renderSystem.update(entity);
 	}
 
@@ -117,6 +121,7 @@ void DummyLevel::process(float deltaTick, Clock& clock)
 
 	// Do operations that should happen at the end of the frame.
 	m_renderSystem.endRender();
+	networkSystem.endFrame();
 }
 
 void DummyLevel::keyCallback(int key, int scancode, int action, int mods)

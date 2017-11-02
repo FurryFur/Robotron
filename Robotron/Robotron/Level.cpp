@@ -395,8 +395,10 @@ void Level::respawnDeadPlayers(Clock& clock)
 	}
 }
 
-void Level::process(float deltaTick, Clock& clock)
-{		
+void Level::process(float deltaTick, Clock& clock, NetworkSystem& networkSystem)
+{			
+	
+
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
@@ -427,6 +429,7 @@ void Level::process(float deltaTick, Clock& clock)
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
+	networkSystem.beginFrame();
 
 	respawnDeadPlayers(clock);
 	// Update all the entities using all the systems.
@@ -441,6 +444,7 @@ void Level::process(float deltaTick, Clock& clock)
 		m_playerbulletsystem.update(entity);
 		m_enemybulletsystem.update(entity);
 		m_physicsSystem.update(entity, deltaTick);
+		networkSystem.update(entity, deltaTick);
 		m_renderSystem.update(entity);
 	}
 
@@ -480,6 +484,7 @@ void Level::process(float deltaTick, Clock& clock)
 
 	// Do operations that should happen at the end of the frame.
 	m_renderSystem.endRender();
+	networkSystem.endFrame();
 }
 
 // Handles the animation between levels. The player flies up, level spawns. And they desend in the centre of the screen.

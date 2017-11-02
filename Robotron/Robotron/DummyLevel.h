@@ -21,6 +21,8 @@
 #include "TextLabel.h"
 #include "KeyObserver.h"
 #include "InputSystem.h"
+#include "NetworkSystem.h"
+#include "PhysicsSystem.h"
 
 class DummyLevel : public IKeyObserver
 {
@@ -28,7 +30,7 @@ public:
 	DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username);
 	~DummyLevel();
 
-	void process(float _fDeltaTick, Clock& clock);
+	void process(float deltaTick, Clock& clock, NetworkSystem& networkSystem);
 
 	// Returns true if there are still alive players in the level.
 	bool checkPlayersAlive();
@@ -39,6 +41,7 @@ private:
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;
 	InputSystem m_inputSystem;
+	PhysicsSystem m_physicsSystem;
 
 	PlayerStatsMenu m_playerStatsMenu;
 

@@ -69,8 +69,6 @@ private:
 
 	void renderMenuScreens();
 
-	void updateNetwork(float deltaTick);
-
 	void process(float deltaTick);
 
 	void keyCallback(int key, int scancode, int action, int mods);
