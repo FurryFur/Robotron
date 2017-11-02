@@ -26,7 +26,7 @@ const bool Audio::LoadAudio() {
 	FMOD_RESULT result;
 	result = m_audioMgr->createSound("Assets/Audio/clang.mp3", FMOD_DEFAULT, 0, &m_hitSound);
 	result = m_audioMgr->createSound("Assets/Audio/button_click.wav", FMOD_DEFAULT, 0, &m_buttonClick);
-	result = m_audioMgr->createSound("Assets/Audio/birbs.wav", FMOD_DEFAULT, 0, &m_bgMusic);
+	result = m_audioMgr->createSound("Assets/Audio/background_music.mp3", FMOD_DEFAULT, 0, &m_bgMusic);
 	m_bgMusic->setMode(FMOD_LOOP_NORMAL);
 	m_buttonClick->setMode(FMOD_LOOP_OFF);
 	return true;
