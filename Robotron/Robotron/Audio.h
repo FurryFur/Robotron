@@ -16,6 +16,19 @@
 
 #include <fmod.hpp>
 
+enum sound
+{
+	ENEMY_DEAD,
+	ENEMY_HIT,
+	ENEMY_SHOOT,
+	SCORE_PICKUP,
+	NEXT_LEVEL,
+	PLAYER_DEAD,
+	PLAYER_SHOOT,
+	PLAYER_SPAWNING,
+	PLAYER_DESCENDING,
+};
+
 class Audio
 {
 public:
@@ -25,14 +38,30 @@ public:
 	void playBgMusic();
 	void playButtonClick();
 
+	// Play a game play sound effect
+	void playSFX(sound sound);
+
 private:
 	bool InitFmod();
 	const bool LoadAudio();
 
 	FMOD::System* m_audioMgr;
+	FMOD::Channel* m_bulletChannel;
+	FMOD::Channel* m_enemyChannel;
+	FMOD::Channel* m_bgMusicChannel;
+	FMOD::Channel* m_sfxChannel;
+
 	FMOD::Sound* m_bgMusic;
 	FMOD::Sound* m_buttonClick;
-	FMOD::Sound* m_hitSound;
-	FMOD::Channel* m_channel;
+
+	FMOD::Sound* m_enemyDead;
+	FMOD::Sound* m_enemyHit;
+	FMOD::Sound* m_nextLevel;
+	FMOD::Sound* m_playerDead;
+	FMOD::Sound* m_playerShoot;
+	FMOD::Sound* m_playerSpawning;
+	FMOD::Sound* m_playerDescending;
+	FMOD::Sound* m_enemyShoot;
+	FMOD::Sound* m_scorePickup;
 };
 

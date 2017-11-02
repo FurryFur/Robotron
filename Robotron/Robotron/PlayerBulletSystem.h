@@ -18,16 +18,19 @@
 
 #pragma once
 
+#include "Audio.h"
+
 class Scene;
 class Entity;
 
 class PlayerBulletSystem {
 public:
-	PlayerBulletSystem(Scene& scene);
+	PlayerBulletSystem(Scene& scene, Audio audio);
 
 	// Updates the entities position from input.
 	void update(Entity&);
 
 private:
 	Scene& m_scene;
+	Audio m_audio;
 };

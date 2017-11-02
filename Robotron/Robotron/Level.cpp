@@ -5,16 +5,16 @@
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window, Clock& clock, std::string username)
+Level::Level(GLFWwindow* window, Clock& clock, Audio audio, std::string username)
 	: m_scene{}
 	, m_renderSystem(window, m_scene)
-	, m_playerControlSystem(m_scene)
+	, m_playerControlSystem(m_scene, audio)
 	, m_inputSystem(window, m_scene, clock)
 	, m_enemy01ControlSystem(m_scene)
 	, m_enemy02ControlSystem(m_scene)
-	, m_enemy03ControlSystem(m_scene)
-	, m_scorePickUpSystem(m_scene)
-	, m_playerbulletsystem(m_scene)
+	, m_enemy03ControlSystem(m_scene, audio)
+	, m_scorePickUpSystem(m_scene, audio)
+	, m_playerbulletsystem(m_scene, audio)
 	, m_enemybulletsystem(m_scene)
 	, m_physicsSystem(m_scene)
 	, m_playerScore("Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
@@ -22,7 +22,7 @@ Level::Level(GLFWwindow* window, Clock& clock, std::string username)
 	, m_playerStatsMenu(m_scene)
 {
 	Scene::makeSceneCurrent(&m_scene);
-
+	m_audio = audio;
 	m_inputSystem.registerKeyObserver(this);
 
 	m_window = window;
@@ -99,7 +99,7 @@ Level::~Level()
 }
 
 void Level::spawnEnemies(int levelType)
-{
+{	
 	// Different combinations of enemies are spawned based on the level type.
 	// The number of enemies increases as the level number increases.
 	
@@ -315,7 +315,7 @@ void Level::spawnEnemies(int levelType)
 void Level::initalizeNextLevel()
 {
 	++m_levelNum;
-
+	m_audio.playSFX(NEXT_LEVEL);
 	// Cycle over all the entities in the scene
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 	{
@@ -405,6 +405,7 @@ void Level::respawnDeadPlayers(Clock& clock)
 			m_scene.getEntity(i).playerStats.isRespawning = false;
 			m_scene.getEntity(i).transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
 			m_descendingPlayers = true;
+			m_audio.playSFX(PLAYER_SPAWNING);
 		}
 	}
 }
@@ -498,6 +499,11 @@ void Level::process(float deltaTick, Clock& clock)
 // Handles the animation between levels. The player flies up, level spawns. And they desend in the centre of the screen.
 void Level::processSetUpPhase()
 {
+	if (m_setUpTick == 1)
+	{
+		m_audio.playSFX(PLAYER_DESCENDING);
+	}
+	
 	// For the first 50 ticks, ascend the players
 	if (m_setUpTick <= 50)
 	{

@@ -30,9 +30,10 @@
 
 #include <cmath>
 
-PlayerControlSystem::PlayerControlSystem(Scene& scene)
+PlayerControlSystem::PlayerControlSystem(Scene& scene, Audio audio)
 	: m_scene{ scene }
 {
+	m_audio = audio;
 }
 
 void PlayerControlSystem::update(Entity& entity, Clock& clock)
@@ -97,6 +98,8 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 			--entity.playerStats.playerInfo.lives;
 			entity.playerStats.isRespawning = true;
 			entity.transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
+
+			m_audio.playSFX(PLAYER_DEAD);
 		}
 	}
 
@@ -157,6 +160,7 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 
 		bullet.physics.velocity = bulletVelocity;
 
+		m_audio.playSFX(PLAYER_SHOOT);
 
 	}
 }

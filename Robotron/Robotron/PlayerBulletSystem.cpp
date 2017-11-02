@@ -24,6 +24,7 @@
 #include "Utils.h"
 #include "AIUtils.h"
 #include "Scene.h"
+//#include "Audio.h"
 #include "Entity.h"
 #include "RenderSystem.h"
 
@@ -33,10 +34,10 @@
 
 #include <cmath>
 
-PlayerBulletSystem::PlayerBulletSystem(Scene& scene)
+PlayerBulletSystem::PlayerBulletSystem(Scene& scene, Audio audio)
 	: m_scene{ scene }
 {
-
+	m_audio = audio;
 }
 
 // Updates the position of the bullets every turn to travel in its travel directory.
@@ -80,7 +81,10 @@ void PlayerBulletSystem::update(Entity& entity)
 				}
 
 				m_scene.destroyEntity(m_scene.getEntity(i));
+				m_audio.playSFX(ENEMY_DEAD);
 			}
+			else
+				m_audio.playSFX(ENEMY_HIT);
 			return;
 		}
 	}

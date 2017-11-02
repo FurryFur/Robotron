@@ -117,7 +117,7 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 			// The mouse is within the back button click
 			if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
 			{
-				Game::s_gameState = HOSTSETUP;
+				Game::s_gameState = MAINMENU;
 			}
 			// The mouse is within the start button click
 			if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == STARTDOWN)
@@ -520,7 +520,7 @@ void Game::process(float deltaTick)
 	{
 		// Create a level if one does not exist
 		if (m_level == nullptr)
-			m_level = std::make_unique<Level>(m_window, m_clock, m_userName);
+			m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_userName);
 
 		// Process the level
 		m_level->process(deltaTick, m_clock);
