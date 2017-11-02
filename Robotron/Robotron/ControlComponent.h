@@ -16,6 +16,7 @@
 struct ControlComponent {
 	float maxMoveSpeed;
 	float maxAcceleration;    // This sets the maximum turning / acceleration speed
+	float damping;
 	float accelerationWeight; // This scales how fast the entity will turn / accelerate
 	float orientationSensitivity;
 	bool worldSpaceMove;

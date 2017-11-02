@@ -214,6 +214,8 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.inputMap.backwardBtnMap = GLFW_KEY_S;
 
 	entity.controlVars.maxMoveSpeed = 8;
+	entity.controlVars.maxAcceleration = 20;
+	entity.controlVars.damping = 1;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 	entity.controlVars.firingSpeed = 0.5f;

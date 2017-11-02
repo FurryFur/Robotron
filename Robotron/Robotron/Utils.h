@@ -194,3 +194,8 @@ constexpr const T& clamp(const T& v, const T& lo, const T& hi)
 {
 	return clamp(v, lo, hi, std::less<>());
 }
+
+// Returns the sign of a number (+1 or -1)
+template <typename T> int sign(T val) {
+	return (T(0) < val) - (val < T(0));
+}

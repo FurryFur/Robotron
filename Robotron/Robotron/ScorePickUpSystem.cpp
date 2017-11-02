@@ -70,7 +70,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 				entity.aiVariables.followEntity = &m_scene.getEntity(i);
 
 				// If following the controlling player, make a sound
-				if (entity.aiVariables.followEntity->hasComponents(COMPONENT_PLAYER_CONTROL));
+				if (entity.aiVariables.followEntity->hasComponents(COMPONENT_PLAYER_CONTROL))
 					m_audio.playSFX(SCORE_PICKUP);
 			}
 		}
