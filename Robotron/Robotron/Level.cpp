@@ -26,9 +26,9 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, std::string username
 	m_inputSystem.registerKeyObserver(this);
 
 	m_window = window;
-	m_levelNum = 0;
+	m_levelNum = -1;
 	m_inSetupPhase = false;
-	m_descendingPlayers = true;
+	m_descendingPlayers = false;
 	m_drawConnectPlayerStats = false;
 
 	std::string strServerMode;
@@ -46,12 +46,10 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, std::string username
 
 	Entity& player = EntityUtils::createPlayer(m_scene,
 		glm::scale({}, glm::vec3{ 4.0f, 4.0f, 4.0f })
-		+ glm::translate({}, glm::vec3{ 0.0f, 50.0f, 0.0f }));
+		+ glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 	player.addComponents(COMPONENT_NETWORK);
 
 	player.playerStats.playerInfo.username = username;
-
-	spawnEnemies(0);
 
 	// Create the skybox
 	Entity& skybox = EntityUtils::createSkybox(m_scene, {
