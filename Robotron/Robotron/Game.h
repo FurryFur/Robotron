@@ -17,10 +17,12 @@
 // Local Includes
 #include "clock.h"
 #include "Level.h"
+#include "DummyLevel.h"
 #include "TextLabel.h"
 #include "Scene.h"
-#include "RenderSystem.h"
-#include "Audio.h"
+#include "NetworkSystem.h"
+#include "NetworkServerSystem.h"
+#include "NetworkClientSystem.h"
 
 #include <memory>
 #include <string>
@@ -51,12 +53,6 @@ public:
 	Game(GLFWwindow* window, Audio audio);
 	~Game();
 
-	void executeOneFrame();
-
-	void renderMenuScreens();
-
-	void process(float deltaTick);
-
 	static GameState s_gameState;
 	static ButtonState s_buttonState;
 	static double s_mousePosX;
@@ -67,13 +63,22 @@ public:
 
 	static std::vector<IKeyObserver*> s_keyObservers;
 
+	void executeOneFrame();
+
 private:
+
+	void renderMenuScreens();
+
+	void updateNetwork(float deltaTick);
+
+	void process(float deltaTick);
 
 	void keyCallback(int key, int scancode, int action, int mods);
 
 	GLFWwindow* m_window;
 	Clock m_clock;
 
+	Scene m_scene;
 	Scene m_menuScene;
 	RenderSystem m_renderSystem;
 
@@ -83,7 +88,10 @@ private:
 	std::vector <TextLabel> m_uiLobbyLabels;
 	std::vector <TextLabel> m_uiGameOverLabels;
 
+	std::unique_ptr<NetworkSystem> m_networkSystem;
+
 	std::unique_ptr<Level> m_level;
+	std::unique_ptr<DummyLevel> m_dummyLevel;
 	
 	Audio m_audio; // the audio device
 	std::string m_serverName; // the name of the server
@@ -91,6 +99,7 @@ private:
 	std::string m_userName; // the username of the player
 	TextLabel m_userNameInput; //displays the suervername
 	bool m_displayGameOverText; // flags wether the player reach the menu screen via a game over
+	bool m_isHost; // A flag to tell the system that the player is running the game as the host
 
 	//TextLabel m_mousePosLabel;
 };
