@@ -381,8 +381,7 @@ void Level::respawnDeadPlayers(Clock& clock)
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		// Return true when the first entity is found with an enemy tag.
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER)
 		    && m_scene.getEntity(i).playerStats.isRespawning == true
 		    && m_scene.getEntity(i).playerStats.playerInfo.lives > 0
 		    && m_scene.getEntity(i).playerStats.deathTime + 3.0f <= clock.GetCurTime())
@@ -501,26 +500,22 @@ void Level::processSetUpPhase()
 		// Cycle through all the entites in the scene.
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 				++m_scene.getEntity(i).transform[3].y;
 		}
 		if(m_setUpTick == 50)
 			initalizeNextLevel();
 	}
-	// For the last 50 ticks, descend the players
 	else
 	{
-		// Cycle through all the entites in the scene.
+		// Set all the player to respawn 
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
-				--m_scene.getEntity(i).transform[3].y;
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
+				m_scene.getEntity(i).playerStats.isRespawning = true;
 		}
-		if (m_setUpTick == 100)
-		{
-			m_inSetupPhase = false;
-			m_setUpTick = 0;
-		}
+		m_inSetupPhase = false;
+		m_setUpTick = 0;
 	}
 }
 

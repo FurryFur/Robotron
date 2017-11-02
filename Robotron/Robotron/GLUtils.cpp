@@ -56,7 +56,7 @@ GLFWwindow* GLUtils::initOpenGL()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	GLFWwindow* glContext = glfwCreateWindow(1400, 800, "Robotron 2017", nullptr, nullptr);
+	GLFWwindow* glContext = glfwCreateWindow(1400, 800, "Doge-otron 2017", nullptr, nullptr);
 	if (!glContext)
 	{
 		std::cerr << "Failed to create GLFW window" << std::endl;
@@ -122,6 +122,22 @@ GLuint GLUtils::getMetalShader()
 	return s_shader;
 }
 
+GLuint GLUtils::getColorShader()
+{
+	static GLuint s_shader;
+	static bool s_shaderBuilt = false;
+
+	if (!s_shaderBuilt) {
+		compileAndLinkShaders(
+			"Assets/Shaders/color_vert.glsl",
+			"Assets/Shaders/color_frag.glsl",
+			s_shader);
+		s_shaderBuilt = true;
+	}
+
+	return s_shader;
+}
+
 GLuint GLUtils::getDebugShader()
 {
 	static GLuint s_shader;
@@ -170,13 +186,17 @@ GLuint GLUtils::bufferMeshData(const std::vector<VertexFormat>& vertices, const 
 	GLuint positionLoc = 0;
 	GLuint normalLoc = 1;
 	GLuint texCoordLoc = 2;
+	GLuint colorLoc = 3;
+
 	glVertexAttribPointer(positionLoc, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), BUFFER_OFFSET(0));
 	glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), BUFFER_OFFSET(3));
 	glVertexAttribPointer(texCoordLoc, 2, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), BUFFER_OFFSET(6));
+	glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), BUFFER_OFFSET(8));
 
 	glEnableVertexAttribArray(positionLoc);
 	glEnableVertexAttribArray(normalLoc);
 	glEnableVertexAttribArray(texCoordLoc);
+	glEnableVertexAttribArray(colorLoc);
 
 	return VAO;
 }

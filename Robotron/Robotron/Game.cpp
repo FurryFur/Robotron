@@ -217,9 +217,9 @@ Game::Game(GLFWwindow* window, Audio audio)
 	m_uiMainMenuLabels.push_back(controls);
 
 	// Create the main menu title text
-	TextLabel title("Robotron", "Assets/Fonts/NYCTALOPIATILT.TTF");
+	TextLabel title("Doge-otron", "Assets/Fonts/NYCTALOPIATILT.TTF");
 	title.setScale(2.0f);
-	title.setPosition(glm::vec2(400.0f, 550.0f));
+	title.setPosition(glm::vec2(350.0f, 550.0f));
 	title.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
 	m_uiMainMenuLabels.push_back(title);
 	
@@ -586,26 +586,36 @@ void Game::process(float deltaTick)
 			// Process the level
 			m_dummyLevel->process(deltaTick, m_clock, *m_networkSystem);
 
+			// Check if the game has started and the client can start checking for loss
+			if (!m_checkLoss) 
+			{
+				for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
+				{
+					if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).playerStats.playerInfo.lives > 0)
+						m_checkLoss = true;
+				}
+			}
+
 			// Check if all players are dead and return to lobby if so
-			//if (!m_dummyLevel->checkPlayersAlive())
-			//{
-			//	// Trigger the game over text to dispay and update it
-			//	m_uiGameOverLabels.at(1).setText("Final Score: " + std::to_string(m_dummyLevel->getPlayerScore()));
-			//	m_displayGameOverText = true;
-			//	// Return to lobby
-			//	s_gameState = LOBBY;
-			//
-			//	// Register input system as a listener for keyboard events
-			//	glfwSetWindowUserPointer(m_window, this);
-			//	auto keyFunc = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-			//		Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
-			//		game->keyCallback(key, scancode, action, mods);
-			//	};
-			//	glfwSetKeyCallback(m_window, keyFunc);
-			//
-			//	// Reset the level
-			//	m_dummyLevel.reset(nullptr);
-			//}
+			if (m_checkLoss && !m_dummyLevel->checkPlayersAlive())
+			{
+				// Trigger the game over text to dispay and update it
+				m_uiGameOverLabels.at(1).setText("Final Score: " + std::to_string(m_dummyLevel->getPlayerScore()));
+				m_displayGameOverText = true;
+				// Return to lobby
+				s_gameState = LOBBY;
+			
+				// Register input system as a listener for keyboard events
+				glfwSetWindowUserPointer(m_window, this);
+				auto keyFunc = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+					Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
+					game->keyCallback(key, scancode, action, mods);
+				};
+				glfwSetKeyCallback(m_window, keyFunc);
+			
+				// Reset the level
+				m_dummyLevel.reset(nullptr);
+			}
 		}
 	}
 
