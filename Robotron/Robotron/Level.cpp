@@ -363,6 +363,8 @@ void Level::initalizeNextLevel()
 // Check atleast one enemy is alive. If return false, trigger next level to start.
 bool Level::checkEnemiesAlive()
 {
+	if (m_inSetupPhase)
+		return true;
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
@@ -559,4 +561,5 @@ int Level::getPlayerScore()
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
 			return m_scene.getEntity(i).playerStats.playerInfo.score;
 	}
+	return 0;
 }
