@@ -5,29 +5,30 @@
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window, Clock& clock)
+Level::Level(GLFWwindow* window, Clock& clock, Audio audio, std::string username)
 	: m_scene{}
 	, m_renderSystem(window, m_scene)
-	, m_playerControlSystem(m_scene)
+	, m_playerControlSystem(m_scene, audio)
 	, m_inputSystem(window, m_scene, clock)
 	, m_enemy01ControlSystem(m_scene)
 	, m_enemy02ControlSystem(m_scene)
-	, m_enemy03ControlSystem(m_scene)
-	, m_scorePickUpSystem(m_scene)
-	, m_playerbulletsystem(m_scene)
+	, m_enemy03ControlSystem(m_scene, audio)
+	, m_scorePickUpSystem(m_scene, audio)
+	, m_playerbulletsystem(m_scene, audio)
 	, m_enemybulletsystem(m_scene)
 	, m_physicsSystem(m_scene)
 	, m_playerScore("Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
 	, m_playerHealth("Health: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	, m_playerStatsMenu(m_scene)
 {
 	Scene::makeSceneCurrent(&m_scene);
-
+	m_audio = audio;
 	m_inputSystem.registerKeyObserver(this);
 
 	m_window = window;
-	m_levelNum = 0;
+	m_levelNum = -1;
 	m_inSetupPhase = false;
-	m_descendingPlayers = true;
+	m_descendingPlayers = false;
 	m_drawConnectPlayerStats = false;
 
 	std::string strServerMode;
@@ -44,10 +45,10 @@ Level::Level(GLFWwindow* window, Clock& clock)
 		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 1.0f }));
 
 	Entity& player = EntityUtils::createPlayer(m_scene,
-		glm::translate({}, glm::vec3{ 0.0f, 50.0f, 0.0f }));
+		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
 	player.addComponents(COMPONENT_NETWORK);
 
-	//spawnEnemies(0);
+	player.playerStats.playerInfo.username = username;
 
 	// Create the skybox
 	Entity& skybox = EntityUtils::createSkybox(m_scene, {
@@ -87,24 +88,6 @@ Level::Level(GLFWwindow* window, Clock& clock)
 	m_playerScore.setPosition(glm::vec2(10.0f, 40.0f));
 	m_playerScore.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 	m_playerScore.setScale(0.5f);
-
-	int numOfPlayers = 0;
-	// Cycle over all the entities in the scene and find the total number of players
-	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
-	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
-			++numOfPlayers;
-	}
-	// Create text labels for each player
-	for (size_t i = 0; i < numOfPlayers; ++i)
-	{
-
-		TextLabel playerInfo("Player", "Assets/Fonts/NYCTALOPIATILT.TTF");
-		playerInfo.setScale(0.3f);
-		playerInfo.setPosition(glm::vec2(1030.0f, 770.0f - (i * 15)));
-		playerInfo.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-		m_statsScreenLabels.push_back(playerInfo);
-	}
 }
 
 
@@ -113,7 +96,7 @@ Level::~Level()
 }
 
 void Level::spawnEnemies(int levelType)
-{
+{	
 	// Different combinations of enemies are spawned based on the level type.
 	// The number of enemies increases as the level number increases.
 	
@@ -329,7 +312,7 @@ void Level::spawnEnemies(int levelType)
 void Level::initalizeNextLevel()
 {
 	++m_levelNum;
-
+	m_audio.playSFX(NEXT_LEVEL);
 	// Cycle over all the entities in the scene
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 	{
@@ -341,11 +324,11 @@ void Level::initalizeNextLevel()
 			{
 				if (m_scene.getEntity(i).aiVariables.lifePickUp != true)
 				{
-					m_scene.getEntity(i).aiVariables.followEntity->playerStats.score += m_scene.getEntity(i).aiVariables.score;
+					m_scene.getEntity(i).aiVariables.followEntity->playerStats.playerInfo.score += m_scene.getEntity(i).aiVariables.score;
 					m_scene.getEntity(i).aiVariables.followEntity->playerStats.extraLifeTrack += m_scene.getEntity(i).aiVariables.score;
 				}
 				else
-					++m_scene.getEntity(i).aiVariables.followEntity->playerStats.lives;
+					++m_scene.getEntity(i).aiVariables.followEntity->playerStats.playerInfo.lives;
 			}
 			m_scene.destroyEntity(m_scene.getEntity(i));
 		}
@@ -397,7 +380,7 @@ bool Level::checkPlayersAlive()
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if(m_scene.getEntity(i).playerStats.lives > 0)
+		if(m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).playerStats.playerInfo.lives > 0)
 			return true;
 	}
 
@@ -413,27 +396,27 @@ void Level::respawnDeadPlayers(Clock& clock)
 		// Return true when the first entity is found with an enemy tag.
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
 		    && m_scene.getEntity(i).playerStats.isRespawning == true
-		    && m_scene.getEntity(i).playerStats.lives > 0
+		    && m_scene.getEntity(i).playerStats.playerInfo.lives > 0
 		    && m_scene.getEntity(i).playerStats.deathTime + 3.0f <= clock.GetCurTime())
 		{
 			m_scene.getEntity(i).playerStats.isRespawning = false;
 			m_scene.getEntity(i).transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
 			m_descendingPlayers = true;
+			m_audio.playSFX(PLAYER_SPAWNING);
 		}
 	}
 }
 
 void Level::process(float deltaTick, Clock& clock)
 {		
-	int playerNum = 0;
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
 		{
 			// Update the UI with the player score and health.
-			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).playerStats.lives));
-			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).playerStats.score));
+			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.lives));
+			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.score));
 
 			// Check that the player has enough score to get an extra life
 			if (m_scene.getEntity(i).playerStats.extraLifeTrack >= m_scene.getEntity(i).playerStats.extraLifeThreshhold)
@@ -443,16 +426,8 @@ void Level::process(float deltaTick, Clock& clock)
 				// Increase the threshold by 500 every time it is reached
 				m_scene.getEntity(i).playerStats.extraLifeThreshhold += 500;
 				// Increase the player's life by 1.
-				++m_scene.getEntity(i).playerStats.lives;
+				++m_scene.getEntity(i).playerStats.playerInfo.lives;
 			}
-		}
-
-		// Update all the players stats only if the flag to render them is true.
-		if (m_drawConnectPlayerStats && m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
-		{
-			m_statsScreenLabels.at(playerNum).setText("Player " + std::to_string(playerNum + 1)
-			+ "Lives: " + std::to_string(m_scene.getEntity(i).playerStats.lives)
-			+ "Score: " + std::to_string(m_scene.getEntity(i).playerStats.score));
 		}
 	}
 
@@ -489,8 +464,8 @@ void Level::process(float deltaTick, Clock& clock)
 	// Draw all the player stats only if the flag is set to true.
 	if (m_drawConnectPlayerStats)
 	{
-		for (size_t i = 0; i < m_statsScreenLabels.size(); ++i)
-			m_statsScreenLabels.at(i).Render();
+		m_playerStatsMenu.updateStats();
+		m_playerStatsMenu.renderStats();
 	}
 
 	// When respawning, players spawn above the level.
@@ -521,6 +496,11 @@ void Level::process(float deltaTick, Clock& clock)
 // Handles the animation between levels. The player flies up, level spawns. And they desend in the centre of the screen.
 void Level::processSetUpPhase()
 {
+	if (m_setUpTick == 1)
+	{
+		m_audio.playSFX(PLAYER_DESCENDING);
+	}
+	
 	// For the first 50 ticks, ascend the players
 	if (m_setUpTick <= 50)
 	{
@@ -576,6 +556,6 @@ int Level::getPlayerScore()
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
-			return m_scene.getEntity(i).playerStats.score;
+			return m_scene.getEntity(i).playerStats.playerInfo.score;
 	}
 }

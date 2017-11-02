@@ -13,11 +13,12 @@
 
 #pragma once
 
+#include "PlayerInfo.h"
+
 struct PlayerStatsComponent {
-	int score; // The current score of the player
+	PlayerInfo playerInfo; // the username, score, lives.
 	int extraLifeTrack; // Keeps track of the players score until they get a new life. Refreshes when they do.
 	int extraLifeThreshhold; // How many points the player needs to get another life
-	int lives; // The current number of lives the player has
 	bool isRespawning; // Is true when they are dead and will respawn
 	double deathTime; // The time it takes for them to respawn
 };

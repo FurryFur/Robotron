@@ -199,7 +199,7 @@ glm::vec3 computeCohesion(std::vector<Entity*> nearbyNeighbours, glm::vec3 curre
 	return (averagePosition / glm::length(averagePosition));
 }
 
-// Compute the seperation section of flocking
+// Compute the separation section of flocking
 glm::vec3 computeSeparation(std::vector<Entity*> nearbyNeighbours, glm::vec3 currentPosition)
 {
 	int neighbourCount = 0;

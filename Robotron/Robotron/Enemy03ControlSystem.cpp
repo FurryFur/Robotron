@@ -33,10 +33,10 @@
 
 #include <cmath>
 
-Enemy03ControlSystem::Enemy03ControlSystem(Scene& scene)
+Enemy03ControlSystem::Enemy03ControlSystem(Scene& scene, Audio audio)
 	: m_scene{ scene }
 {
-
+	m_audio = audio;
 }
 
 //the ai movement behavious for enemy03s
@@ -109,6 +109,9 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 				glm::translate({}, glm::vec3(entity.transform[3]))
 				* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
 			
+			// Bullet shoot sound effect
+			m_audio.playSFX(ENEMY_SHOOT);
+
 			//Find a position to shoot at where the player will be
 			float T = (glm::length(glm::vec2{ targetPosition.x - currentPosition.x, targetPosition.z - currentPosition.z }) / targetsMoveSpeed) / 2;
 			glm::vec3 firingPosition = targetPosition + targetsVelocity * T;

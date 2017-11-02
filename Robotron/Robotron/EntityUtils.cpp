@@ -188,8 +188,9 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	                                  | COMPONENT_TRANSFORM
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS
 									  | COMPONENT_PLAYER);
-	entity.playerStats.lives = 30000;
-	entity.playerStats.score = 0;
+
+	entity.playerStats.playerInfo.lives = 100;
+	entity.playerStats.playerInfo.score = 0;
 	entity.playerStats.extraLifeThreshhold = 1000;
 	entity.transform = transform * glm::scale(glm::mat4{}, { 5.0f, 5.0f, 5.0f }); // Scale the player model up by default
 
@@ -215,7 +216,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.controlVars.maxMoveSpeed = 8;
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
-	entity.controlVars.firingSpeed = 0.4f;
+	entity.controlVars.firingSpeed = 0.5f;
 
 	return entity;
 }

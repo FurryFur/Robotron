@@ -32,10 +32,10 @@
 
 #include <cmath>
 
-ScorePickUpSystem::ScorePickUpSystem(Scene& scene)
+ScorePickUpSystem::ScorePickUpSystem(Scene& scene, Audio audio)
 	: m_scene{ scene }
 {
-
+	m_audio = audio;
 }
 
 //the ai movement behavious for enemy01s
@@ -68,6 +68,10 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 			{
 				targetPosition = { m_scene.getEntity(i).transform[3].x, m_scene.getEntity(i).transform[3].y, m_scene.getEntity(i).transform[3].z };
 				entity.aiVariables.followEntity = &m_scene.getEntity(i);
+
+				// If following the controlling player, make a sound
+				if (entity.aiVariables.followEntity->hasComponents(COMPONENT_PLAYER_CONTROL));
+					m_audio.playSFX(SCORE_PICKUP);
 			}
 		}
 	}

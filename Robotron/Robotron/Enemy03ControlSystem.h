@@ -18,17 +18,20 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtx\rotate_vector.hpp>
 
+#include "Audio.h"
+
 class Scene;
 class Clock;
 class Entity;
 
 class Enemy03ControlSystem {
 public:
-	Enemy03ControlSystem(Scene& scene);
+	Enemy03ControlSystem(Scene& scene, Audio audio);
 
 	// Updates the entities position from input
 	void update(Entity&, float deltaTick, Clock& clock);
 
 private:
 	Scene& m_scene;
+	Audio m_audio;
 };

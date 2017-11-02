@@ -35,6 +35,8 @@
 #include "PhysicsSystem.h"
 #include "KeyObserver.h"
 #include "TextLabel.h"
+#include "Audio.h"
+#include "PlayerStatsMenu.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
@@ -48,7 +50,7 @@
 class Level : public IKeyObserver
 {
 public:
-	Level(GLFWwindow* window, Clock& clock);
+	Level(GLFWwindow* window, Clock& clock, Audio audio, std::string username);
 	~Level();
 
 	// Increases the level count of the game and spawns the next enemies.
@@ -69,6 +71,7 @@ private:
 	void processSetUpPhase();
 
 	Scene m_scene;
+	Audio m_audio;
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;
 	PlayerControlSystem m_playerControlSystem;
@@ -82,10 +85,10 @@ private:
 	PhysicsSystem m_physicsSystem;
 	std::unique_ptr<NetworkSystem> m_networkSystem;
 
+	PlayerStatsMenu m_playerStatsMenu;
+
 	TextLabel m_playerHealth;
 	TextLabel m_playerScore;
-
-	std::vector<TextLabel> m_statsScreenLabels;
 
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	int m_levelNum;

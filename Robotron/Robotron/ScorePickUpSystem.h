@@ -16,16 +16,19 @@
 
 #pragma once
 
+#include "Audio.h"
+
 class Scene;
 class Entity;
 
 class ScorePickUpSystem {
 public:
-	ScorePickUpSystem(Scene& scene);
+	ScorePickUpSystem(Scene& scene, Audio audio);
 
 	// Updates the entities position from input
 	void update(Entity&, float deltaTick);
 
 private:
 	Scene& m_scene;
+	Audio m_audio;
 };

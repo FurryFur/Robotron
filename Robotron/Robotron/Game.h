@@ -18,6 +18,9 @@
 #include "clock.h"
 #include "Level.h"
 #include "TextLabel.h"
+#include "Scene.h"
+#include "RenderSystem.h"
+#include "Audio.h"
 
 #include <memory>
 #include <string>
@@ -45,7 +48,7 @@ enum ButtonState
 class Game
 {
 public:
-	Game(GLFWwindow* window);
+	Game(GLFWwindow* window, Audio audio);
 	~Game();
 
 	void executeOneFrame();
@@ -58,6 +61,7 @@ public:
 	static ButtonState s_buttonState;
 	static double s_mousePosX;
 	static double s_mousePosY;
+	static bool s_buttonClicked;
 
 	static void registerKeyObserver(IKeyObserver * observer);
 
@@ -70,6 +74,9 @@ private:
 	GLFWwindow* m_window;
 	Clock m_clock;
 
+	Scene m_menuScene;
+	RenderSystem m_renderSystem;
+
 	// Each screen state has a vector of text labels that are used to populate the interfaces.
 	std::vector <TextLabel> m_uiMainMenuLabels;
 	std::vector <TextLabel> m_uiHostSetupLabels;
@@ -78,10 +85,12 @@ private:
 
 	std::unique_ptr<Level> m_level;
 	
-	std::string m_serverName;
-	TextLabel m_serverNameInput;
-
-	bool m_displayGameOverText;
+	Audio m_audio; // the audio device
+	std::string m_serverName; // the name of the server
+	TextLabel m_serverNameInput; // displays the servername
+	std::string m_userName; // the username of the player
+	TextLabel m_userNameInput; //displays the suervername
+	bool m_displayGameOverText; // flags wether the player reach the menu screen via a game over
 
 	//TextLabel m_mousePosLabel;
 };

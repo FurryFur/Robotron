@@ -15,17 +15,19 @@
 #pragma once
 
 #include "Clock.h"
+#include "Audio.h"
 
 class Scene;
 class Entity;
 
 class PlayerControlSystem {
 public:
-	PlayerControlSystem(Scene& scene);
+	PlayerControlSystem(Scene& scene, Audio audio);
 
 	// Updates the entities position from input
 	void update(Entity& entity, Clock& clock);
 
 private:
 	Scene& m_scene;
+	Audio m_audio;
 };
