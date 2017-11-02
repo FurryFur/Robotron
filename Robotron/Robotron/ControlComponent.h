@@ -19,4 +19,6 @@ struct ControlComponent {
 	float accelerationWeight; // This scales how fast the entity will turn / accelerate
 	float orientationSensitivity;
 	bool worldSpaceMove;
+	double lastFiringTime; // Keeps track of the last time the entity fired
+	double firingSpeed; // The time allowed before the entity can fire again
 };

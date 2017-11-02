@@ -2,12 +2,17 @@
 
 #include "NetworkSystem.h"
 #include "GhostSnapshot.h"
+#include "RPC.h"
+
+#include <glm\glm.hpp>
 
 #include <vector>
 #include <memory>
+#include <cstdint>
 
 class Scene;
 class Entity;
+struct InputComponent;
 struct Packet;
 
 enum ClientState {
@@ -20,7 +25,7 @@ enum ClientState {
 class NetworkClientSystem : public NetworkSystem
 {
 public:
-	NetworkClientSystem(Scene& scene);
+	NetworkClientSystem(Scene&);
 
 	virtual void beginFrame() override;
 	virtual void update(Entity&, float deltaTick) override;
@@ -33,6 +38,14 @@ public:
 
 	// Join the server at the specified address
 	void joinServer(const sockaddr_in& address);
+
+	void createGhost(std::int32_t entityNetId, ModelID modelId, const glm::mat4& transform);
+	void createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const glm::mat4& transform);
+
+	// Destroys the entity if one exists at the specified
+	// network id.
+	// Returns true if an entity was destroyed
+	bool destroyIfExistsInNetwork(std::int32_t entityNetId);
 private:
 	// Check for and handle broadcast responses and join responses from server
 	void handleServerJoinPackets(const Packet&, const sockaddr_in& address);

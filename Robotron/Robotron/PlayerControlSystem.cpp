@@ -103,9 +103,12 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	//Fire player bullets if they are set to fire
 	// Check which way the player is firing and shoot in that direction.
 	// Create a bullet on the player shooting right
-	if (entity.input.shootRight || entity.input.shootLeft || entity.input.shootDown || entity.input.shootUp
-	 || entity.input.shootRightUp || entity.input.shootRightDown || entity.input.shootLeftUp || entity.input.shootLeftDown)
+	if ( (entity.input.shootRight || entity.input.shootLeft || entity.input.shootDown || entity.input.shootUp
+	  ||  entity.input.shootRightUp || entity.input.shootRightDown || entity.input.shootLeftUp || entity.input.shootLeftDown)
+	  && (entity.controlVars.lastFiringTime + entity.controlVars.firingSpeed <= clock.GetCurTime()))
 	{
+		entity.controlVars.lastFiringTime = clock.GetCurTime();
+
 		glm::vec3 bulletVelocity;
 		// The player is shooting right
 		if (entity.input.shootRight)

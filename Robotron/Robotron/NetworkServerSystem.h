@@ -4,6 +4,7 @@
 #include "socket.h"
 #include "RPC.h"
 #include "ClientInfo.h"
+#include "InputComponent.h"
 
 #include <vector>
 #include <unordered_map>
@@ -27,7 +28,6 @@ public:
 	}
 };
 
-
 class NetworkServerSystem : public NetworkSystem {
 public:
 	NetworkServerSystem(Scene&);
@@ -38,6 +38,7 @@ public:
 	virtual bool isInGame() override;
 
 	void startGame();
+	void recordInput(std::int32_t entityNetId, const InputComponent& input);
 
 	static const USHORT s_kDefaultServerPort;
 private:

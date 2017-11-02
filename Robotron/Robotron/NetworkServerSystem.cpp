@@ -22,6 +22,7 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene)
 {
 	m_socket.initialise(s_kDefaultServerPort);
 	allocateRecvBuffer();
+	RPC::setServer(this);
 
 	// TODO: Create client connection code instead of hard coding single
 	// client
@@ -57,14 +58,7 @@ void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr
 	std::uint32_t seqNumSeen = clientIt->second.lastSeqNumSeen;
 	std::uint32_t seqNumRecvd = packet.sequenceNum;
 	std::uint32_t bufferOffset = std::min((seqNumRecvd - seqNumSeen - 1),
-			                                (static_cast<std::uint32_t>(packet.rpcGroupBuffer.size() - 1)));
-
-	// Ignore out of order RPCs
-	if (seqNumRecvd > seqNumSeen + 1 && bufferOffset < packet.rpcGroupBuffer.size() - 1) {
-		// TODO: Add logging here
-		std::cout << "INFO: Server received and out of order packet" << std::endl;
-		return;
-	}
+			                              (static_cast<std::uint32_t>(packet.rpcGroupBuffer.size() - 1)));
 		
 	// Execute RPCs received from client
 	for (int i = bufferOffset; i >= 0; --i) {
@@ -72,7 +66,7 @@ void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr
 		for (auto& rpc : rpcGroup.getRpcs()) {
 			// TODO: Add check to make sure rpc is being executed
 			// on an entity that the client actually controls (security)
-			rpc->execute(m_netEntities);
+			rpc->execute();
 		}
 	}
 
@@ -208,6 +202,14 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 
 void NetworkServerSystem::beginFrame()
 {
+	// Inform each network entity that it has not yet received
+	// input this frame.
+	for (Entity* entity : m_netEntities) {
+		if (entity && entity->hasComponents(COMPONENT_INPUT)) {
+			entity->network.receivedInputThisFrame = false;
+		}
+	}
+
 	sockaddr_in address;
 	while (receiveData(m_recvPacket, address)) {
 		// Receive and process packets
@@ -241,6 +243,13 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 	// Detect new entities
 	if (entity.hasComponents(COMPONENT_NETWORK) && isNewEntity) {
 		addToNetworking(entity);
+	}
+
+	// Fast forward input state to the last input received
+	// if we didn't receive input this frame.
+	if (entity.hasComponents(COMPONENT_NETWORK, COMPONENT_INPUT) 
+		&& !entity.network.receivedInputThisFrame) {
+		entity.input = entity.network.lastInputReceived;
 	}
 }
 
@@ -295,6 +304,45 @@ void NetworkServerSystem::startGame()
 		newPlayer.removeComponents(COMPONENT_INPUT_MAP); // Input will come from the clients
 		addressClientInfoPair.second.playerEntity = &newPlayer;
 		addToNetworking(newPlayer);
+	}
+}
+
+void NetworkServerSystem::recordInput(std::int32_t entityNetId, const InputComponent& input)
+{
+	if (entityNetId < m_netEntities.size()) {
+		Entity* entity = m_netEntities.at(entityNetId);
+		if (entity) {
+			// Set the local input state in a such a way that button
+			// states updated from the network remain down for at least one
+			// frame so they can be processed by other systems.
+			entity->input.axis = input.axis;
+			entity->input.orientationDelta = input.orientationDelta;
+			entity->input.btn1Down       = entity->input.btn1Down       || input.btn1Down;
+			entity->input.btn2Down       = entity->input.btn2Down       || input.btn2Down;
+			entity->input.btn3Down       = entity->input.btn3Down       || input.btn3Down;
+			entity->input.btn4Down       = entity->input.btn4Down       || input.btn4Down;
+			entity->input.shootLeftDown  = entity->input.shootLeftDown  || input.shootLeftDown ;
+			entity->input.shootDown      = entity->input.shootDown      || input.shootDown     ;
+			entity->input.shootRightDown = entity->input.shootRightDown || input.shootRightDown;
+			entity->input.shootLeft      = entity->input.shootLeft      || input.shootLeft     ;
+			entity->input.shootRight     = entity->input.shootRight     || input.shootRight    ;
+			entity->input.shootLeftUp    = entity->input.shootLeftUp    || input.shootLeftUp   ;
+			entity->input.shootUp        = entity->input.shootUp        || input.shootUp       ;
+			entity->input.shootRightUp   = entity->input.shootRightUp   || input.shootRightUp  ;
+
+			// These are used to set the input to the last received input
+			// after one frame.
+			entity->network.lastInputReceived = input;
+			entity->network.receivedInputThisFrame = true;
+		}
+		else {
+			// TODO: Add logging here
+			std::cout << "Info: Received input for a destroyed entity" << std::endl;
+		}
+	}
+	else {
+		// TODO: Add logging here
+		std::cout << "ERROR: Received input for an entity with an out of range network id" << std::endl;
 	}
 }
 

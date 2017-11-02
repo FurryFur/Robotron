@@ -23,6 +23,7 @@ NetworkClientSystem::NetworkClientSystem(Scene& scene)
 {
 	m_socket.initialise(4567);
 	allocateRecvBuffer();
+	RPC::setClient(this);
 
 	broadcastForServers();
 
@@ -59,7 +60,7 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 	if (m_clientState != CLIENT_STATE_IN_GAME)
 		return;
 
-	if (!entity.hasComponents(COMPONENT_NETWORK, COMPONENT_TRANSFORM))
+	if (!entity.hasComponents(COMPONENT_NETWORK))
 		return;
 
 	std::int32_t id = entity.network.id;
@@ -133,6 +134,45 @@ void NetworkClientSystem::joinServer(const sockaddr_in& address)
 	sendData(joinResq, address);
 }
 
+void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const glm::mat4& transform)
+{
+	// Destroy existing entities with the same id before creating new ones
+	// TODO: Add logging here
+	if (destroyIfExistsInNetwork(entityNetId))
+		std::cout << "INFO: Overwritting entity with network id: " << entityNetId << std::endl;
+
+	Entity& newEntity = EntityUtils::createGhost(m_scene, modelId, transform, entityNetId);
+
+	// Add entity to network system tracking
+	if (entityNetId >= m_netEntities.size())
+		m_netEntities.resize(entityNetId + 1);
+	m_netEntities.at(entityNetId) = &newEntity;
+}
+
+void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const glm::mat4& transform)
+{
+	// Destroy existing entities with the same id before creating new ones
+	// TODO: Add logging here
+	if (destroyIfExistsInNetwork(entityNetId))
+		std::cout << "INFO: Overwritting entity with network id: " << entityNetId << std::endl;
+
+	Entity& newEntity = EntityUtils::createPlayerGhost(m_scene, transform, entityNetId);
+
+	// TODO: Conditionally add the player controller if the username matches the clients username
+	// newEntity.addComponents(COMPONENT_PLAYER_CONTROL);
+	newEntity.addComponents(COMPONENT_INPUT_MAP);
+	newEntity.inputMap.mouseInputEnabled = false;
+	newEntity.inputMap.leftBtnMap = GLFW_KEY_A;
+	newEntity.inputMap.rightBtnMap = GLFW_KEY_D;
+	newEntity.inputMap.forwardBtnMap = GLFW_KEY_W;
+	newEntity.inputMap.backwardBtnMap = GLFW_KEY_S;
+
+	// Add entity to network system tracking
+	if (entityNetId >= m_netEntities.size())
+		m_netEntities.resize(entityNetId + 1);
+	m_netEntities.at(entityNetId) = &newEntity;
+}
+
 void NetworkClientSystem::handleServerJoinPackets(const Packet& packet, const sockaddr_in& address)
 {
 	switch (packet.packetType)
@@ -198,7 +238,7 @@ void NetworkClientSystem::handleGamePackets(const Packet& packet, const sockaddr
 	for (int i = bufferOffset; i >= 0; --i) {
 		const RPCGroup& rpcGroup = rpcGroups.at(i);
 		for (auto& rpc : rpcGroup.getRpcs()) {
-			rpc->execute(m_netEntities);
+			rpc->execute();
 		}
 	}
 
@@ -231,4 +271,18 @@ void NetworkClientSystem::handleGamePackets(const Packet& packet, const sockaddr
 		// Update the last sequence number seen from the server
 		m_lastSeqNumSeen = seqNumRecvd;
 	}
+}
+
+bool NetworkClientSystem::destroyIfExistsInNetwork(std::int32_t entityNetId)
+{
+	if (0 <= entityNetId && entityNetId < m_netEntities.size()) {
+		Entity* existingEntity = m_netEntities.at(entityNetId);
+		if (existingEntity) {
+			existingEntity->destroy();
+			m_netEntities.at(entityNetId) = nullptr;
+			return true;
+		}
+	}
+
+	return false;
 }

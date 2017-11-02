@@ -95,6 +95,8 @@ void Entity::addComponents(size_t componentMask)
 		// been destroyed and its memory reused.
 		network.isNewEntity = true;
 		network.priority = 999;
+		network.lastInputReceived = {};
+		network.receivedInputThisFrame = false;
 	}
 	if (matches(componentMask, COMPONENT_SCOREPICKUP)) {
 		m_componentMask |= COMPONENT_SCOREPICKUP;

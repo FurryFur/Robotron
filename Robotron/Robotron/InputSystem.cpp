@@ -167,30 +167,17 @@ void InputSystem::update(Entity& entity)
 		}
 	}
 
-	// Triggers when the player presses a key to shoot.
-	if (shootRight || shootLeft || shootDown || shootUp
-		|| shootRightUp || shootRightDown || shootLeftUp || shootLeftDown)
-	{
-		if (entity.hasComponents(COMPONENT_PLAYER, COMPONENT_INPUT, COMPONENT_INPUT_MAP))
-		{
-			// Check to see if the player has not shot too recently
-			if (entity.playerStats.lastFiringTime + entity.playerStats.firingSpeed <= m_clock.GetCurTime())
-			{
-				entity.playerStats.lastFiringTime = m_clock.GetCurTime();
-					
-				// Triggers the player object to fire a bullet in the direction pressed by the player
-				entity.input.shootLeftDown = shootLeftDown;
-				entity.input.shootDown = shootDown;
-				entity.input.shootRightDown = shootRightDown;
-				entity.input.shootLeft = shootLeft;
-				entity.input.shootRight = shootRight;
-				entity.input.shootLeftUp = shootLeftUp;
-				entity.input.shootUp = shootUp;
-				entity.input.shootRightUp = shootRightUp;
-			}
-		}
+	if (entity.hasComponents(COMPONENT_PLAYER, COMPONENT_INPUT, COMPONENT_INPUT_MAP)) {
+		// Triggers the player object to fire a bullet in the direction pressed by the player
+		entity.input.shootLeftDown = shootLeftDown;
+		entity.input.shootDown = shootDown;
+		entity.input.shootRightDown = shootRightDown;
+		entity.input.shootLeft = shootLeft;
+		entity.input.shootRight = shootRight;
+		entity.input.shootLeftUp = shootLeftUp;
+		entity.input.shootUp = shootUp;
+		entity.input.shootRightUp = shootRightUp;
 	}
-
 
 	// Filter input receivers
 	const size_t kInputReceiverMask = COMPONENT_INPUT | COMPONENT_INPUT_MAP;

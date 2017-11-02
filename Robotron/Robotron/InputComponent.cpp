@@ -40,18 +40,18 @@ InBufferStream& InputComponent::deserialize(InBufferStream& ibs)
 	std::uint16_t boolPack;
 	ibs >> axis >> orientationDelta >> boolPack;
 
-	btn1Down = boolPack & (1 << 0) != 0;
-	btn2Down = boolPack & (1 << 1) != 0;
-	btn3Down = boolPack & (1 << 2) != 0;
-	btn4Down = boolPack & (1 << 3) != 0;
-	shootLeftDown = boolPack & (1 << 4) != 0;
-	shootDown = boolPack & (1 << 5) != 0;
-	shootRightDown = boolPack & (1 << 6) != 0;
-	shootLeft = boolPack & (1 << 7) != 0;
-	shootRight = boolPack & (1 << 8) != 0;
-	shootLeftUp = boolPack & (1 << 9) != 0;
-	shootUp = boolPack & (1 << 10) != 0;
-	shootRightUp = boolPack & (1 << 11) != 0;
+	btn1Down = (boolPack & (1 << 0)) != 0;
+	btn2Down = (boolPack & (1 << 1)) != 0;
+	btn3Down = (boolPack & (1 << 2)) != 0;
+	btn4Down = (boolPack & (1 << 3)) != 0;
+	shootLeftDown = (boolPack & (1 << 4)) != 0;
+	shootDown = (boolPack & (1 << 5)) != 0;
+	shootRightDown = (boolPack & (1 << 6)) != 0;
+	shootLeft = (boolPack & (1 << 7)) != 0;
+	shootRight = (boolPack & (1 << 8)) != 0;
+	shootLeftUp = (boolPack & (1 << 9)) != 0;
+	shootUp = (boolPack & (1 << 10)) != 0;
+	shootRightUp = (boolPack & (1 << 11)) != 0;
 
 	return ibs;
 }

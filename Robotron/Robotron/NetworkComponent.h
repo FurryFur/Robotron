@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PhysicsComponent.h"
+#include "InputComponent.h"
 
 #include <glm\glm.hpp>
 
@@ -25,5 +25,14 @@ struct NetworkComponent {
 	// goes without having a snapshot sent out.
 	int priority;
 
-	//glm::mat4 transformError;
+	// This variable is used by the server to fast forward inputs
+	// to the lastest version received, if no inputs are received 
+	// within a frame, and all previous inputs have already been processed.
+	InputComponent lastInputReceived;
+
+	// This variable is used, and updated, by the server to check 
+	// whether an input was received this frame or not. The server
+	// can then decide whether to fast forward the entities current
+	// input state to the last version it has seen.
+	bool receivedInputThisFrame;
 };

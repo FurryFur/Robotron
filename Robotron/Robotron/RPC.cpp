@@ -2,8 +2,14 @@
 
 #include "BufferStream.h"
 #include "Scene.h"
+#include "NetworkSystem.h"
+#include "NetworkClientSystem.h"
+#include "NetworkServerSystem.h"
 
 #include <iostream>
+
+NetworkClientSystem* g_clientSystem = nullptr;
+NetworkServerSystem* g_serverSystem = nullptr;
 
 void RPCGroup::addRPC(std::unique_ptr<RemoteProcedureCall> rpc)
 {
@@ -88,14 +94,20 @@ RPCDestroyGhost::RPCDestroyGhost(std::int32_t entityNetId)
 {
 }
 
-void RPCDestroyGhost::execute(std::vector<Entity*>& netEntities)
+void RPCDestroyGhost::execute()
 {
-	if (0 <= m_entityNetId && m_entityNetId < netEntities.size()) {
-		Entity* netEntity = netEntities.at(m_entityNetId);
-		if (netEntity) {
-			netEntity->destroy();
-			netEntities.at(m_entityNetId) = nullptr;
-		}
+	if (m_entityNetId < 0) {
+		// TODO: Add logging here
+		std::cout << "ERROR: Received an RPC with an unset network entity id" << std::endl;
+		return;
+	}
+
+	if (g_clientSystem) {
+		g_clientSystem->destroyIfExistsInNetwork(m_entityNetId);
+	}
+	else {
+		// TODO: Add logging here
+		std::cout << "WARNING: Received destroy ghost RPC on a non-client, or RPC client not set" << std::endl;
 	}
 }
 
@@ -128,45 +140,20 @@ RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId,
 {
 }
 
-void RPCCreatePlayerGhost::execute(std::vector<Entity*>& netEntities)
+void RPCCreatePlayerGhost::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Trying to execute an RPC with a negative network entity id" << std::endl;
+		std::cout << "ERROR: Received an RPC with an unset network entity id" << std::endl;
 		return;
 	}
 
-	Scene* scene = Scene::getCurrentScene();
-	if (scene) {
-		// Destroy existing entities with the same id before creating new ones
-		if (0 <= m_entityNetId && m_entityNetId < netEntities.size()) {
-			Entity* existingEntity = netEntities.at(m_entityNetId);
-			if (existingEntity) {
-				existingEntity->destroy();
-				netEntities.at(m_entityNetId) = nullptr;
-			}
-		}
-
-		Entity& newEntity = EntityUtils::createPlayerGhost(*scene, m_transform, m_entityNetId);
-	
-		// TODO: Conditionally add the player controller if the username matches the clients username
-		// newEntity.addComponents(COMPONENT_PLAYER_CONTROL);
-		newEntity.addComponents(COMPONENT_INPUT_MAP);
-		newEntity.inputMap.mouseInputEnabled = false;
-		newEntity.inputMap.leftBtnMap = GLFW_KEY_A;
-		newEntity.inputMap.rightBtnMap = GLFW_KEY_D;
-		newEntity.inputMap.forwardBtnMap = GLFW_KEY_W;
-		newEntity.inputMap.backwardBtnMap = GLFW_KEY_S;
-
-		// Add entity to network system tracking
-		if (m_entityNetId >= netEntities.size())
-			netEntities.resize(m_entityNetId + 1);
-		netEntities.at(m_entityNetId) = &newEntity;
+	if (g_clientSystem) {
+		g_clientSystem->createPlayerGhost(m_entityNetId, m_playerInfo, m_transform);
 	}
 	else {
 		// TODO: Add logging here
-		std::cout << "Warning: Could not execute RPC Create Ghost. Missing scene, "
-			"did you forget to call Scene::makeSceneCurrent." << std::endl;
+		std::cout << "WARNING: Received create player ghost RPC on a non-client, or RPC client not set" << std::endl;
 	}
 }
 
@@ -190,37 +177,19 @@ RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId,
 {
 }
 
-void RPCCreateGhost::execute(std::vector<Entity*>& netEntities)
+void RPCCreateGhost::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Trying to execute an RPC with a negative network entity id" << std::endl;
+		std::cout << "ERROR: Received an RPC with an unset network entity id" << std::endl;
 		return;
 	}
 
-	Scene* scene = Scene::getCurrentScene();
-	if (scene) {
-		// Destroy existing entities with the same id before creating new ones
-		if (0 <= m_entityNetId && m_entityNetId < netEntities.size()) {
-			Entity* existingEntity = netEntities.at(m_entityNetId);
-			if (existingEntity) {
-				existingEntity->destroy();
-				netEntities.at(m_entityNetId) = nullptr;
-				std::cout << "INFO: Overwritting entity with network id: " << m_entityNetId << std::endl;
-			}
-		}
-
-		Entity& newEntity = EntityUtils::createGhost(*scene, m_modelId, m_transform, m_entityNetId);
-
-		// Add entity to network system tracking
-		if (m_entityNetId >= netEntities.size())
-			netEntities.resize(m_entityNetId + 1);
-		netEntities.at(m_entityNetId) = &newEntity;
-		
+	if (g_clientSystem) {
+		g_clientSystem->createGhost(m_entityNetId, m_modelId, m_transform);
 	} else {
 		// TODO: Add logging here
-		std::cout << "Warning: Could not execute RPC Create Ghost. Missing scene, "
-			"did you forget to call Scene::makeSceneCurrent." << std::endl;
+		std::cout << "WARNING: Received create ghost RPC on a non-client, or RPC client not set" << std::endl;
 	}
 }
 
@@ -243,24 +212,32 @@ RPCRecordInput::RPCRecordInput(std::int32_t entityNetId, const InputComponent& i
 {
 }
 
-void RPCRecordInput::execute(std::vector<Entity*>& netEntities)
+void RPCRecordInput::execute()
 {
 	if (m_entityNetId < 0) {
-		// TODO: Do logging here
-		std::cout << "Warning: Received an RPC with an unassigned network ID" << std::endl;
+		// TODO: Add logging here
+		std::cout << "ERROR: Received an RPC with an unset network entity id" << std::endl;
+		return;
 	}
 
-	if (m_entityNetId < netEntities.size()) {
-		if (netEntities.at(m_entityNetId))
-			netEntities.at(m_entityNetId)->input = m_input;
-		else {
-			// TODO: Add logging here
-			std::cout << "Info: Received RPC for destroyed entity" << std::endl;
-		}
-	} else {
+	if (g_serverSystem)
+		g_serverSystem->recordInput(m_entityNetId, m_input);
+	else {
 		// TODO: Add logging here
-		std::cout << "Warning: Received RPC with out of range network id" << std::endl;
+		std::cout << "WARNING: Received input on a non-server, or RPC server not set" << std::endl;
 	}
+
+	//if (m_entityNetId < netEntities.size()) {
+	//	if (netEntities.at(m_entityNetId))
+	//		netEntities.at(m_entityNetId)->input = m_input;
+	//	else {
+	//		// TODO: Add logging here
+	//		std::cout << "Info: Received RPC for destroyed entity" << std::endl;
+	//	}
+	//} else {
+	//	// TODO: Add logging here
+	//	std::cout << "Warning: Received RPC with out of range network id" << std::endl;
+	//}
 }
 
 OutBufferStream& RPCRecordInput::serialize(OutBufferStream& obs) const
@@ -272,4 +249,14 @@ OutBufferStream& RPCRecordInput::serialize(OutBufferStream& obs) const
 InBufferStream& RPCRecordInput::deserialize(InBufferStream& ibs)
 {
 	return ibs >> m_entityNetId >> m_input;
+}
+
+void RPC::setClient(NetworkClientSystem* clientSystem)
+{
+	g_clientSystem = clientSystem;
+}
+
+void RPC::setServer(NetworkServerSystem* serverSystem)
+{
+	g_serverSystem = serverSystem;
 }

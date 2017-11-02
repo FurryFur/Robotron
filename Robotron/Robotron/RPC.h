@@ -12,6 +12,8 @@
 
 class OutBufferStream;
 class InBufferStream;
+class NetworkServerSystem;
+class NetworkClientSystem;
 struct InputComponent;
 
 enum RPCType : std::uint8_t {
@@ -21,12 +23,17 @@ enum RPCType : std::uint8_t {
 	RPC_RECORD_INPUT
 };
 
+namespace RPC {
+	void setClient(NetworkClientSystem*);
+	void setServer(NetworkServerSystem*);
+}
+
 class RemoteProcedureCall {
 public:
 	RemoteProcedureCall() = default;
 	RemoteProcedureCall(std::int32_t entityNetid);
 
-	virtual void execute(std::vector<Entity*>& netEntities) = 0;
+	virtual void execute() = 0;
 	virtual OutBufferStream& serialize(OutBufferStream&) const = 0;
 	virtual InBufferStream& deserialize(InBufferStream&) = 0;
 
@@ -45,7 +52,7 @@ public:
 	RPCCreatePlayerGhost(std::int32_t entityNetId, const PlayerInfo&,
 		const glm::mat4& transform);
 
-	virtual void execute(std::vector<Entity*>& netEntities) override;
+	virtual void execute() override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 	virtual InBufferStream& deserialize(InBufferStream&) override;
 
@@ -60,7 +67,7 @@ public:
 	RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
 		const glm::mat4& transform);
 
-	virtual void execute(std::vector<Entity*>& netEntities) override;
+	virtual void execute() override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 	virtual InBufferStream& deserialize(InBufferStream&) override;
 
@@ -74,7 +81,7 @@ public:
 	RPCDestroyGhost() = default;
 	RPCDestroyGhost(std::int32_t entityNetId);
 
-	virtual void execute(std::vector<Entity*>& netEntities) override;
+	virtual void execute() override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 	virtual InBufferStream& deserialize(InBufferStream&) override;
 };
@@ -86,7 +93,7 @@ public:
 	RPCRecordInput() = default;
 	RPCRecordInput(std::int32_t entityNetId, const InputComponent&);
 
-	virtual void execute(std::vector<Entity*>& netEntities) override;
+	virtual void execute() override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 	virtual InBufferStream& deserialize(InBufferStream&) override;
 	
