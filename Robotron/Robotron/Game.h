@@ -57,6 +57,8 @@ public:
 	static ButtonState s_buttonState;
 	static double s_mousePosX;
 	static double s_mousePosY;
+	static size_t numServers; // The total number of successfully reached in broadcast
+	static size_t serverNum; // The server number in the vector connected to
 	static bool s_buttonClicked;
 
 	static void registerKeyObserver(IKeyObserver * observer);
@@ -67,10 +69,9 @@ public:
 
 private:
 
+	void createTextLabel(std::string labelText, glm::vec2 position, std::vector<TextLabel>* screenVector, float scale = 1.0f);
 	void renderMenuScreens();
-
 	void process(float deltaTick);
-
 	void keyCallback(int key, int scancode, int action, int mods);
 
 	GLFWwindow* m_window;
@@ -85,6 +86,8 @@ private:
 	std::vector <TextLabel> m_uiHostSetupLabels;
 	std::vector <TextLabel> m_uiLobbyLabels;
 	std::vector <TextLabel> m_uiGameOverLabels;
+	std::vector <TextLabel> m_uiSearchLobbyLabels; // Each label is repesents an available network to join. Also holds the back button.
+	TextLabel m_SearchLobbyBackButton;
 
 	std::unique_ptr<NetworkSystem> m_networkSystem;
 
