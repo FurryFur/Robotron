@@ -166,6 +166,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClCompile Include="BufferStream.cpp" />
     <ClCompile Include="ClientInfo.cpp" />
     <ClCompile Include="Clock.cpp" />
+    <ClCompile Include="DummyLevel.cpp" />
     <ClCompile Include="Enemy01ControlSystem.cpp" />
     <ClCompile Include="Enemy02ControlSystem.cpp" />
     <ClCompile Include="Enemy03ControlSystem.cpp" />
@@ -210,6 +211,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="CameraComponent.h" />
     <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="Clock.h" />
+    <ClInclude Include="DummyLevel.h" />
     <ClInclude Include="Enemy01ControlSystem.h" />
     <ClInclude Include="Enemy02ControlSystem.h" />
     <ClInclude Include="Enemy03ControlSystem.h" />
@@ -265,6 +267,8 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="VertexFormat.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\color_frag.glsl" />
+    <None Include="Assets\Shaders\color_vert.glsl" />
     <None Include="Assets\Shaders\debug_frag.glsl" />
     <None Include="Assets\Shaders\debug_vert.glsl" />
     <None Include="Assets\Shaders\default_frag.glsl" />

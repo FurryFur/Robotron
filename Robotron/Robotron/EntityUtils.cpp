@@ -60,8 +60,8 @@ Entity& EntityUtils::createEnemyZombie(Scene& scene, const TransformComponent& t
 	entity.aiVariables.score = 5;
 	entity.aiVariables.lives = 1;
 
-	float pi = static_cast<float>(M_PI_2);
 	entity.transform = transform;
+	entity.transform.scale *= glm::vec3{ 2.5f, 2.5f, 2.5f };
 
 	setModelEnemyZombie(entity);
 
@@ -81,11 +81,11 @@ Entity& EntityUtils::createEnemySnake(Scene& scene, int positionInQueue, const T
 	
 	entity.aiVariables.positionInQueue = positionInQueue;
 
+	entity.transform = transform;
+	entity.transform.scale *= glm::vec3{ 2.5f, 2.5f, 2.5f };
+
 	entity.aiVariables.score = 5;
 	entity.aiVariables.lives = 1;
-
-	float pi = static_cast<float>(M_PI_2);
-	entity.transform = transform;
 
 	setModelEnemySnake(entity);
 
@@ -102,13 +102,14 @@ Entity& EntityUtils::createEnemyShooter(Scene& scene, const TransformComponent& 
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_ENEMY_SHOOTER
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
-	float pi = static_cast<float>(M_PI_2);
-	entity.transform = transform;
 
 	entity.aiVariables.score = 10;
 	entity.aiVariables.lives = 3;
 
 	setModelEnemyShooter(entity);
+
+	entity.transform = transform;
+	entity.transform.scale *= glm::vec3{ 2.0f, 2.0f, 2.0f };
 
 	entity.controlVars.maxMoveSpeed = 10.0f;
 	entity.controlVars.maxAcceleration = 10.0f;
@@ -232,30 +233,24 @@ Entity& EntityUtils::createEnemyBullet(Scene& scene, const TransformComponent& t
 
 void EntityUtils::setModelEnemyZombie(Entity& entity)
 {
-	entity.model = GLPrimitives::getSphereModel();
-
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/blackhole.jpg");
+	entity.model = ModelUtils::loadModel("Assets/Models/plane_dog/model.obj");
+	
 	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
 	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
 }
 
 void EntityUtils::setModelEnemySnake(Entity& entity)
 {
-	entity.model = GLPrimitives::getSphereModel();
+	entity.model = ModelUtils::loadModel("Assets/Models/hotdog/model.obj");
 
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/doge.jpg");
 	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
 	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
 }
 
 void EntityUtils::setModelEnemyShooter(Entity& entity)
-{
-	entity.model = GLPrimitives::getSphereModel();
+{	
+	entity.model = ModelUtils::loadModel("Assets/Models/fox/model.obj");
 
-	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/coral.jpg");
 	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
 	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
 }
@@ -440,7 +435,7 @@ Entity& EntityUtils::createCube(Scene& scene, const TransformComponent& transfor
 Entity& EntityUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm::vec3& center, const glm::vec3& up)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_INPUT 
-	                                  | COMPONENT_CAMERA | COMPONENT_TRANSFORM);
+	                                  | COMPONENT_CAMERA);
 
 	entity.controlVars.maxMoveSpeed = 0.1f;
 	entity.controlVars.orientationSensitivity = 0.005f;

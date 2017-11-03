@@ -14,6 +14,9 @@
 
 #include "Game.h"
 
+#include "RenderSystem.h"
+#include "Audio.h"
+
 GameState Game::s_gameState = MAINMENU;
 ButtonState Game::s_buttonState = NOBUTTONDOWN;
 bool Game::s_buttonClicked = false;
@@ -132,7 +135,8 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 }
 
 Game::Game(GLFWwindow* window, Audio audio)
-	: m_serverNameInput("", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	: m_scene{}
+	, m_serverNameInput("", "Assets/Fonts/NYCTALOPIATILT.TTF")
 	, m_userNameInput("", "Assets/Fonts/NYCTALOPIATILT.TTF")
 	, m_menuScene{}
 	, m_renderSystem(window, m_menuScene)
@@ -213,9 +217,9 @@ Game::Game(GLFWwindow* window, Audio audio)
 	m_uiMainMenuLabels.push_back(controls);
 
 	// Create the main menu title text
-	TextLabel title("Robotron", "Assets/Fonts/NYCTALOPIATILT.TTF");
+	TextLabel title("Doge-otron", "Assets/Fonts/NYCTALOPIATILT.TTF");
 	title.setScale(2.0f);
-	title.setPosition(glm::vec2(400.0f, 550.0f));
+	title.setPosition(glm::vec2(350.0f, 550.0f));
 	title.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
 	m_uiMainMenuLabels.push_back(title);
 	
@@ -318,6 +322,7 @@ void Game::keyCallback(int key, int scancode, int action, int mods)
 			{
 				m_uiLobbyLabels.at(0).setText("Server: " + m_serverName);
 				s_gameState = LOBBY;
+				m_isHost = true;
 			}
 			// Delete characters of the server name if backspace pressed.
 			else if (key == 259)
@@ -421,6 +426,7 @@ void Game::renderMenuScreens()
 
 void Game::process(float deltaTick)
 {
+
 	// If not in the game state read the coordinates of the mouse and render the menu
 	if (s_gameState != GAME)
 	{
@@ -431,6 +437,14 @@ void Game::process(float deltaTick)
 	// The Game is currently in the main menu. Here the player can search for a lobby by clicking join or host a lobby.
 	if (s_gameState == MAINMENU)
 	{
+		// Reset the network
+		if (m_networkSystem != nullptr)
+			m_networkSystem.reset(nullptr);
+		
+		//Set the host to be false if the player is in the main menu
+		if(m_isHost)
+			m_isHost = false;
+
 		if (s_buttonClicked == true)
 		{
 			m_audio.playButtonClick();
@@ -473,7 +487,9 @@ void Game::process(float deltaTick)
 	// The game is at the search for lobby screen. A list of available lobbies are shown, clicking one allows the player to join it.
 	else if (s_gameState == JOINLOBBY)
 	{
-
+		// If you are the host create the network system
+		if (m_networkSystem == nullptr)
+			m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene);
 	}
 	// The game is at the host setup screen. Here the player can choose a name of a server before creating it.
 	else if (s_gameState == HOSTSETUP)
@@ -493,6 +509,10 @@ void Game::process(float deltaTick)
 	// The game is at the Lobby screen. Players wait here for the game to start. The host can start the game.
 	else if (s_gameState == LOBBY)
 	{
+		// If you are the host create the network system
+		if(m_isHost && m_networkSystem == nullptr)
+			m_networkSystem = std::make_unique<NetworkServerSystem>(m_scene);
+
 		// The mouse is within the back button click
 		if (s_mousePosX >= 135.0f && s_mousePosX <= 280.0f && s_mousePosY >= 650.0f && s_mousePosY <= 695.0f)
 		{
@@ -518,36 +538,84 @@ void Game::process(float deltaTick)
 	// The game is in the gameplay screen.
 	else if (s_gameState == GAME)
 	{
-		// Create a level if one does not exist
-		if (m_level == nullptr)
-			m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_userName);
-
-		// Process the level
-		m_level->process(deltaTick, m_clock);
-
-		// Check if all enemies are dead and spawn new ones if so
-		if (!m_level->checkEnemiesAlive())
-			m_level->triggerNextLevel();
-
-		// Check if all players are dead and return to lobby if so
-		if (!m_level->checkPlayersAlive())
+		if (m_isHost)
 		{
-			// Trigger the game over text to dispay and update it
-			m_uiGameOverLabels.at(1).setText("Final Score: " + std::to_string(m_level->getPlayerScore()));
-			m_displayGameOverText = true;
-			// Return to lobby
-			s_gameState = LOBBY;
+			// Create a level if one does not exist
+			if (m_level == nullptr)
+				m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_scene, m_userName);
 
-			// Register input system as a listener for keyboard events
-			glfwSetWindowUserPointer(m_window, this);
-			auto keyFunc = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-				Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
-				game->keyCallback(key, scancode, action, mods);
-			};
-			glfwSetKeyCallback(m_window, keyFunc);
+			// Process the level
+			m_level->process(deltaTick, m_clock, *m_networkSystem);
+
+			// Check if all enemies are dead and spawn new ones if so
+			if (!m_level->checkEnemiesAlive())
+				m_level->triggerNextLevel();
+
+			// Check if all players are dead and return to lobby if so
+			if (!m_level->checkPlayersAlive())
+			{
+				// Trigger the game over text to dispay and update it
+				m_uiGameOverLabels.at(1).setText("Final Score: " + std::to_string(m_level->getPlayerScore()));
+				m_displayGameOverText = true;
+				// Return to lobby
+				s_gameState = LOBBY;
+
+				// Register input system as a listener for keyboard events
+				glfwSetWindowUserPointer(m_window, this);
+				auto keyFunc = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+					Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
+					game->keyCallback(key, scancode, action, mods);
+				};
+				glfwSetKeyCallback(m_window, keyFunc);
+
+				// Reset the level
+				m_level.reset(nullptr);
+			}
+		}
+		else
+		{
+			//TODO: MAKE THIS ONLY OCCUR IN THIS SEARCH FOR LOBBY SCREEN
+			// If you are the host create the network system
+			if (m_networkSystem == nullptr)
+				m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene);
+
+			// Create a level if one does not exist
+			if (m_dummyLevel == nullptr)
+				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName);
+
+			// Process the level
+			m_dummyLevel->process(deltaTick, m_clock, *m_networkSystem);
+
+			// Check if the game has started and the client can start checking for loss
+			if (!m_checkLoss) 
+			{
+				for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
+				{
+					if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).playerStats.playerInfo.lives > 0)
+						m_checkLoss = true;
+				}
+			}
+
+			// Check if all players are dead and return to lobby if so
+			if (m_checkLoss && !m_dummyLevel->checkPlayersAlive())
+			{
+				// Trigger the game over text to dispay and update it
+				m_uiGameOverLabels.at(1).setText("Final Score: " + std::to_string(m_dummyLevel->getPlayerScore()));
+				m_displayGameOverText = true;
+				// Return to lobby
+				s_gameState = LOBBY;
 			
-			// Reset the level
-			m_level.reset(nullptr);
+				// Register input system as a listener for keyboard events
+				glfwSetWindowUserPointer(m_window, this);
+				auto keyFunc = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+					Game* game = static_cast<Game*>(glfwGetWindowUserPointer(window));
+					game->keyCallback(key, scancode, action, mods);
+				};
+				glfwSetKeyCallback(m_window, keyFunc);
+			
+				// Reset the level
+				m_dummyLevel.reset(nullptr);
+			}
 		}
 	}
 

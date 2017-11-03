@@ -37,7 +37,6 @@ std::vector<Texture> loadMaterialTextures(const aiMaterial* mat, aiTextureType t
 			textures.push_back(std::move(texture));
 		}
 	}
-
 	return textures;
 }
 
@@ -78,7 +77,16 @@ Material processMaterial(const aiMaterial* _aiMaterial, const aiScene* scene, co
 	//std::vector<Texture> unknownTextureMaps = loadMaterialTextures(_aiMaterial, aiTextureType::aiTextureType_UNKNOWN, textureDir);
 
 	// TODO: Swap shader model based on the textures we have
-	if (metallicnessMaps.size() > 0)
+	if (colorMaps.size() == 0) 
+	{
+		aiColor3D color;
+		_aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+		material.debugColor.r = color.r;
+		material.debugColor.g = color.g;
+		material.debugColor.b = color.b;
+		material.shader = GLUtils::getDebugShader();
+	}
+	else if (metallicnessMaps.size() > 0)
 		material.shader = GLUtils::getMetalShader();
 	else
 		material.shader = GLUtils::getDefaultShader();
@@ -88,7 +96,7 @@ Material processMaterial(const aiMaterial* _aiMaterial, const aiScene* scene, co
 
 Mesh processMesh(const aiMesh* _aiMesh, const aiScene* scene)
 {
-	bool hasNormals = _aiMesh->mNormals != nullptr;
+	bool hasNormals = _aiMesh->HasNormals();
 
 	// Walk through each of the mesh's vertices
 	std::vector<VertexFormat> vertices;

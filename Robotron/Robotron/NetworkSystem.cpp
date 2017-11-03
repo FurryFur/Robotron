@@ -62,7 +62,7 @@ void NetworkSystem::sendData(const Packet& packet, const sockaddr_in& address)
 	int numBytesSent = sendto(
 		m_socket.getSocketHandle(),                     // socket to send through.
 		packetData,                                     // data to send
-		m_obs.getBytesWritten(),                        // number of bytes to send
+		static_cast<int>(m_obs.getBytesWritten()),      // number of bytes to send
 		0,                                              // flags
 		reinterpret_cast<const sockaddr*>(&address),    // address to be filled with packet target
 		sizeof(address)                                 // size of the above address struct.
@@ -84,7 +84,7 @@ bool NetworkSystem::receiveData(Packet& outPacket, sockaddr_in& outAddress)
 	int numBytesRead = recvfrom(
 		m_socket.getSocketHandle(),
 		m_recvBuffer.data(),
-		m_recvBuffer.size(),
+		static_cast<int>(m_recvBuffer.size()),
 		0,
 		reinterpret_cast<sockaddr*>(&outAddress),
 		&sizeofAddress

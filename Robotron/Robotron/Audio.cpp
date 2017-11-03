@@ -56,21 +56,23 @@ void Audio::playSFX(sound sound)
 {
 	if(sound == ENEMY_DEAD)
 		m_audioMgr->playSound(m_enemyDead, 0, false, &m_sfxChannel);
-	if (sound == ENEMY_HIT)
+	else if (sound == ENEMY_HIT)
 		m_audioMgr->playSound(m_enemyHit, 0, false, &m_sfxChannel);
-	if (sound == ENEMY_SHOOT)
+	else if (sound == ENEMY_SHOOT)
 		m_audioMgr->playSound(m_enemyShoot, 0, false, &m_enemyChannel);
-	if (sound == SCORE_PICKUP)
+	else if (sound == SCORE_PICKUP)
 		m_audioMgr->playSound(m_scorePickup, 0, false, &m_sfxChannel);
-	if (sound == NEXT_LEVEL)
+	else if (sound == NEXT_LEVEL)
 		m_audioMgr->playSound(m_nextLevel, 0, false, &m_sfxChannel);
-	if (sound == PLAYER_DEAD)
+	else if (sound == PLAYER_DEAD)
 		m_audioMgr->playSound(m_playerDead, 0, false, &m_sfxChannel);
-	if (sound == PLAYER_SHOOT)
+	else if (sound == PLAYER_SHOOT)
 		m_audioMgr->playSound(m_playerShoot, 0, false, &m_bulletChannel);
-	if (sound == PLAYER_SPAWNING)
+	else if (sound == PLAYER_SPAWNING)
 		m_audioMgr->playSound(m_playerSpawning, 0, false, &m_sfxChannel);
-	if (sound == PLAYER_DESCENDING)
+	else if (sound == PLAYER_DESCENDING)
 		m_audioMgr->playSound(m_playerDescending, 0, false, &m_sfxChannel);
+
+	//TODO: SEND A NETWORK PACKET THAT SOUND SHOULD PLAY
 }
 

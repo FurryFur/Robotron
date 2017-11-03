@@ -1,12 +1,10 @@
 #include "Level.h"
 
-#include "NetworkClientSystem.h"
-
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window, Clock& clock, Audio audio, std::string username)
-	: m_scene{}
+Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username)
+	: m_scene(scene)
 	, m_renderSystem(window, m_scene)
 	, m_playerControlSystem(m_scene, audio)
 	, m_inputSystem(window, m_scene, clock)
@@ -30,14 +28,6 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, std::string username
 	m_inSetupPhase = false;
 	m_descendingPlayers = false;
 	m_drawConnectPlayerStats = false;
-
-	std::string strServerMode;
-	std::cout << "Run in server mode: ";
-	std::cin >> strServerMode;
-	if (strServerMode == "y")
-		m_networkSystem = std::make_unique<NetworkServerSystem>(m_scene);
-	else
-		m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene);
 
 	// Create 3D entities.
 	TransformComponent transform{};
@@ -160,10 +150,6 @@ void Level::spawnEnemies(int levelType)
 		score2PickUpCount += randomInt(2, 6);
 		healthPickUpCount += randomInt(0, 1);
 	}
-
-	//EntityUtils::createModel(m_scene, "Assets/Models/nanosuit/nanosuit.obj", 
-	//	  glm::translate({}, glm::vec3{ 1.0f, 10.0f, 10.0f })
-	//	* glm::scale({}, glm::vec3{ 1.0f, 1.0f, 1.0f }));
 
 	// Create all the zombie enemy types in the scene.
 	for (int i = 0; i < zombieCount; ++i)
@@ -409,8 +395,7 @@ void Level::respawnDeadPlayers(Clock& clock)
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		// Return true when the first entity is found with an enemy tag.
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER)
 		    && m_scene.getEntity(i).playerStats.isRespawning == true
 		    && m_scene.getEntity(i).playerStats.playerInfo.lives > 0
 		    && m_scene.getEntity(i).playerStats.deathTime + 3.0f <= clock.GetCurTime())
@@ -423,8 +408,10 @@ void Level::respawnDeadPlayers(Clock& clock)
 	}
 }
 
-void Level::process(float deltaTick, Clock& clock)
-{		
+void Level::process(float deltaTick, Clock& clock, NetworkSystem& networkSystem)
+{			
+	
+
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
@@ -433,7 +420,10 @@ void Level::process(float deltaTick, Clock& clock)
 			// Update the UI with the player score and health.
 			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.lives));
 			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.score));
+		}
 
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
+		{
 			// Check that the player has enough score to get an extra life
 			if (m_scene.getEntity(i).playerStats.extraLifeTrack >= m_scene.getEntity(i).playerStats.extraLifeThreshhold)
 			{
@@ -452,8 +442,8 @@ void Level::process(float deltaTick, Clock& clock)
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
+	networkSystem.beginFrame();
 
-	m_networkSystem->beginFrame();
 	respawnDeadPlayers(clock);
 	// Update all the entities using all the systems.
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
@@ -467,11 +457,12 @@ void Level::process(float deltaTick, Clock& clock)
 		m_playerbulletsystem.update(entity);
 		m_enemybulletsystem.update(entity);
 		m_physicsSystem.update(entity, deltaTick);
-		m_networkSystem->update(entity, deltaTick);
+		networkSystem.update(entity, deltaTick);
 		m_renderSystem.update(entity);
 	}
 
-	if (m_inSetupPhase && m_networkSystem->isInGame())
+	//if (m_inSetupPhase && m_networkSystem->isInGame())
+	if (m_inSetupPhase)
 	{
 		++m_setUpTick;
 		processSetUpPhase();
@@ -506,7 +497,7 @@ void Level::process(float deltaTick, Clock& clock)
 
 	// Do operations that should happen at the end of the frame.
 	m_renderSystem.endRender();
-	m_networkSystem->endFrame();
+	networkSystem.endFrame();
 }
 
 // Handles the animation between levels. The player flies up, level spawns. And they desend in the centre of the screen.
@@ -523,26 +514,22 @@ void Level::processSetUpPhase()
 		// Cycle through all the entites in the scene.
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 				++m_scene.getEntity(i).transform.position.y;
 		}
 		if(m_setUpTick == 50)
 			initalizeNextLevel();
 	}
-	// For the last 50 ticks, descend the players
 	else
 	{
-		// Cycle through all the entites in the scene.
+		// Set all the player to respawn 
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
-			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
-				--m_scene.getEntity(i).transform.position.y;
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
+				m_scene.getEntity(i).playerStats.isRespawning = true;
 		}
-		if (m_setUpTick == 100)
-		{
-			m_inSetupPhase = false;
-			m_setUpTick = 0;
-		}
+		m_inSetupPhase = false;
+		m_setUpTick = 0;
 	}
 }
 

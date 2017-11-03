@@ -6,7 +6,7 @@
 //
 // (c) 2017 Media Design School
 //
-// Description  : Controls the gameplay scene and components
+// Description  : The host runs the main level. The handles all the game logic and renders it for the host
 //				  
 // Author       : Jack Mair
 // Mail         : jack.mai7246@mediadesign.school.nz
@@ -23,8 +23,6 @@
 #include "PlayerControlSystem.h"
 #include "RenderSystem.h"
 #include "Scene.h"
-#include "NetworkSystem.h"
-#include "NetworkServerSystem.h"
 #include "GameplayLogicSystem.h"
 #include "Enemy01ControlSystem.h"
 #include "Enemy02ControlSystem.h"
@@ -37,6 +35,7 @@
 #include "TextLabel.h"
 #include "Audio.h"
 #include "PlayerStatsMenu.h"
+#include "NetworkSystem.h"
 
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
@@ -50,7 +49,7 @@
 class Level : public IKeyObserver
 {
 public:
-	Level(GLFWwindow* window, Clock& clock, Audio audio, std::string username);
+	Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username);
 	~Level();
 
 	// Increases the level count of the game and spawns the next enemies.
@@ -59,7 +58,7 @@ public:
 	bool checkEnemiesAlive();
 	// Returns true if there are still alive players in the level.
 	bool checkPlayersAlive();
-	void process(float _fDeltaTick, Clock& clock);
+	void process(float deltaTick, Clock& clock, NetworkSystem& networkSystem);
 	void triggerNextLevel();
 	// Get the player's score
 	int getPlayerScore();
@@ -70,7 +69,7 @@ private:
 	void spawnEnemies(int levelType);
 	void processSetUpPhase();
 
-	Scene m_scene;
+	Scene& m_scene;
 	Audio m_audio;
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;
@@ -83,7 +82,6 @@ private:
 	PlayerBulletSystem m_playerbulletsystem;
 	EnemyBulletSystem m_enemybulletsystem;
 	PhysicsSystem m_physicsSystem;
-	std::unique_ptr<NetworkSystem> m_networkSystem;
 
 	PlayerStatsMenu m_playerStatsMenu;
 

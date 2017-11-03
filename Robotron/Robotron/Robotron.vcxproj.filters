@@ -171,6 +171,9 @@
     <ClCompile Include="Audio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DummyLevel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="TransformComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -353,6 +356,9 @@
     <ClInclude Include="Audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DummyLevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="TransformComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -380,6 +386,12 @@
       <Filter>Assets\Shaders</Filter>
     </None>
     <None Include="Assets\Shaders\metal_frag.glsl">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\color_vert.glsl">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\color_frag.glsl">
       <Filter>Assets\Shaders</Filter>
     </None>
   </ItemGroup>
