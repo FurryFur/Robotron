@@ -121,7 +121,7 @@ void RenderSystem::update(const Entity& entity)
 
 	// Render the 
 
-	renderModel(entity.model, GLMUtils::transformComponentToMat4(entity.transform));
+	renderModel(entity.model, GLMUtils::transformToMat(entity.transform));
 }
 
 void RenderSystem::setCamera(const Entity* entity)

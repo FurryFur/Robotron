@@ -32,10 +32,15 @@ namespace GLMUtils {
 		return vec;
 	}
 
-	inline glm::mat4 transformComponentToMat4(const TransformComponent& transform)
+	inline glm::mat4 eulerToMat(const glm::vec3& eulerAngles) 
+	{
+		return glm::yawPitchRoll(eulerAngles.y, eulerAngles.x, eulerAngles.z);
+	}
+
+	inline glm::mat4 transformToMat(const TransformComponent& transform)
 	{
 		return glm::translate(glm::mat4{}, transform.position)
-		     * glm::orientate4(transform.eulerAngle)
+		     * eulerToMat(transform.eulerAngles)
 		     * glm::scale(glm::mat4{}, transform.scale);
 	}
 }

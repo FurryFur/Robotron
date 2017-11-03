@@ -31,7 +31,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 
 	// Create 3D entities.
 	TransformComponent transform{};
-	transform.eulerAngle.x = static_cast<float>(M_PI / 2);
+	transform.eulerAngles.x = static_cast<float>(M_PI / 2);
 	transform.scale = glm::vec3{ 20.0f, 20.0f, 20.0f };
 	EntityUtils::createQuad(m_scene, transform);
 

@@ -56,15 +56,15 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 
 	// Assume local space orientation for now
 	// TODO: Add world space orientation
-	//entity.transform.eulerAngle.x += deltaPitch;
-	//entity.transform.eulerAngle.y += deltaYaw;
-	//entity.transform.eulerAngle.z += deltaRoll;
+	//entity.transform.eulerAngles.x += deltaPitch;
+	//entity.transform.eulerAngles.y += deltaYaw;
+	//entity.transform.eulerAngles.z += deltaRoll;
 	const float rollScale = 0.1f;
 	const float pitchScale = 0.05f;
-	entity.transform.eulerAngle.x = entity.physics.velocity.z * pitchScale;
-	entity.transform.eulerAngle.y = -entity.physics.velocity.x * rollScale;
+	entity.transform.eulerAngles.x = entity.physics.velocity.z * pitchScale;
+	entity.transform.eulerAngles.z = -entity.physics.velocity.x * rollScale;
 
-	glm::mat4 orientation = glm::orientate4(entity.transform.eulerAngle);
+	glm::mat4 orientation = GLMUtils::eulerToMat(entity.transform.eulerAngles);
 	glm::vec3 pos = entity.transform.position;
 
 	// Displacement
