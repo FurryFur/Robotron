@@ -21,7 +21,8 @@ enum RPCType : std::uint8_t {
 	RPC_CREATE_PLAYER_GHOST,
 	RPC_CREATE_GHOST,
 	RPC_DESTROY_GHOST,
-	RPC_RECORD_INPUT
+	RPC_RECORD_INPUT,
+	RPC_UPDATE_PLAYERS
 };
 
 namespace RPC {
@@ -104,17 +105,17 @@ private:
 
 // A remote procedure call sent from the server to update the lobby
 // state of clients
-class RPCLobbyUpdate : public RemoteProcedureCall {
+class RPCUpdatePlayers : public RemoteProcedureCall {
 public:
-	RPCLobbyUpdate() = default;
-	RPCLobbyUpdate(const std::vector<PlayerInfo>& playerInfoCollection);
+	RPCUpdatePlayers() = default;
+	RPCUpdatePlayers(const std::vector<PlayerInfo>& playerInfoCollection);
 
 	virtual void execute() override;
 	virtual OutBufferStream& serialize(OutBufferStream &) const override;
 	virtual InBufferStream& deserialize(InBufferStream &) override;
 
 private:
-	std::vector<PlayerInfo> m_playerInfoCollection;
+	std::vector<PlayerInfo> m_currentPlayers;
 };
 
 // Remote procedure call collection.

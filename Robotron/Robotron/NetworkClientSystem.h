@@ -40,7 +40,7 @@ public:
 	// Join the server at the specified address
 	void joinServer(const sockaddr_in& address);
 
-	void updateLobby(const std::vector<PlayerInfo>& currentPlayers);
+	void updatePlayers(const std::vector<PlayerInfo>& currentPlayers);
 
 	void createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform);
 	void createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const TransformComponent& transform);

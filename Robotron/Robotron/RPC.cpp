@@ -54,6 +54,9 @@ InBufferStream& RPCGroup::deserialize(InBufferStream& ibs)
 		case RPC_RECORD_INPUT:
 			rpc = std::make_unique<RPCRecordInput>();
 			break;
+		case RPC_UPDATE_PLAYERS:
+			rpc = std::make_unique<RPCUpdatePlayers>();
+			break;
 		default:
 			ibs.setError(IBS_ERROR_CORRUPT_DATA);
 			break;
@@ -98,7 +101,7 @@ void RPCDestroyGhost::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Received an RPC with an unset network entity id" << std::endl;
+		std::cout << "ERROR: Received Destroy Ghost RPC with an unset network entity id" << std::endl;
 		return;
 	}
 
@@ -134,7 +137,7 @@ void RPCCreatePlayerGhost::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Received an RPC with an unset network entity id" << std::endl;
+		std::cout << "ERROR: Received Create Player Ghost RPC with an unset network entity id" << std::endl;
 		return;
 	}
 
@@ -171,7 +174,7 @@ void RPCCreateGhost::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Received an RPC with an unset network entity id" << std::endl;
+		std::cout << "ERROR: Received a Create Ghost RPC with an unset network entity id" << std::endl;
 		return;
 	}
 
@@ -206,7 +209,7 @@ void RPCRecordInput::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Received an RPC with an unset network entity id" << std::endl;
+		std::cout << "ERROR: Received Record Input RPC with an unset network entity id" << std::endl;
 		return;
 	}
 
@@ -251,36 +254,36 @@ void RPC::setServer(NetworkServerSystem* serverSystem)
 	g_serverSystem = serverSystem;
 }
 
-RPCLobbyUpdate::RPCLobbyUpdate(const std::vector<PlayerInfo>& playerInfoCollection)
-	: m_playerInfoCollection{ playerInfoCollection }
+RPCUpdatePlayers::RPCUpdatePlayers(const std::vector<PlayerInfo>& playerInfoCollection)
+	: m_currentPlayers{ playerInfoCollection }
 {
 }
 
-void RPCLobbyUpdate::execute()
+void RPCUpdatePlayers::execute()
 {
 	if (g_clientSystem)
-		g_clientSystem->updateLobby(m_playerInfoCollection);
+		g_clientSystem->updatePlayers(m_currentPlayers);
 	else {
 		// TODO: Add logging here
 		std::cout << "WARNING: Received lobby update RPC on a non-client, or RPC client not set" << std::endl;
 	}
 }
 
-OutBufferStream& RPCLobbyUpdate::serialize(OutBufferStream& obs) const
+OutBufferStream& RPCUpdatePlayers::serialize(OutBufferStream& obs) const
 {
-	obs << static_cast<std::uint8_t>(m_playerInfoCollection.size());
-	for (const PlayerInfo& playerInfo : m_playerInfoCollection)
+	obs << RPC_UPDATE_PLAYERS << static_cast<std::uint8_t>(m_currentPlayers.size());
+	for (const PlayerInfo& playerInfo : m_currentPlayers)
 		obs << playerInfo;
 
 	return obs;
 }
 
-InBufferStream& RPCLobbyUpdate::deserialize(InBufferStream& ibs)
+InBufferStream& RPCUpdatePlayers::deserialize(InBufferStream& ibs)
 {
 	std::uint8_t size;
 	ibs >> size;
-	m_playerInfoCollection.resize(size);
-	for (PlayerInfo& playerInfo : m_playerInfoCollection)
+	m_currentPlayers.resize(size);
+	for (PlayerInfo& playerInfo : m_currentPlayers)
 		ibs >> playerInfo;
 
 	return ibs;

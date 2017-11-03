@@ -53,7 +53,7 @@ private:
 	void handleBroadcastPacket(const Packet&, const sockaddr_in& address);
 	void handleJoinPacket(const Packet&, const sockaddr_in& address);
 	void addToNetworking(Entity& entity);
-	std::vector<PlayerInfo> getPlayerInfoFromClients();
+	std::vector<PlayerInfo> getPlayers();
 
 	void broadcastToClients(const Packet& packet);
 

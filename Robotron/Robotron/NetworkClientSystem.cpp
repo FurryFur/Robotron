@@ -135,9 +135,15 @@ void NetworkClientSystem::joinServer(const sockaddr_in& address)
 	sendData(joinResq, address);
 }
 
-void NetworkClientSystem::updateLobby(const std::vector<PlayerInfo>& currentPlayers)
+void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPlayers)
 {
-	if (m_lobbyEventListener)
+	// TODO: Add logging here
+	std::cout << "Received a lobby update, current players:" << std::endl;
+	for (auto& playerInfo : currentPlayers) {
+		std::cout << playerInfo.username << std::endl;
+	}
+
+	if (m_clientState == CLIENT_STATE_IN_LOBBY && m_lobbyEventListener)
 		m_lobbyEventListener->handleLobbyUpdate(currentPlayers);
 }
 
@@ -197,9 +203,9 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 		          << std::endl;
 
 		// TODO: Remove auto join, replace with lobby
-		//std::cout << "Attempting to auto join server: " << packet.serverName 
-		//          << std::endl;
-		//joinServer(address);
+		std::cout << "Attempting to auto join server: " << packet.serverName 
+		          << std::endl;
+		joinServer(address);
 
 		break;
 	case PACKET_TYPE_JOIN_RESPONSE:
@@ -211,13 +217,15 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 
 			std::cout << "Received join accept from server at address: " 
 			          << toString(address) << std::endl;
-			m_lobbyEventListener->handleJoinAccepted();
+			if (m_lobbyEventListener)
+				m_lobbyEventListener->handleJoinAccepted();
 		} else {
 			m_clientState = CLIENT_STATE_NO_SERVER;
 
 			std::cout << "Received join reject from server at address: " 
 			          << toString(address) << std::endl;
-			m_lobbyEventListener->handleJoinRejected();
+			if (m_lobbyEventListener)
+				m_lobbyEventListener->handleJoinRejected();
 		}
 		break;
 	default:

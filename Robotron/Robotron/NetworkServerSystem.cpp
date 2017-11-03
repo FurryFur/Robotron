@@ -124,10 +124,11 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 	sendData(joinResp, address);
 
 	// Send RPCs to clients informing them of lobby updates
-	std::vector<PlayerInfo> playerInfoCollection = getPlayerInfoFromClients();
-	bufferRpc(std::make_unique<RPCLobbyUpdate>(playerInfoCollection));
+	std::vector<PlayerInfo> currentPlayers = getPlayers();
+	bufferRpc(std::make_unique<RPCUpdatePlayers>(currentPlayers));
 	
-	m_lobbyEventListener->handleLobbyUpdate(getPlayerInfoFromClients());
+	if (m_serverState == SERVER_STATE_LOBBY_MODE && m_lobbyEventListener)
+		m_lobbyEventListener->handleLobbyUpdate(getPlayers());
 
 	// TODO: Don't auto start the game, stay in lobby until game is started
 	//startGame();
@@ -214,8 +215,9 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 	}
 }
 
-std::vector<PlayerInfo> NetworkServerSystem::getPlayerInfoFromClients()
+std::vector<PlayerInfo> NetworkServerSystem::getPlayers()
 {
+	// TODO: Add server player info as well
 	std::vector<PlayerInfo> playerInfo;
 	for (auto& client : m_clients) {
 		playerInfo.push_back(client.second.playerInfo);

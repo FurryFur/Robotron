@@ -416,6 +416,9 @@ void Game::renderMenuScreens()
 void Game::process(float deltaTick)
 {
 
+	if (m_networkSystem)
+		m_networkSystem->beginFrame();
+
 	// If not in the game state read the coordinates of the mouse and render the menu
 	if (s_gameState != GAME)
 	{
@@ -641,6 +644,9 @@ void Game::process(float deltaTick)
 		}
 	}
 	//m_mousePosLabel.setText("X: " + std::to_string(s_mousePosX) + " Y: " + std::to_string(s_mousePosY));
+
+	if (m_networkSystem)
+		m_networkSystem->endFrame();
 
 	glfwPollEvents();
 }
