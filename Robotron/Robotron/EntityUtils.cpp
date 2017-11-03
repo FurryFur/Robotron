@@ -235,24 +235,30 @@ void EntityUtils::setModelEnemyZombie(Entity& entity)
 {
 	entity.model = ModelUtils::loadModel("Assets/Models/plane_dog/model.obj");
 	
-	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
-	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
+	for (size_t i = 0; i < entity.model.materials.size(); ++i) {
+		entity.model.materials.at(i).shaderParams.glossiness = 0.9f;
+		entity.model.materials.at(i).shaderParams.metallicness = 0.0f;
+	}
 }
 
 void EntityUtils::setModelEnemySnake(Entity& entity)
 {
 	entity.model = ModelUtils::loadModel("Assets/Models/hotdog/model.obj");
 
-	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
-	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
+	for (size_t i = 0; i < entity.model.materials.size(); ++i) {
+		entity.model.materials.at(i).shaderParams.glossiness = 1.0f;
+		entity.model.materials.at(i).shaderParams.metallicness = 0.0f;
+	}
 }
 
 void EntityUtils::setModelEnemyShooter(Entity& entity)
 {	
 	entity.model = ModelUtils::loadModel("Assets/Models/fox/model.obj");
 
-	entity.model.materials.at(0).shaderParams.glossiness = 0.3f;
-	entity.model.materials.at(0).shaderParams.metallicness = 0.3f;
+	for (size_t i = 0; i < entity.model.materials.size(); ++i) {
+		entity.model.materials.at(i).shaderParams.glossiness = 1.0f;
+		entity.model.materials.at(i).shaderParams.metallicness = 1.0f;
+	}
 }
 
 void EntityUtils::setModelScorePickup01(Entity& entity)
@@ -289,9 +295,9 @@ void EntityUtils::setModelPlayer(Entity& entity)
 {
 	entity.model = ModelUtils::loadModel("Assets/Models/spaceship/space_ship.obj");
 
-	for (size_t i = 0; i < entity.model.materials.size(); ++i)
-	{
+	for (size_t i = 0; i < entity.model.materials.size(); ++i) {
 		entity.model.materials.at(i).shaderParams.glossiness = 1.0f;
+		entity.model.materials.at(i).shaderParams.metallicness = 0.0f;
 	}
 }
 
