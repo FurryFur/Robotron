@@ -21,6 +21,8 @@ GameState Game::s_gameState = MAINMENU;
 ButtonState Game::s_buttonState = NOBUTTONDOWN;
 bool Game::s_buttonClicked = false;
 
+size_t Game::numServers = 4;
+size_t Game::serverNum;
 double Game::s_mousePosX = 0.0f;
 double Game::s_mousePosY = 0.0f;
 std::vector<IKeyObserver*>  Game::s_keyObservers;
@@ -56,7 +58,7 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 		else if (Game::s_gameState == HOSTSETUP)
 		{
 			// The mouse is within the back button click
-			if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
+			if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
 			{
 				Game::s_buttonClicked = true;
 				Game::s_buttonState = BACKDOWN;
@@ -78,6 +80,25 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 				Game::s_buttonState = STARTDOWN;
 			}
 		}
+		else if (Game::s_gameState == JOINLOBBY)
+		{
+			// The mouse is within the back button click
+			if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
+			{
+				Game::s_buttonClicked = true;
+				Game::s_buttonState = BACKDOWN;
+			}
+			// Handlers the visual interaction of the server buttons.
+			for (size_t i = 0; i < Game::numServers; ++i)
+			{
+				// The mouse is within the join button click
+				if (Game::s_mousePosY >= 23.0f + i * 40.0f && Game::s_mousePosY <= 63.0f + i * 40.0f)
+				{
+					Game::serverNum = i;
+					Game::s_gameState = GAME;
+				}
+			}
+		}
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
 	{
@@ -87,7 +108,7 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 			// Join button clicked. Enter search for lobby screen.
 			if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 450 && Game::s_mousePosY <= 495 && Game::s_buttonState == JOINDOWN)
 			{
-				Game::s_gameState = GAME;
+				Game::s_gameState = JOINLOBBY;
 			}
 
 			// Host button clicked. Enter host lobby screen.
@@ -108,7 +129,16 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 		else if (Game::s_gameState == HOSTSETUP)
 		{
 			// The mouse is within the back button click
-			if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
+			if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
+			{
+				Game::s_gameState = MAINMENU;
+			}
+		}
+
+		else if (Game::s_gameState == JOINLOBBY)
+		{
+			// The mouse is within the back button click
+			if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
 			{
 				Game::s_gameState = MAINMENU;
 			}
@@ -140,6 +170,7 @@ Game::Game(GLFWwindow* window, Audio audio)
 	, m_userNameInput("", "Assets/Fonts/NYCTALOPIATILT.TTF")
 	, m_menuScene{}
 	, m_renderSystem(window, m_menuScene)
+	, m_SearchLobbyBackButton("Back", "Assets/Fonts/NYCTALOPIATILT.TTF")
 {
 	m_clock.Process();
 	m_window = window;
@@ -192,111 +223,60 @@ Game::Game(GLFWwindow* window, Audio audio)
 	m_userNameInput.setScale(0.5f);
 
 	// Create the main menu join text
-	TextLabel join("Join", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	join.setPosition(glm::vec2(637.0f, 312.0f));
-	join.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiMainMenuLabels.push_back(join);
-
+	createTextLabel("Join", glm::vec2(637.0f, 312.0f), &m_uiMainMenuLabels);
 	// Create the main menu host text
-	TextLabel host("Host", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	host.setPosition(glm::vec2(632.0f, 212.0f));
-	host.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiMainMenuLabels.push_back(host);
-
+	createTextLabel("Host", glm::vec2(632.0f, 212.0f), &m_uiMainMenuLabels);
 	// Create the main menu quit text
-	TextLabel quit("Quit", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	quit.setPosition(glm::vec2(637.0f, 112.0f));
-	quit.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiMainMenuLabels.push_back(quit);
-
+	createTextLabel("Quit", glm::vec2(637.0f, 112.0f), &m_uiMainMenuLabels);
 	// Create the main menu controls text
-	TextLabel controls("Move: WASD      Shoot: 8 Directions on Numpad", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	controls.setScale(0.5f);
-	controls.setPosition(glm::vec2(10.0f, 10.0f));
-	controls.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiMainMenuLabels.push_back(controls);
-
+	createTextLabel("Move: WASD      Shoot: 8 Directions on Numpad", glm::vec2(10.0f, 10.0f), &m_uiMainMenuLabels, 0.5f);
 	// Create the main menu title text
-	TextLabel title("Doge-otron", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	title.setScale(2.0f);
-	title.setPosition(glm::vec2(350.0f, 550.0f));
-	title.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
-	m_uiMainMenuLabels.push_back(title);
-	
+	createTextLabel("Doge-otron", glm::vec2(350.0f, 550.0f), &m_uiMainMenuLabels, 2.0f);
 	// Create the main menu sub title text
-	TextLabel subtitle("2017", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	subtitle.setScale(0.8f);
-	subtitle.setPosition(glm::vec2(800.0f, 500.0f));
-	subtitle.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
-	m_uiMainMenuLabels.push_back(subtitle);
-
+	createTextLabel("2017", glm::vec2(800.0f, 500.0f), &m_uiMainMenuLabels, 0.8f);
 	// Create the main menu credits text
-	TextLabel credits("Made by: Lance Chaney & Jack Mair", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	credits.setScale(0.5f);
-	credits.setPosition(glm::vec2(830.0f, 10.0f));
-	credits.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiMainMenuLabels.push_back(credits);
-
+	createTextLabel("Made by: Lance Chaney & Jack Mair", glm::vec2(830.0f, 10.0f), &m_uiMainMenuLabels, 0.5f);
 	// Create the main menu enter username text
-	TextLabel enterUsername("Enter a username: ", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	enterUsername.setPosition(glm::vec2(330.0f, 412.0f));
-	enterUsername.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
-	enterUsername.setScale(0.5f);
-	m_uiMainMenuLabels.push_back(enterUsername);
+	createTextLabel("Enter a username: ", glm::vec2(330.0f, 412.0f), &m_uiMainMenuLabels, 0.5f);
 
 	// Create the host setup host text
-	TextLabel enter("Enter a server name: ", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	enter.setPosition(glm::vec2(100.0f, 312.0f));
-	enter.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiHostSetupLabels.push_back(enter);
-
+	createTextLabel("Enter a server name: ", glm::vec2(100.0f, 312.0f), &m_uiHostSetupLabels);
 	// Create the host setup back text
-	TextLabel back("Back", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	back.setPosition(glm::vec2(637.0f, 112.0f));
-	back.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiHostSetupLabels.push_back(back);
+	createTextLabel("Back", glm::vec2(137.0f, 112.0f), &m_uiHostSetupLabels);
 
 	// Create the server name input text label
 	m_serverNameInput.setPosition(glm::vec2(100.0f, 212.0f));
 	m_serverNameInput.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 
+	// Create the search lobby back text
+	m_SearchLobbyBackButton.setPosition(glm::vec2(137.0f, 112.0f));
+	m_SearchLobbyBackButton.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+
 	// Create the lobby server name text label
-	TextLabel serverName("", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	serverName.setPosition(glm::vec2(100.0f, 712.0f));
-	serverName.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiLobbyLabels.push_back(serverName);
-
+	createTextLabel("", glm::vec2(100.0f, 712.0f), &m_uiLobbyLabels);
 	// Create the lobby back button text label
-	TextLabel lobbyBack("Back", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	lobbyBack.setPosition(glm::vec2(137.0f, 112.0f));
-	lobbyBack.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiLobbyLabels.push_back(lobbyBack);
-
+	createTextLabel("Back", glm::vec2(137.0f, 112.0f), &m_uiLobbyLabels);
 	// Create the lobby start game button text label
-	TextLabel start("Start!", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	start.setPosition(glm::vec2(637.0f, 112.0f));
-	start.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiLobbyLabels.push_back(start);
-
+	createTextLabel("Start!", glm::vec2(637.0f, 112.0f), &m_uiLobbyLabels);
+	
 	// Create the game over text label
-	TextLabel gameOverMan("Game over man, game over!", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	gameOverMan.setScale(0.8f);
-	gameOverMan.setPosition(glm::vec2(100.0f, 612.0f));
-	gameOverMan.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiGameOverLabels.push_back(gameOverMan);
-
+	createTextLabel("Game over man, game over!", glm::vec2(100.0f, 612.0f), &m_uiGameOverLabels);
 	// Create the final score text label
-	TextLabel finalScore("Final Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF");
-	finalScore.setScale(0.8f);
-	finalScore.setPosition(glm::vec2(100.0f, 562.0f));
-	finalScore.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_uiGameOverLabels.push_back(finalScore);
-
+	createTextLabel("Final Score: ", glm::vec2(100.0f, 562.0f), &m_uiGameOverLabels, 0.8f);
 }
 
 
 Game::~Game()
 {
+}
+
+void Game::createTextLabel(std::string labelText, glm::vec2 position, std::vector<TextLabel>* screenVector, float scale)
+{
+	TextLabel label(labelText, "Assets/Fonts/NYCTALOPIATILT.TTF");
+	label.setScale(scale);
+	label.setPosition(position);
+	label.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+	screenVector->push_back(label);
 }
 
 void Game::registerKeyObserver(IKeyObserver* observer)
@@ -394,6 +374,15 @@ void Game::renderMenuScreens()
 		//m_mousePosLabel.Render();
 	}
 	// Render the host setup screen.
+	else if (s_gameState == JOINLOBBY)
+	{
+		m_SearchLobbyBackButton.Render();
+		for (unsigned int i = 0; i < Game::m_uiSearchLobbyLabels.size(); ++i)
+		{
+			m_uiSearchLobbyLabels.at(i).Render();
+		}
+	}
+	// Render the host setup screen.
 	else if (s_gameState == HOSTSETUP)
 	{
 		for (unsigned int i = 0; i < Game::m_uiHostSetupLabels.size(); ++i)
@@ -419,7 +408,7 @@ void Game::renderMenuScreens()
 			}
 		}
 	}
-
+	//m_mousePosLabel.Render();
 	m_renderSystem.endRender();
 	//glfwSwapBuffers(m_window);
 }
@@ -490,12 +479,50 @@ void Game::process(float deltaTick)
 		// If you are the host create the network system
 		if (m_networkSystem == nullptr)
 			m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene);
+		
+		size_t numServers = 4;
+
+		// If he number of servers no longer = the number of buttons. Reset the buttons
+		if (numServers != m_uiSearchLobbyLabels.size())
+		{
+			m_uiSearchLobbyLabels.clear();
+			for (size_t i = 0; i < numServers; ++i)
+			{
+				createTextLabel("ServerName", glm::vec2(137.0f, 750.0f - i * 40), &m_uiSearchLobbyLabels, 0.5f);
+			}
+		}
+
+		// Handlers the visual interaction of the server buttons.
+		for (size_t i = 0; i < numServers; ++i)
+		{
+			// The mouse is within the join button click
+			if (s_mousePosY >= 23.0f + i * 40.0f && s_mousePosY <= 63.0f + i * 40.0f)
+			{
+				if (Game::s_buttonState == NOBUTTONDOWN)
+					m_uiSearchLobbyLabels.at(i).setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+				else if (Game::s_buttonState == JOINDOWN)
+					m_uiSearchLobbyLabels.at(i).setColor(glm::vec3(1.0f, 0.0f, 0.0f));
+			}
+			else
+				m_uiSearchLobbyLabels.at(i).setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+		}
+
+		// The mouse is within the back button click
+		if (s_mousePosX >= 135.0f && s_mousePosX <= 280.0f && s_mousePosY >= 650.0f && s_mousePosY <= 695.0f)
+		{
+			if (Game::s_buttonState == NOBUTTONDOWN)
+				m_SearchLobbyBackButton.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+			else if (Game::s_buttonState == BACKDOWN)
+				m_SearchLobbyBackButton.setColor(glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+		else
+			m_SearchLobbyBackButton.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 	}
 	// The game is at the host setup screen. Here the player can choose a name of a server before creating it.
 	else if (s_gameState == HOSTSETUP)
 	{
 		// The mouse is within the back button click
-		if (s_mousePosX >= 635.0f && s_mousePosX <= 780.0f && s_mousePosY >= 650.0f && s_mousePosY <= 695.0f)
+		if (s_mousePosX >= 135.0f && s_mousePosX <= 280.0f && s_mousePosY >= 650.0f && s_mousePosY <= 695.0f)
 		{
 			if (Game::s_buttonState == NOBUTTONDOWN)
 				m_uiHostSetupLabels.at(1).setColor(glm::vec3(1.0f, 1.0f, 1.0f));
@@ -574,11 +601,6 @@ void Game::process(float deltaTick)
 		}
 		else
 		{
-			//TODO: MAKE THIS ONLY OCCUR IN THIS SEARCH FOR LOBBY SCREEN
-			// If you are the host create the network system
-			if (m_networkSystem == nullptr)
-				m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene);
-
 			// Create a level if one does not exist
 			if (m_dummyLevel == nullptr)
 				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName);
@@ -618,7 +640,6 @@ void Game::process(float deltaTick)
 			}
 		}
 	}
-
 	//m_mousePosLabel.setText("X: " + std::to_string(s_mousePosX) + " Y: " + std::to_string(s_mousePosY));
 
 	glfwPollEvents();
