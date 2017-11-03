@@ -46,6 +46,12 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& server
 
 void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr_in& address)
 {
+	if (packet.packetType != PACKET_TYPE_NORMAL) {
+		// TODO: Add logging here
+		std::cout << "WARNING: Received lobby packet while in game" << std::endl;
+		return;
+	}
+
 	// Check we have a client associated with this address
 	auto clientIt = m_clients.find(address);
 	if (clientIt == m_clients.end()) {
@@ -117,6 +123,9 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 	          << std::endl;
 
 	ClientInfo client;
+	client.playerInfo.lives = 3;
+	client.playerInfo.score = 0;
+	client.playerInfo.username = packet.username;
 	m_clients.insert(std::make_pair(address, client));
 
 	Packet joinResp;

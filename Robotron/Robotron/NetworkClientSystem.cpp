@@ -27,8 +27,6 @@ NetworkClientSystem::NetworkClientSystem(Scene& scene, const std::string& userna
 	allocateRecvBuffer();
 	RPC::setClient(this);
 
-	broadcastForServers();
-
 	// TODO: Add broadcast to find servers
 	//inet_pton(AF_INET, "127.0.0.1", &m_serverAddress.sin_addr);
 	//m_serverAddress.sin_port = htons(8456);
