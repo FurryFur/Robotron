@@ -15,7 +15,7 @@ using namespace std::chrono_literals;
 NetworkSystem::NetworkSystem(Scene& scene)
 	: m_scene{ scene }
 	, m_curSeqenceNum{ 0 }
-	, m_packetInterval{ 500ms }
+	, m_packetInterval{ 25ms }
 {
 	// Startup windows sockets:
 	WSADATA wsaData;
