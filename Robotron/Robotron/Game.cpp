@@ -35,26 +35,28 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 		switch (Game::s_gameState)
 		{
 			case MAINMENU:
-				if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 450 && Game::s_mousePosY <= 495)
 				{
-					Game::s_buttonClicked = true;
-					Game::s_buttonState = JOINDOWN;
-				}
+					if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 450 && Game::s_mousePosY <= 495)
+					{
+						Game::s_buttonClicked = true;
+						Game::s_buttonState = JOINDOWN;
+					}
 
-				// The mouse is within the host button click
-				else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 550 && Game::s_mousePosY <= 595)
-				{
-					Game::s_buttonClicked = true;
-					Game::s_buttonState = HOSTDOWN;
-				}
+					// The mouse is within the host button click
+					else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 550 && Game::s_mousePosY <= 595)
+					{
+						Game::s_buttonClicked = true;
+						Game::s_buttonState = HOSTDOWN;
+					}
 
-				// The mouse is within the quit button click
-				else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
-				{
-					Game::s_buttonClicked = true;
-					Game::s_buttonState = QUITDOWN;
+					// The mouse is within the quit button click
+					else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
+					{
+						Game::s_buttonClicked = true;
+						Game::s_buttonState = QUITDOWN;
+					}
+					break;
 				}
-				break;
 			case HOSTSETUP:
 				{
 					// The mouse is within the back button click
