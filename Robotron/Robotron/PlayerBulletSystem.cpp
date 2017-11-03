@@ -48,10 +48,11 @@ void PlayerBulletSystem::update(Entity& entity)
 	if (!entity.hasComponents(COMPONENT_PLAYERBULLET))
 		return;
 	
-	if (   entity.transform[3].x > 20.0f
-		|| entity.transform[3].x < -20.0f
-		|| entity.transform[3].z > 20.0f
-		|| entity.transform[3].z < -20.0f)
+	glm::vec3 pos = entity.transform.position;
+	if (   pos.x > 20.0f
+		|| pos.x < -20.0f
+		|| pos.z > 20.0f
+		|| pos.z < -20.0f)
 	{
 		m_scene.destroyEntity(entity);
 		return;
@@ -62,7 +63,7 @@ void PlayerBulletSystem::update(Entity& entity)
 	{
 		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ZOMBIE, COMPONENT_SNAKE,
 			   COMPONENT_ENEMY_SHOOTER, COMPONENT_ENEMYBULLET)
-			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 1)
+			&& glm::length(m_scene.getEntity(i).transform.position - pos) < 1)
 		{
 			// Destroy the bullet.
 			m_scene.destroyEntity(entity);

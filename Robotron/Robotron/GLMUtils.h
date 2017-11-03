@@ -13,8 +13,12 @@
 
 #pragma once
 
+#include "TransformComponent.h"
+
 #include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
+#include <glm\gtx\euler_angles.hpp>
 
 namespace GLMUtils {
 	// Limits a vector to the specified magnitude
@@ -26,5 +30,12 @@ namespace GLMUtils {
 			return glm::normalize(vec) * maxMagnitude;
 		}
 		return vec;
+	}
+
+	inline glm::mat4 transformComponentToMat4(const TransformComponent& transform)
+	{
+		return glm::translate(glm::mat4{}, transform.position)
+		     * glm::orientate4(transform.eulerAngle)
+		     * glm::scale(glm::mat4{}, transform.scale);
 	}
 }

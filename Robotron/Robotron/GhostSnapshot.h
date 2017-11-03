@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PhysicsComponent.h"
+#include "TransformComponent.h"
 
 #include <glm\glm.hpp>
 
@@ -11,10 +12,10 @@ class InBufferStream;
 
 struct GhostSnapshot {
 	GhostSnapshot() = default;
-	GhostSnapshot(std::int32_t entityNetId, const glm::mat4& transform, const PhysicsComponent&);
+	GhostSnapshot(std::int32_t entityNetId, const TransformComponent& transform, const PhysicsComponent&);
 
 	std::int32_t entityNetId;
-	glm::mat4 transform;
+	TransformComponent transform;
 	PhysicsComponent physics;
 
 	OutBufferStream& serialize(OutBufferStream&) const;

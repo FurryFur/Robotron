@@ -28,6 +28,7 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtx\rotate_vector.hpp>
+#include <glm\gtx\euler_angles.hpp>
 
 #include <cmath>
 
@@ -39,13 +40,9 @@ PlayerControlSystem::PlayerControlSystem(Scene& scene, Audio audio)
 
 void PlayerControlSystem::update(Entity& entity, Clock& clock)
 {
-	if (!entity.hasComponents(COMPONENT_PLAYER_CONTROL))
-		return;
-
 	// Filter movable
 	const size_t kMovableMask = COMPONENT_PLAYER_CONTROL | COMPONENT_INPUT | COMPONENT_TRANSFORM;
-	const size_t kMovableCamMask = COMPONENT_CAMERA | COMPONENT_INPUT | COMPONENT_TRANSFORM;
-	if (!entity.hasComponents(kMovableMask) && !entity.hasComponents(kMovableCamMask))
+	if (!entity.hasComponents(kMovableMask))
 		return;
 
 	float maxMoveSpeed = entity.controlVars.maxMoveSpeed;
@@ -53,20 +50,27 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	float damping = entity.controlVars.damping;
 	float orientationSensitivity = entity.controlVars.orientationSensitivity;
 
-	float deltaAzimuth = -orientationSensitivity * entity.input.orientationDelta.x;
-	float deltaElevation = -orientationSensitivity * entity.input.orientationDelta.y;
-	float roll = -orientationSensitivity * entity.input.orientationDelta.z;
-	glm::vec3 front = glm::vec3{ 0, 0, -1 };
-	if (!entity.controlVars.worldSpaceMove)
-		front = entity.transform * glm::vec4{ front, 0 }; // Convert movement to local coordinates
-	glm::vec3 pos = entity.transform[3];
-	glm::vec3 up = glm::vec3{ 0, 1, 0 };
-	glm::vec3 right = glm::cross(front, up);
+	//float deltaYaw = -orientationSensitivity * entity.input.orientationDelta.x;
+	//float deltaPitch = -orientationSensitivity * entity.input.orientationDelta.y;
+	//float deltaRoll = -orientationSensitivity * entity.input.orientationDelta.z;
+
+	// Assume local space orientation for now
+	// TODO: Add world space orientation
+	//entity.transform.eulerAngle.x += deltaPitch;
+	//entity.transform.eulerAngle.y += deltaYaw;
+	//entity.transform.eulerAngle.z += deltaRoll;
+	const float rollScale = 0.1f;
+	const float pitchScale = 0.05f;
+	entity.transform.eulerAngle.x = entity.physics.velocity.z * pitchScale;
+	entity.transform.eulerAngle.y = -entity.physics.velocity.x * rollScale;
+
+	glm::mat4 orientation = glm::orientate4(entity.transform.eulerAngle);
+	glm::vec3 pos = entity.transform.position;
 
 	// Displacement
 	glm::vec3 axis = GLMUtils::limitVec(entity.input.axis, 1);
 	if (!entity.controlVars.worldSpaceMove)
-		axis = entity.transform * glm::vec4{ axis, 0 }; // Convert movement to local coordinates
+		axis = orientation * glm::vec4{ axis, 0 }; // Convert movement to local coordinates
 	glm::vec3 acceleration = maxAcceleration * axis;
 	if (axis != glm::vec3{ 0,0,0 }) {
 		// TODO: Move this out of the player controller or place in physics component
@@ -80,20 +84,6 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	else
 		entity.physics.acceleration = acceleration;
 
-	// Rotation
-	// Prevent elevation going past 90 degrees
-	glm::mat3 elevationMat{ 1 };
-	float elevation = static_cast<float>(M_PI / 2 - std::acos(glm::dot(front, up)));
-	if (std::abs(elevation + deltaElevation) < M_PI / 2)
-		elevationMat = glm::rotate(deltaElevation, right);
-	glm::mat3 azimuthMat = glm::rotate(deltaAzimuth, up);
-	glm::mat3 rollMat = glm::rotate(roll, front);
-
-	entity.transform[3] = { 0, 0, 0, 1 }; // Remove displacement temporarily
-	entity.transform = glm::mat4{ rollMat * azimuthMat * elevationMat } *entity.transform; // Rotation without displacement
-	entity.transform[3] = glm::vec4{ pos, 1 }; // Add displacement back in
-
-
 	//Check if an enemy or enemy bullet is touching the player.
 	//If so damage them and respawn them.
 	// Find the closest player object to seek to.
@@ -101,12 +91,12 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	{
 		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ZOMBIE,
 			COMPONENT_SNAKE, COMPONENT_ENEMY_SHOOTER, COMPONENT_ENEMYBULLET) // its an enemy bullet
-			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 1)		    // the player is within range to be damaged by it
+			&& glm::length(m_scene.getEntity(i).transform.position - pos) < 1)		    // the player is within range to be damaged by it
 		{
 			entity.playerStats.deathTime = clock.GetCurTime();
 			--entity.playerStats.playerInfo.lives;
 			entity.playerStats.isRespawning = true;
-			entity.transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
+			entity.transform.position = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
 
 			m_audio.playSFX(PLAYER_DEAD);
 		}
@@ -166,13 +156,13 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 		entity.input.shootDown = false;
 
 		// Create the bullet and apply the acceleration.
-		Entity& bullet = EntityUtils::createPlayerBullet(m_scene,
-			glm::translate({}, glm::vec3(entity.transform[3]))
-			* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+		TransformComponent transform{};
+		transform.position = entity.transform.position;
+		transform.scale = glm::vec3{ 0.5f, 0.5f, 0.5f };
+		Entity& bullet = EntityUtils::createPlayerBullet(m_scene, transform);
 
 		bullet.physics.velocity = bulletVelocity;
 
 		m_audio.playSFX(PLAYER_SHOOT);
-
 	}
 }

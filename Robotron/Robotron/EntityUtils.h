@@ -13,8 +13,10 @@
 
 #pragma once
 
-#include <glad\glad.h>
+#include "TransformComponent.h"
+
 #include <glm\glm.hpp>
+#include <glad\glad.h>
 
 #include <vector>
 #include <string>
@@ -40,42 +42,42 @@ enum ModelID : std::uint8_t {
 
 namespace EntityUtils {
 	// Creates a unit square facing down the positive z axis with the 
-	// specified transform
-	Entity& createQuad(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	// specified lookAt
+	Entity& createQuad(Scene&, const TransformComponent& transform = {});
 
 	// Creates a unit sphere, centered at the origin, with the specified 
-	// transform;
-	Entity& createSphere(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	// lookAt;
+	Entity& createSphere(Scene&, const TransformComponent& transform = {});
 
 	//Creates the enemy01 enemy type
-	Entity& createEnemyZombie(Scene &, const glm::mat4 & _transform = glm::mat4{ 1 });
+	Entity& createEnemyZombie(Scene &, const TransformComponent& transform = {});
 
 	//Creates the enemy02 enemy type
-	Entity& createEnemySnake(Scene& scene, const glm::mat4& transform, int positionInQueue);
+	Entity& createEnemySnake(Scene& scene, int positionInQueue, const TransformComponent& transform = {});
 
 	//Creates the enemy03 enemy type
-	Entity& createEnemyShooter(Scene& scene, const glm::mat4& transform);
+	Entity& createEnemyShooter(Scene& scene, const TransformComponent& transform = {});
 
 	//Creates the score pickup01 entity type
-	Entity& createScorePickUp01(Scene& scene, const glm::mat4& transform);
+	Entity& createScorePickUp01(Scene& scene, const TransformComponent& transform = {});
 
 	//Creates the score pickup01 entity type
-	Entity& createScorePickUp02(Scene& scene, const glm::mat4& transform);
+	Entity& createScorePickUp02(Scene& scene, const TransformComponent& transform = {});
 
 	//Creates the score pickup01 entity type
-	Entity& createHealthPickUp(Scene& scene, const glm::mat4& transform);
+	Entity& createHealthPickUp(Scene& scene, const TransformComponent& transform = {});
 
 	// Creates a  Player (currently a unit sphere), centered at the origin, with the specified 
-	// transform;
-	Entity& createPlayer(Scene& scene, const glm::mat4& transform = glm::mat4{ 1 });
+	// lookAt;
+	Entity& createPlayer(Scene& scene, const TransformComponent& transform = {});
 
 	// Creates a  Player Bullet (currently a unit sphere), centered at the origin, with the specified 
-	// transform;
-	Entity& createPlayerBullet(Scene& scene, const glm::mat4& transform = glm::mat4{ 1 });
+	// lookAt;
+	Entity& createPlayerBullet(Scene& scene, const TransformComponent& transform = {});
 
 	// Creates a  Player Bullet (currently a unit sphere), centered at the origin, with the specified 
-	// transform;
-	Entity& createEnemyBullet(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	// lookAt;
+	Entity& createEnemyBullet(Scene&, const TransformComponent& transform = {});
 
 	void setModelEnemyZombie(Entity&);
 	void setModelEnemySnake(Entity&);
@@ -88,19 +90,19 @@ namespace EntityUtils {
 	void setModelEnemyBullet(Entity&);
 
 	// Create a simple dummy entity that will be controlled by a remote controller
-	Entity& createGhost(Scene&, ModelID, const glm::mat4& transform, std::int32_t entityNetId);
+	Entity& createGhost(Scene&, ModelID, const TransformComponent& transform, std::int32_t entityNetId);
 
 	// Create local player object that will have it's inputs sent to a remote controller
-	Entity& createPlayerGhost(Scene&, const glm::mat4& transform, std::int32_t entityNetId);
+	Entity& createPlayerGhost(Scene&, const TransformComponent& transform, std::int32_t entityNetId);
 
 	// Creates a cylinder with the specified radius and height.
-	Entity& createCylinder(Scene&, float radius = 1, float height = 1, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createCylinder(Scene&, float radius = 1, float height = 1, const TransformComponent& transform = {});
 
 	// Creates a pyramid
-	Entity& createPyramid(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createPyramid(Scene&, const TransformComponent& transform = {});
 
 	// Creates a pyramid
-	Entity& createCube(Scene&, const glm::mat4& transform = glm::mat4{ 1 });
+	Entity& createCube(Scene&, const TransformComponent& transform = {});
 
 	// Creates a camera.
 	// This camera needs to be set as active on the render in order to be rendered from.
@@ -111,8 +113,8 @@ namespace EntityUtils {
 	Entity& createSkybox(Scene&, const std::vector<std::string>& faceFilenames);
 
 	// Creates an entity from a 3D model file.
-	// The entity returned is a simple entity with only a model and a transform component.
-	Entity& createModel(Scene&, const std::string& path, const glm::mat4& transform = glm::mat4{ 1 });
+	// The entity returned is a simple entity with only a model and a lookAt component.
+	Entity& createModel(Scene&, const std::string& path, const TransformComponent& transform = {});
 	
 	// Handles boilerplate input binding
 	void setDefaultInputBindings(InputMapComponent& input);

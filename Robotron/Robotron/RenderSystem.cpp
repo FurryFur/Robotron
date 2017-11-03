@@ -14,6 +14,7 @@
 #include "RenderSystem.h"
 
 #include "GLUtils.h"
+#include "GLMUtils.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "Scene.h"
@@ -25,6 +26,7 @@
 #include <GLFW\glfw3.h>
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
+#include <glm\gtx\euler_angles.hpp>
 
 using glm::mat4;
 using glm::vec3;
@@ -118,7 +120,8 @@ void RenderSystem::update(const Entity& entity)
 	s_renderState = m_renderState;
 
 	// Render the 
-	renderModel(entity.model, entity.transform);
+
+	renderModel(entity.model, GLMUtils::transformComponentToMat4(entity.transform));
 }
 
 void RenderSystem::setCamera(const Entity* entity)
@@ -140,8 +143,6 @@ void RenderSystem::setIrradianceMap(GLuint irradianceMap)
 
 void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& transform)
 {
-	const mat4& cameraTransform = s_renderState.cameraEntity->transform;
-
 	// Get Aspect ratio
 	int width, height;
 	GLFWwindow* glContext = glfwGetCurrentContext();
@@ -152,9 +153,9 @@ void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& tra
 	UniformFormat uniforms;
 	
 	uniforms.model = transform;
-	uniforms.view = glm::inverse(cameraTransform);
+	uniforms.view = s_renderState.cameraEntity->camera.lookAt;
 	uniforms.projection = glm::perspective(glm::radians(60.0f), aspectRatio, 0.5f, 100.0f);
-	uniforms.cameraPos = cameraTransform[3];
+	uniforms.cameraPos = glm::vec4(s_renderState.cameraEntity->camera.position, 1.0f);
 
 	// Loop over all the meshes in the model
 	for (size_t i = 0; i < model.meshes.size(); ++i) {

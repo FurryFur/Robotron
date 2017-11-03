@@ -11,7 +11,7 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <iostream>
 
-Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createQuad(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_LOGIC);
@@ -33,7 +33,7 @@ Entity& EntityUtils::createQuad(Scene& scene, const glm::mat4& transform)
 	return entity;
 }
 
-Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createSphere(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_MODEL 
 	                                  | COMPONENT_TRANSFORM);
@@ -51,7 +51,7 @@ Entity& EntityUtils::createSphere(Scene& scene, const glm::mat4& transform)
 	return entity;
 }
 
-Entity& EntityUtils::createEnemyZombie(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createEnemyZombie(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 	                                  | COMPONENT_ZOMBIE
@@ -61,7 +61,7 @@ Entity& EntityUtils::createEnemyZombie(Scene& scene, const glm::mat4& transform)
 	entity.aiVariables.lives = 1;
 
 	float pi = static_cast<float>(M_PI_2);
-	entity.transform = transform * glm::rotate(glm::mat4{}, pi, glm::vec3{ 1.0f, 0.0f, 0.0f });
+	entity.transform = transform;
 
 	setModelEnemyZombie(entity);
 
@@ -73,7 +73,7 @@ Entity& EntityUtils::createEnemyZombie(Scene& scene, const glm::mat4& transform)
 	return entity;
 }
 
-Entity& EntityUtils::createEnemySnake(Scene& scene, const glm::mat4& transform, int positionInQueue)
+Entity& EntityUtils::createEnemySnake(Scene& scene, int positionInQueue, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_SNAKE
@@ -85,7 +85,7 @@ Entity& EntityUtils::createEnemySnake(Scene& scene, const glm::mat4& transform, 
 	entity.aiVariables.lives = 1;
 
 	float pi = static_cast<float>(M_PI_2);
-	entity.transform = transform * glm::rotate(glm::mat4{}, pi, glm::vec3{ 1.0f, 0.0f, 0.0f });
+	entity.transform = transform;
 
 	setModelEnemySnake(entity);
 
@@ -97,13 +97,13 @@ Entity& EntityUtils::createEnemySnake(Scene& scene, const glm::mat4& transform, 
 	return entity;
 }
 
-Entity& EntityUtils::createEnemyShooter(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createEnemyShooter(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
 	                                  | COMPONENT_ENEMY_SHOOTER
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS);
 	float pi = static_cast<float>(M_PI_2);
-	entity.transform = transform * glm::rotate(glm::mat4{}, pi, glm::vec3{ 1.0f, 0.0f, 0.0f });
+	entity.transform = transform;
 
 	entity.aiVariables.score = 10;
 	entity.aiVariables.lives = 3;
@@ -119,7 +119,7 @@ Entity& EntityUtils::createEnemyShooter(Scene& scene, const glm::mat4& transform
 	return entity;
 }
 
-Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createScorePickUp01(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 	                                  | COMPONENT_SCOREPICKUP
@@ -139,7 +139,7 @@ Entity& EntityUtils::createScorePickUp01(Scene& scene, const glm::mat4& transfor
 	return entity;
 }
 
-Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createScorePickUp02(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = createScorePickUp01(scene, transform);
 
@@ -150,7 +150,7 @@ Entity& EntityUtils::createScorePickUp02(Scene& scene, const glm::mat4& transfor
 	return entity;
 }
 
-Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createHealthPickUp(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = createScorePickUp01(scene, transform);
 
@@ -162,7 +162,7 @@ Entity& EntityUtils::createHealthPickUp(Scene& scene, const glm::mat4& transform
 }
 
 
-Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT | COMPONENT_PLAYER_CONTROL 
 	                                  | COMPONENT_INPUT_MAP | COMPONENT_MODEL
@@ -173,7 +173,8 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	entity.playerStats.playerInfo.lives = 100;
 	entity.playerStats.playerInfo.score = 0;
 	entity.playerStats.extraLifeThreshhold = 1000;
-	entity.transform = transform * glm::scale(glm::mat4{}, { 5.0f, 5.0f, 5.0f }); // Scale the player model up by default
+	entity.transform = transform; // Scale the player model up by default
+	entity.transform.scale *= 5.0f;
 
 	setModelPlayer(entity);
 
@@ -194,7 +195,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const glm::mat4& transform)
 	return entity;
 }
 
-Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createPlayerBullet(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 	                                  | COMPONENT_PLAYERBULLET
@@ -211,7 +212,7 @@ Entity& EntityUtils::createPlayerBullet(Scene& scene, const glm::mat4& transform
 	return entity;
 }
 
-Entity& EntityUtils::createEnemyBullet(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createEnemyBullet(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM
 		| COMPONENT_ENEMYBULLET
@@ -319,7 +320,7 @@ void EntityUtils::setModelEnemyBullet(Entity& entity)
 	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
 }
 
-Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const glm::mat4& transform, std::int32_t entityNetId)
+Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const TransformComponent& transform, std::int32_t entityNetId)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL, COMPONENT_TRANSFORM, 
 	                                    COMPONENT_NETWORK, COMPONENT_PHYSICS);
@@ -364,7 +365,7 @@ Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const glm::mat4&
 	return entity;
 }
 
-Entity & EntityUtils::createPlayerGhost(Scene& scene, const glm::mat4& transform, std::int32_t entityNetId)
+Entity & EntityUtils::createPlayerGhost(Scene& scene, const TransformComponent& transform, std::int32_t entityNetId)
 {
 	Entity& entity = createPlayer(scene, transform);
 	entity.removeComponents(COMPONENT_PLAYER_CONTROL);
@@ -373,12 +374,15 @@ Entity & EntityUtils::createPlayerGhost(Scene& scene, const glm::mat4& transform
 	return entity;
 }
 
-Entity& EntityUtils::createCylinder(Scene& scene, float radius, float height, const glm::mat4& transform)
+Entity& EntityUtils::createCylinder(Scene& scene, float radius, float height, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_MODEL 
 	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
 
-	entity.transform = transform * glm::scale(glm::mat4{ 1 }, glm::vec3{ radius, height, radius });
+	entity.transform = transform;
+	entity.transform.scale.x *= radius;
+	entity.transform.scale.y *= height;
+	entity.transform.scale.z *= radius;
 
 	entity.model = GLPrimitives::getCylinderModel();
 
@@ -393,7 +397,7 @@ Entity& EntityUtils::createCylinder(Scene& scene, float radius, float height, co
 	return entity;
 }
 
-Entity& EntityUtils::createPyramid(Scene& scene, const glm::mat4& transform)
+Entity& EntityUtils::createPyramid(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_MODEL 
 	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
@@ -413,7 +417,7 @@ Entity& EntityUtils::createPyramid(Scene& scene, const glm::mat4& transform)
 	return entity;
 }
 
-Entity& EntityUtils::createCube(Scene& scene, const glm::mat4 & transform)
+Entity& EntityUtils::createCube(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_INPUT_MAP | COMPONENT_MODEL 
 	                                  | COMPONENT_TRANSFORM | COMPONENT_LOGIC);
@@ -442,7 +446,8 @@ Entity& EntityUtils::createCamera(Scene& scene, const glm::vec3& pos, const glm:
 	entity.controlVars.orientationSensitivity = 0.005f;
 	entity.controlVars.worldSpaceMove = false;
 
-	entity.transform = glm::inverse(glm::lookAt(pos, center, up));
+	entity.camera.lookAt = glm::lookAt(pos, center, up);
+	entity.camera.position = pos;
 
 	entity.inputMap.mouseInputEnabled = true;
 	entity.inputMap.forwardBtnMap = GLFW_KEY_W;
@@ -470,7 +475,7 @@ Entity& EntityUtils::createSkybox(Scene& scene, const std::vector<std::string>& 
 	return entity;
 }
 
-Entity & EntityUtils::createModel(Scene& scene, const std::string& path, const glm::mat4& transform)
+Entity & EntityUtils::createModel(Scene& scene, const std::string& path, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM);
 

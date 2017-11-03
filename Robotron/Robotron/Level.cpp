@@ -40,12 +40,14 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, std::string username
 		m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene);
 
 	// Create 3D entities.
-	EntityUtils::createQuad(m_scene,
-		  glm::rotate(glm::mat4{}, static_cast<float>(M_PI / 2), glm::vec3{ 1, 0, 0 })
-		* glm::scale({}, glm::vec3{ 20.0f, 20.0f, 1.0f }));
+	TransformComponent transform{};
+	transform.eulerAngle.x = static_cast<float>(M_PI / 2);
+	transform.scale = glm::vec3{ 20.0f, 20.0f, 20.0f };
+	EntityUtils::createQuad(m_scene, transform);
 
-	Entity& player = EntityUtils::createPlayer(m_scene,
-		glm::translate({}, glm::vec3{ 0.0f, 1.0f, 0.0f }));
+	transform = {};
+	transform.position = glm::vec3{ 0, 1, 0 };
+	Entity& player = EntityUtils::createPlayer(m_scene, transform);
 	player.addComponents(COMPONENT_NETWORK);
 
 	player.playerStats.playerInfo.username = username;
@@ -174,9 +176,9 @@ void Level::spawnEnemies(int levelType)
 		if (randomInt(0, 1) == 0)
 			randZ += 30;
 
-		Entity& enemy = EntityUtils::createEnemyZombie(m_scene,
-			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
-		enemy.addComponents(COMPONENT_NETWORK);
+		TransformComponent transform{};
+		transform.position = glm::vec3{ randX, 1.0f, randZ };
+		Entity& enemy = EntityUtils::createEnemyZombie(m_scene, transform);
 	}
 
 
@@ -188,13 +190,15 @@ void Level::spawnEnemies(int levelType)
 		{
 			if (-19.0f + i < 20.0f)
 			{
-				EntityUtils::createEnemySnake(m_scene,
-					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f + i }), i);
+				TransformComponent transform{};
+				transform.position = glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f + i };
+				EntityUtils::createEnemySnake(m_scene, i, transform);
 			}
 			else
 			{
-				EntityUtils::createEnemySnake(m_scene,
-					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f}), i);
+				TransformComponent transform{};
+				transform.position = glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, -19.0f };
+				EntityUtils::createEnemySnake(m_scene, i, transform);
 			}
 		}
 	}
@@ -204,13 +208,15 @@ void Level::spawnEnemies(int levelType)
 
 			if (19.0f - i < 20.0f)
 			{
-				EntityUtils::createEnemySnake(m_scene,
-					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f - i }), i);
+				TransformComponent transform{};
+				transform.position = glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f - i };
+				EntityUtils::createEnemySnake(m_scene, i, transform);
 			}
 			else
 			{
-				EntityUtils::createEnemySnake(m_scene,
-					glm::translate({}, glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f}), i);
+				TransformComponent transform{};
+				transform.position = glm::vec3{ -(randcoord + randomReal<float>(-0.2f, 0.2f)), 1.0f, 19.0f };
+				EntityUtils::createEnemySnake(m_scene, i, transform);
 			}
 		}
 	}
@@ -219,13 +225,15 @@ void Level::spawnEnemies(int levelType)
 		{
 			if (-19.0f + i < 20.0f)
 			{
-				EntityUtils::createEnemySnake(m_scene,
-					glm::translate({}, glm::vec3{ -19.0f + i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
+				TransformComponent transform{};
+				transform.position = glm::vec3{ -19.0f + i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) };
+				EntityUtils::createEnemySnake(m_scene, i, transform);
 			}
 			else
 			{
-				EntityUtils::createEnemySnake(m_scene,
-					glm::translate({}, glm::vec3{ -19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
+				TransformComponent transform{};
+				transform.position = glm::vec3{ -19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) };
+				EntityUtils::createEnemySnake(m_scene, i, transform);
 			}
 		}
 	}
@@ -234,13 +242,15 @@ void Level::spawnEnemies(int levelType)
 		{
 			if (19.0f - i < 20.0f)
 			{
-				EntityUtils::createEnemySnake(m_scene,
-					glm::translate({}, glm::vec3{ 19.0f - i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
+				TransformComponent transform{};
+				transform.position = glm::vec3{ 19.0f - i, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) };
+				EntityUtils::createEnemySnake(m_scene, i, transform);
 			}
 			else
 			{
-				EntityUtils::createEnemySnake(m_scene,
-					glm::translate({}, glm::vec3{ 19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) }), i);
+				TransformComponent transform{};
+				transform.position = glm::vec3{ 19.0f, 1.0f, (randcoord + randomReal<float>(-0.2f, 0.2f)) };
+				EntityUtils::createEnemySnake(m_scene, i, transform);
 			}
 		}
 	}
@@ -256,8 +266,9 @@ void Level::spawnEnemies(int levelType)
 		if (randomInt(0, 1) == 0)
 			randZ += 30;
 	
-		EntityUtils::createEnemyShooter(m_scene,
-			glm::translate({}, glm::vec3{ randX, 1.0f, randZ }));
+		TransformComponent transform{};
+		transform.position = glm::vec3{ randX, 1.0f, randZ };
+		EntityUtils::createEnemyShooter(m_scene, transform);
 	}
 
 	// Create ScorePickups01
@@ -271,9 +282,10 @@ void Level::spawnEnemies(int levelType)
 		if (randomInt(0, 1) == 0)
 			randZ += 30;
 	
-		Entity& enemy = EntityUtils::createScorePickUp01(m_scene,
-			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
-			* glm::scale({}, glm::vec3{ 0.4f, 0.4f, 0.4f }));
+		TransformComponent transform{};
+		transform.position = glm::vec3{ randX, 1.0f, randZ };
+		transform.scale = glm::vec3{ 0.4f, 0.4f, 0.4f };
+		Entity& enemy = EntityUtils::createScorePickUp01(m_scene, transform);
 	}
 
 	// Create ScorePickups02
@@ -287,9 +299,10 @@ void Level::spawnEnemies(int levelType)
 		if (randomInt(0, 1) == 0)
 			randZ += 30;
 
-		Entity& enemy = EntityUtils::createScorePickUp02(m_scene,
-			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
-			* glm::scale({}, glm::vec3{ 0.6f, 0.6f, 0.6f }));
+		TransformComponent transform{};
+		transform.position = glm::vec3{ randX, 1.0f, randZ };
+		transform.scale = glm::vec3{ 0.6f, 0.6f, 0.6f };
+		Entity& enemy = EntityUtils::createScorePickUp02(m_scene, transform);
 	}
 
 	// Create Health Pickups
@@ -303,9 +316,10 @@ void Level::spawnEnemies(int levelType)
 		if (randomInt(0, 1) == 0)
 			randZ += 30;
 
-		Entity& enemy = EntityUtils::createHealthPickUp(m_scene,
-			glm::translate({}, glm::vec3{ randX, 1.0f, randZ })
-			* glm::scale({}, glm::vec3{ 0.4f, 0.4f, 0.4f }));
+		TransformComponent transform{};
+		transform.position = glm::vec3{ randX, 1.0f, randZ };
+		transform.scale = glm::vec3{ 0.4f, 0.4f, 0.4f };
+		Entity& enemy = EntityUtils::createHealthPickUp(m_scene, transform);
 	}
 }
 
@@ -336,8 +350,8 @@ void Level::initalizeNextLevel()
 		// Move the player back to the centre point of the level
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 		{
-			m_scene.getEntity(i).transform[3].x = 0.0f;
-			m_scene.getEntity(i).transform[3].z = 0.0f;
+			m_scene.getEntity(i).transform.position.x = 0.0f;
+			m_scene.getEntity(i).transform.position.z = 0.0f;
 		}
 	}
 
@@ -402,7 +416,7 @@ void Level::respawnDeadPlayers(Clock& clock)
 		    && m_scene.getEntity(i).playerStats.deathTime + 3.0f <= clock.GetCurTime())
 		{
 			m_scene.getEntity(i).playerStats.isRespawning = false;
-			m_scene.getEntity(i).transform[3] = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
+			m_scene.getEntity(i).transform.position = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
 			m_descendingPlayers = true;
 			m_audio.playSFX(PLAYER_SPAWNING);
 		}
@@ -479,9 +493,9 @@ void Level::process(float deltaTick, Clock& clock)
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
-			 && m_scene.getEntity(i).transform[3].y > 1.0f)
+			 && m_scene.getEntity(i).transform.position.y > 1.0f)
 			{
-				--m_scene.getEntity(i).transform[3].y;
+				--m_scene.getEntity(i).transform.position.y;
 				m_descendingPlayers = true;
 			}
 		}
@@ -510,7 +524,7 @@ void Level::processSetUpPhase()
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
-				++m_scene.getEntity(i).transform[3].y;
+				++m_scene.getEntity(i).transform.position.y;
 		}
 		if(m_setUpTick == 50)
 			initalizeNextLevel();
@@ -522,7 +536,7 @@ void Level::processSetUpPhase()
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
-				--m_scene.getEntity(i).transform[3].y;
+				--m_scene.getEntity(i).transform.position.y;
 		}
 		if (m_setUpTick == 100)
 		{

@@ -48,10 +48,11 @@ void EnemyBulletSystem::update(Entity& entity)
 	if (!entity.hasComponents(COMPONENT_ENEMYBULLET))
 		return;
 
-	if (entity.transform[3].x > 20.0f
-		|| entity.transform[3].x < -20.0f
-		|| entity.transform[3].z > 20.0f
-		|| entity.transform[3].z < -20.0f)
+	glm::vec3 pos = entity.transform.position;
+	if (pos.x > 20.0f
+	 || pos.x < -20.0f
+	 || pos.z > 20.0f
+	 || pos.z < -20.0f)
 	{
 		m_scene.destroyEntity(entity);
 		return;

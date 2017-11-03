@@ -53,8 +53,8 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_SNAKE) 
 		 && m_scene.getEntity(i).aiVariables.positionInQueue ==  followNumber - 1)
 		{
-			followPosition = m_scene.getEntity(i).transform[3];
-			followPosition.y = entity.transform[3].y; // Keep enemy on same plane
+			followPosition = m_scene.getEntity(i).transform.position;
+			followPosition.y = entity.transform.position.y; // Keep enemy on same plane
 			followNumber = m_scene.getEntity(i).aiVariables.positionInQueue;
 			followEntity = &m_scene.getEntity(i);
 			break;
@@ -89,7 +89,7 @@ void Enemy02ControlSystem::update(Entity& entity, float deltaTick)
 		entity.controlVars.maxMoveSpeed = 22.857f / tailLength + 7.142f;
 	}
 	else {
-		acceleration = seekWithArrival(followPosition, glm::vec3{ entity.transform[3] }, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
+		acceleration = seekWithArrival(followPosition, entity.transform.position, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
 		if(followEntity != nullptr)
 			entity.controlVars.maxMoveSpeed = followEntity->controlVars.maxMoveSpeed;

@@ -4,7 +4,7 @@
 #include "PhysicsComponent.h"
 #include "BufferStream.h"
 
-GhostSnapshot::GhostSnapshot(std::int32_t entityNetId, const glm::mat4& transform, const PhysicsComponent& physics)
+GhostSnapshot::GhostSnapshot(std::int32_t entityNetId, const TransformComponent& transform, const PhysicsComponent& physics)
 {
 	this->entityNetId = entityNetId;
 	this->transform = transform;

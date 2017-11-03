@@ -63,10 +63,10 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 		for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)						                          //its a player object
-				&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - glm::vec3(entity.transform[3]))     //it is the closet player to the target
-				&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 5)							                                      //the player is within the enemys aggro range
+				&& glm::length(m_scene.getEntity(i).transform.position - entity.transform.position) < glm::length(targetPosition - glm::vec3(entity.transform.position))     //it is the closet player to the target
+				&& glm::length(m_scene.getEntity(i).transform.position - entity.transform.position) < 5)							                                      //the player is within the enemys aggro range
 			{
-				targetPosition = { m_scene.getEntity(i).transform[3].x, m_scene.getEntity(i).transform[3].y, m_scene.getEntity(i).transform[3].z };
+				targetPosition = { m_scene.getEntity(i).transform.position.x, m_scene.getEntity(i).transform.position.y, m_scene.getEntity(i).transform.position.z };
 				entity.aiVariables.followEntity = &m_scene.getEntity(i);
 
 				// If following the controlling player, make a sound
@@ -82,14 +82,14 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 	{
 		entity.controlVars.maxMoveSpeed = 20.0f;
 		// Add a pursue acceleration to the culmative acceleration.
-		acceleration = followLeader(glm::vec3(entity.aiVariables.followEntity->transform[3]), entity.aiVariables.followEntity->physics.velocity, entity.aiVariables.followEntity->aiVariables.previousVelocity, glm::vec3(entity.transform[3]), entity.physics.velocity, entity.controlVars.maxMoveSpeed);
+		acceleration = followLeader(glm::vec3(entity.aiVariables.followEntity->transform.position), entity.aiVariables.followEntity->physics.velocity, entity.aiVariables.followEntity->aiVariables.previousVelocity, glm::vec3(entity.transform.position), entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
 		// Find all the closest Enemy01 neighbours and store them in a vector.
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_SCOREPICKUP) &&
-				(glm::length(glm::vec2(m_scene.getEntity(i).transform[3].x - entity.transform[3].x, m_scene.getEntity(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
+				(glm::length(glm::vec2(m_scene.getEntity(i).transform.position.x - entity.transform.position.x, m_scene.getEntity(i).transform.position.z - entity.transform.position.z))) <= 2.0f)
 			{
 				nearbyNeighbours.push_back(&m_scene.getEntity(i));
 			}
@@ -97,7 +97,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 
 		// Add a flock acceleration to the culmative acceleration.
 		if (nearbyNeighbours.size() > 0 && entity.aiVariables.followEntity->physics.velocity != glm::vec3{ 0,0,0 })
-			acceleration += flock(nearbyNeighbours, glm::vec3(entity.transform[3]), entity.physics.velocity, entity.controlVars.maxMoveSpeed);
+			acceleration += flock(nearbyNeighbours, glm::vec3(entity.transform.position), entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 	}
 	// If no player to follow, just wander.
 	else

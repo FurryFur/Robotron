@@ -307,7 +307,9 @@ void NetworkServerSystem::startGame()
 	for (auto& addressClientInfoPair : m_clients) {
 		addressClientInfoPair.first;
 
-		Entity& newPlayer = EntityUtils::createPlayer(m_scene, glm::translate(glm::mat4{}, { 0, 1, 0 }));
+		TransformComponent transform{};
+		transform.position.y = 1;
+		Entity& newPlayer = EntityUtils::createPlayer(m_scene, transform);
 		newPlayer.removeComponents(COMPONENT_INPUT_MAP); // Input will come from the clients
 		addressClientInfoPair.second.playerEntity = &newPlayer;
 		addToNetworking(newPlayer);

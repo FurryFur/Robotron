@@ -133,7 +133,7 @@ std::int32_t RemoteProcedureCall::getEntityNetId()
 }
 
 RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId,
-	const PlayerInfo& playerInfo, const glm::mat4& transform)
+	const PlayerInfo& playerInfo, const TransformComponent& transform)
 	: RemoteProcedureCall(entityNetId)
 	, m_playerInfo(playerInfo)
 	, m_transform{ transform }
@@ -170,7 +170,7 @@ InBufferStream& RPCCreatePlayerGhost::deserialize(InBufferStream& ibs)
 }
 
 RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
-	const glm::mat4& transform)
+	const TransformComponent& transform)
 	: RemoteProcedureCall(entityNetId)
 	, m_modelId{ modelId }
 	, m_transform { transform }

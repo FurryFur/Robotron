@@ -134,7 +134,7 @@ void NetworkClientSystem::joinServer(const sockaddr_in& address)
 	sendData(joinResq, address);
 }
 
-void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const glm::mat4& transform)
+void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform)
 {
 	// Destroy existing entities with the same id before creating new ones
 	// TODO: Add logging here
@@ -149,7 +149,7 @@ void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId,
 	m_netEntities.at(entityNetId) = &newEntity;
 }
 
-void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const glm::mat4& transform)
+void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const TransformComponent& transform)
 {
 	// Destroy existing entities with the same id before creating new ones
 	// TODO: Add logging here

@@ -50,17 +50,17 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 	glm::vec3 targetPosition  = glm::vec3{100, 100, 100};
 	glm::vec3 targetsVelocity;
 	float targetsMoveSpeed;
-	glm::vec3 currentPosition = glm::vec3{ entity.transform[3].x,  entity.transform[3].y,  entity.transform[3].z};
+	glm::vec3 currentPosition = entity.transform.position;
 	bool targetFound = false;
 
 	// Find the closest player object to seek to.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)          						                               //its a player object
-		 && glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
-		 && glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 30)								                  //the player is within the enemys aggro range
+		 && glm::length(m_scene.getEntity(i).transform.position - currentPosition) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
+		 && glm::length(m_scene.getEntity(i).transform.position - currentPosition) < 30)								                  //the player is within the enemys aggro range
 		{
-			targetPosition = { m_scene.getEntity(i).transform[3].x, entity.transform[3].y, m_scene.getEntity(i).transform[3].z};
+			targetPosition = { m_scene.getEntity(i).transform.position.x, currentPosition.y, m_scene.getEntity(i).transform.position.z};
 			targetsVelocity = m_scene.getEntity(i).physics.velocity;
 			targetsMoveSpeed = m_scene.getEntity(i).controlVars.maxMoveSpeed;
 			targetFound = true;
@@ -79,7 +79,7 @@ void Enemy01ControlSystem::update(Entity& entity, float deltaTick)
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if ((m_scene.getEntity(i).hasComponents(COMPONENT_ZOMBIE)) &&
-			    (glm::length(glm::vec2(m_scene.getEntity(i).transform[3].x - entity.transform[3].x, m_scene.getEntity(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
+			    (glm::length(glm::vec2(m_scene.getEntity(i).transform.position.x - currentPosition.x, m_scene.getEntity(i).transform.position.z - currentPosition.z))) <= 2.0f)
 			{
 				nearbyNeighbours.push_back(&m_scene.getEntity(i));
 			}

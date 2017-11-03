@@ -200,12 +200,14 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClCompile Include="socket.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="TextLabel.cpp" />
+    <ClCompile Include="TransformComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIComponent.h" />
     <ClInclude Include="AIUtils.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="BufferStream.h" />
+    <ClInclude Include="CameraComponent.h" />
     <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="Clock.h" />
     <ClInclude Include="Enemy01ControlSystem.h" />
@@ -257,6 +259,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="StreamableVector.h" />
     <ClInclude Include="TextLabel.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="UniformFormat.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VertexFormat.h" />

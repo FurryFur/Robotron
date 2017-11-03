@@ -58,6 +58,7 @@ void Entity::addComponents(size_t componentMask)
 	}
 	if (matches(componentMask, COMPONENT_CAMERA)) {
 		m_componentMask |= COMPONENT_CAMERA;
+		camera = {};
 	}
 	if (matches(componentMask, COMPONENT_PLAYER_CONTROL)) {
 		m_componentMask |= COMPONENT_PLAYER_CONTROL;

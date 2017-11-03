@@ -51,17 +51,17 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 	glm::vec3 targetsVelocity;
 	glm::vec3 targetsPreviousVelocity;
 	float targetsMoveSpeed;
-	glm::vec3 currentPosition = glm::vec3{ entity.transform[3].x,  entity.transform[3].y,  entity.transform[3].z };
+	glm::vec3 currentPosition = entity.transform.position;
 	bool targetFound = false;
 
 	// Find the closest player object to seek to.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL) 					                                           //its a player object
-			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
-			&& glm::length(m_scene.getEntity(i).transform[3] - entity.transform[3]) < 40)								                  //the player is within the enemys aggro range
+			&& glm::length(m_scene.getEntity(i).transform.position - currentPosition) < glm::length(targetPosition - currentPosition)     //it is the closet player to the target
+			&& glm::length(m_scene.getEntity(i).transform.position - currentPosition) < 40)								                  //the player is within the enemys aggro range
 		{
-			targetPosition = { m_scene.getEntity(i).transform[3].x, entity.transform[3].y, m_scene.getEntity(i).transform[3].z };
+			targetPosition = { m_scene.getEntity(i).transform.position.x, currentPosition.y, m_scene.getEntity(i).transform.position.z };
 			targetsVelocity = m_scene.getEntity(i).physics.velocity;
 			targetsPreviousVelocity = m_scene.getEntity(i).aiVariables.previousVelocity;
 			targetsMoveSpeed = m_scene.getEntity(i).controlVars.maxMoveSpeed;
@@ -74,11 +74,11 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 	if (targetFound)
 	{
 		// Pursue to the target if above a certain distance away from them.
-		if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) > 15) {
+		if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ currentPosition.x, currentPosition.z }) > 15) {
 			acceleration = seekWithArrival(targetPosition, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 		}
 		// Avade from the target if too close to a player.
-		else if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ entity.transform[3].x, entity.transform[3].z }) < 5)
+		else if (glm::length(glm::vec2{ targetPosition.x, targetPosition.z } -glm::vec2{ currentPosition.x, currentPosition.z }) < 5)
 			acceleration = evade(targetPosition, targetsVelocity, targetsMoveSpeed, currentPosition, entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
@@ -86,7 +86,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if ((m_scene.getEntity(i).hasComponents(COMPONENT_ZOMBIE)) &&
-			    (glm::length(glm::vec2(m_scene.getEntity(i).transform[3].x - entity.transform[3].x, m_scene.getEntity(i).transform[3].z - entity.transform[3].z))) <= 2.0f)
+			    (glm::length(glm::vec2(m_scene.getEntity(i).transform.position.x - currentPosition.x, m_scene.getEntity(i).transform.position.z - currentPosition.z))) <= 2.0f)
 			{
 				nearbyNeighbours.push_back(&m_scene.getEntity(i));
 			}
@@ -105,9 +105,10 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 			entity.controlVars.lastFiringTime = clock.GetCurTime();
 			entity.controlVars.firingSpeed = randomReal<double>(1.0f, 1.2f);
 			
-			Entity& bullet = EntityUtils::createEnemyBullet(m_scene,
-				glm::translate({}, glm::vec3(entity.transform[3]))
-				* glm::scale({}, glm::vec3{ 0.5f, 0.5f, 0.5f }));
+			TransformComponent transform{};
+			transform.position = currentPosition;
+			transform.scale = glm::vec3{ 0.5f, 0.5f, 0.5f };
+			Entity& bullet = EntityUtils::createEnemyBullet(m_scene, transform);
 			
 			// Bullet shoot sound effect
 			m_audio.playSFX(ENEMY_SHOOT);
@@ -118,7 +119,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 
 			firingPosition.y = currentPosition.y;
 			
-			glm::vec3 bulletVelocity = ((firingPosition - glm::vec3(entity.transform[3])) / (glm::length(firingPosition - glm::vec3(entity.transform[3])))) * 10.0f;
+			glm::vec3 bulletVelocity = ((firingPosition - currentPosition) / (glm::length(firingPosition - currentPosition))) * 10.0f;
 
 			bulletVelocity.y = 0.0f;
 			bullet.physics.velocity = bulletVelocity;

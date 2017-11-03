@@ -93,7 +93,7 @@ glm::vec3 evade(glm::vec3 targetPosition, glm::vec3 targetsVelocity, float targe
 // Returns an acceleration to move to a random position forward from the current position.
 glm::vec3 wander(Entity& entity)
 {
-	glm::vec3 currentPosition = entity.transform[3];
+	glm::vec3 currentPosition = entity.transform.position;
 	glm::vec3 currentVelocity = entity.physics.velocity;
 	float maxMoveSpeed = entity.controlVars.maxMoveSpeed;
 
@@ -176,7 +176,7 @@ glm::vec3 computeCohesion(std::vector<Entity*> nearbyNeighbours, glm::vec3 curre
 	// Find all the closest neighbours and add their position to a culmative position.
 	for (unsigned int i = 0; i < nearbyNeighbours.size(); ++i)
 	{
-		glm::vec3 neighbourPosition = { (*nearbyNeighbours.at(i)).transform[3].x, (*nearbyNeighbours.at(i)).transform[3].y, (*nearbyNeighbours.at(i)).transform[3].z };
+		glm::vec3 neighbourPosition = { (*nearbyNeighbours.at(i)).transform.position.x, (*nearbyNeighbours.at(i)).transform.position.y, (*nearbyNeighbours.at(i)).transform.position.z };
 		// Check its not looking at itself.
 		if (currentPosition != neighbourPosition)
 		{
@@ -208,7 +208,7 @@ glm::vec3 computeSeparation(std::vector<Entity*> nearbyNeighbours, glm::vec3 cur
 	// Find all the closest neighbours and add their distance away from the current object.
 	for (unsigned int i = 0; i < nearbyNeighbours.size(); ++i)
 	{
-		glm::vec3 neighbourPosition = { (*nearbyNeighbours.at(i)).transform[3].x, (*nearbyNeighbours.at(i)).transform[3].y, (*nearbyNeighbours.at(i)).transform[3].z };
+		glm::vec3 neighbourPosition = { (*nearbyNeighbours.at(i)).transform.position.x, (*nearbyNeighbours.at(i)).transform.position.y, (*nearbyNeighbours.at(i)).transform.position.z };
 		// Check its not looking at itself.
 		if (currentPosition != neighbourPosition)
 		{
@@ -277,15 +277,15 @@ void steer(Entity& entity, const glm::vec3& steeringAcceleration)
 	entity.physics.acceleration = GLMUtils::limitVec<glm::vec3>(entity.physics.acceleration, entity.controlVars.maxAcceleration);
 
 	// Bounce of the boundraies of the walls
-	glm::vec3 position = entity.transform[3];
+	glm::vec3 position = entity.transform.position;
 	if (position.x > 20.0f || position.x < -20.0f)
 	{
 		entity.physics.velocity.x *= -1;
 		entity.aiVariables.wanderPosition.x *= -1;
 		if (position.x > 20.0f)
-			entity.transform[3].x = 20.0f;
+			entity.transform.position.x = 20.0f;
 		else
-			entity.transform[3].x = -20.0f;
+			entity.transform.position.x = -20.0f;
 	}
 
 	if (position.z > 20.0f || position.z < -20.0f)
@@ -293,8 +293,8 @@ void steer(Entity& entity, const glm::vec3& steeringAcceleration)
 		entity.physics.velocity.z *= -1;
 		entity.aiVariables.wanderPosition.z *= -1;
 		if (position.z > 20.0f)
-			entity.transform[3].z = 20.0f;
+			entity.transform.position.z = 20.0f;
 		else
-			entity.transform[3].z = -20.0f;
+			entity.transform.position.z = -20.0f;
 	}
 }

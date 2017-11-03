@@ -9,6 +9,8 @@
 #include "PhysicsComponent.h"
 #include "NetworkComponent.h"
 #include "AIComponent.h"
+#include "TransformComponent.h"
+#include "CameraComponent.h"
 
 enum ComponentMask {
 	COMPONENT_TRANSFORM = 1 << 0,
@@ -31,7 +33,7 @@ enum ComponentMask {
 
 class Entity {
 public:
-	glm::mat4 transform;
+	TransformComponent transform;
 	PhysicsComponent physics;
 	ModelComponent model;
 	ControlComponent controlVars;
@@ -41,6 +43,7 @@ public:
 	LogicComponent logicVars;
 	NetworkComponent network;
 	AIComponent aiVariables;
+	CameraComponent camera;
 
 	Entity();
 	Entity(Entity&&) = default;
