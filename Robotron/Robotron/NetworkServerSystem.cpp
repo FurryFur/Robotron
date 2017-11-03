@@ -17,9 +17,10 @@
 
 const USHORT NetworkServerSystem::s_kDefaultServerPort = 8456;
 
-NetworkServerSystem::NetworkServerSystem(Scene& scene)
+NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& serverName)
 	: NetworkSystem(scene)
 	, m_serverState{ SERVER_STATE_LOBBY_MODE }
+	, m_serverName{ serverName }
 {
 	m_socket.initialise(s_kDefaultServerPort);
 	allocateRecvBuffer();
@@ -104,7 +105,7 @@ void NetworkServerSystem::handleBroadcastPacket(const Packet& packet, const sock
 	Packet broadcastResp;
 	broadcastResp.packetType = PACKET_TYPE_BROADCAST_RESPONSE;
 	// TODO: Add server name from UI input
-	broadcastResp.serverName = "Server Name Goes Here";
+	broadcastResp.serverName = m_serverName;
 	sendData(broadcastResp, address);
 }
 

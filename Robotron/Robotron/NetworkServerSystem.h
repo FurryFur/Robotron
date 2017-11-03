@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <memory>
 #include <queue>
+#include <string>
 
 class Scene;
 class Entity;
@@ -31,7 +32,7 @@ public:
 
 class NetworkServerSystem : public NetworkSystem {
 public:
-	NetworkServerSystem(Scene&);
+	NetworkServerSystem(Scene&, const std::string& serverName);
 
 	virtual void beginFrame() override;
 	virtual void update(Entity&, float deltaTick) override;
@@ -43,6 +44,8 @@ public:
 
 	static const USHORT s_kDefaultServerPort;
 private:
+
+	std::string m_serverName;
 	std::unordered_map<sockaddr_in, ClientInfo> m_clients;
 	ServerState m_serverState;
 
