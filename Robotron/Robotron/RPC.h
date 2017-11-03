@@ -3,6 +3,7 @@
 #include "PlayerInfo.h"
 #include "Entity.h"
 #include "EntityUtils.h"
+#include "PlayerInfo.h"
 
 #include <glm\glm.hpp>
 
@@ -31,16 +32,10 @@ namespace RPC {
 class RemoteProcedureCall {
 public:
 	RemoteProcedureCall() = default;
-	RemoteProcedureCall(std::int32_t entityNetid);
 
 	virtual void execute() = 0;
 	virtual OutBufferStream& serialize(OutBufferStream&) const = 0;
 	virtual InBufferStream& deserialize(InBufferStream&) = 0;
-
-	std::int32_t getEntityNetId();
-
-protected:
-	std::int32_t m_entityNetId;
 };
 
 OutBufferStream& operator<<(OutBufferStream&, const RemoteProcedureCall&);
@@ -57,6 +52,7 @@ public:
 	virtual InBufferStream& deserialize(InBufferStream&) override;
 
 private:
+	std::int32_t m_entityNetId;
 	PlayerInfo m_playerInfo;
 	TransformComponent m_transform;
 };
@@ -72,6 +68,7 @@ public:
 	virtual InBufferStream& deserialize(InBufferStream&) override;
 
 private:
+	std::int32_t m_entityNetId;
 	ModelID m_modelId;
 	TransformComponent m_transform;
 };
@@ -84,6 +81,9 @@ public:
 	virtual void execute() override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 	virtual InBufferStream& deserialize(InBufferStream&) override;
+
+private:
+	std::int32_t m_entityNetId;
 };
 
 // A remote procedure call sent from the client that updates input state
@@ -98,7 +98,23 @@ public:
 	virtual InBufferStream& deserialize(InBufferStream&) override;
 	
 private:
+	std::int32_t m_entityNetId;
 	InputComponent m_input;
+};
+
+// A remote procedure call sent from the server to update the lobby
+// state of clients
+class RPCLobbyUpdate : public RemoteProcedureCall {
+public:
+	RPCLobbyUpdate() = default;
+	RPCLobbyUpdate(const std::vector<PlayerInfo>& playerInfoCollection);
+
+	virtual void execute() override;
+	virtual OutBufferStream& serialize(OutBufferStream &) const override;
+	virtual InBufferStream& deserialize(InBufferStream &) override;
+
+private:
+	std::vector<PlayerInfo> m_playerInfoCollection;
 };
 
 // Remote procedure call collection.

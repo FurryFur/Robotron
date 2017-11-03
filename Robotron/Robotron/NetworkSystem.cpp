@@ -4,6 +4,7 @@
 #include "Packet.h"
 #include "Scene.h"
 #include "RPC.h"
+#include "LobbyEventListener.h"
 
 #include <iostream>
 #include <memory>
@@ -131,4 +132,9 @@ void NetworkSystem::bufferRpc(std::unique_ptr<RemoteProcedureCall> rpc)
 	// Add the rpc to the latest RPCGroup
 	RPCGroup& rpcGroup = m_sendPacket.rpcGroupBuffer.front();
 	rpcGroup.addRPC(std::move(rpc));
+}
+
+void NetworkSystem::setLobbyEventListener(LobbyEventListener* eventListener)
+{
+	m_lobbyEventListener = eventListener;
 }

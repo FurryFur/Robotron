@@ -17,10 +17,11 @@
 #include <iostream>
 #include <cstdint>
 
-NetworkClientSystem::NetworkClientSystem(Scene& scene)
+NetworkClientSystem::NetworkClientSystem(Scene& scene, const std::string& username)
 	: NetworkSystem(scene)
 	, m_lastSeqNumSeen{ 0 }
 	, m_clientState{ CLIENT_STATE_NO_SERVER }
+	, m_username{ username }
 {
 	m_socket.initialise(4567);
 	allocateRecvBuffer();
@@ -130,14 +131,14 @@ void NetworkClientSystem::joinServer(const sockaddr_in& address)
 
 	Packet joinResq;
 	joinResq.packetType = PACKET_TYPE_JOIN_REQUEST;
-	// TODO: Add username from UI input
-	joinResq.username = "Client Username Goes Here";
+	joinResq.username = m_username;
 	sendData(joinResq, address);
 }
 
-void NetworkClientSystem::setLobbyEventListener(LobbyEventListener* eventListener)
+void NetworkClientSystem::updateLobby(const std::vector<PlayerInfo>& currentPlayers)
 {
-	m_lobbyEventListener = eventListener;
+	if (m_lobbyEventListener)
+		m_lobbyEventListener->handleLobbyUpdate(currentPlayers);
 }
 
 void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform)

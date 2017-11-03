@@ -6,6 +6,7 @@
 #include "Utils.h"
 #include "ClientInfo.h"
 #include "GhostSnapshot.h"
+#include "LobbyEventListener.h"
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -122,8 +123,14 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 	joinResp.joinAccepted = true; // Just always accept join requests for now
 	sendData(joinResp, address);
 
+	// Send RPCs to clients informing them of lobby updates
+	std::vector<PlayerInfo> playerInfoCollection = getPlayerInfoFromClients();
+	bufferRpc(std::make_unique<RPCLobbyUpdate>(playerInfoCollection));
+	
+	m_lobbyEventListener->handleLobbyUpdate(getPlayerInfoFromClients());
+
 	// TODO: Don't auto start the game, stay in lobby until game is started
-	startGame();
+	//startGame();
 }
 
 void NetworkServerSystem::addToNetworking(Entity& entity)
@@ -205,6 +212,15 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 	if (rpc) {
 		bufferRpc(std::move(rpc));
 	}
+}
+
+std::vector<PlayerInfo> NetworkServerSystem::getPlayerInfoFromClients()
+{
+	std::vector<PlayerInfo> playerInfo;
+	for (auto& client : m_clients) {
+		playerInfo.push_back(client.second.playerInfo);
+	}
+	return playerInfo;
 }
 
 void NetworkServerSystem::beginFrame()

@@ -5,6 +5,7 @@
 #include "RPC.h"
 #include "ClientInfo.h"
 #include "InputComponent.h"
+#include "PlayerInfo.h"
 
 #include <vector>
 #include <unordered_map>
@@ -52,6 +53,7 @@ private:
 	void handleBroadcastPacket(const Packet&, const sockaddr_in& address);
 	void handleJoinPacket(const Packet&, const sockaddr_in& address);
 	void addToNetworking(Entity& entity);
+	std::vector<PlayerInfo> getPlayerInfoFromClients();
 
 	void broadcastToClients(const Packet& packet);
 

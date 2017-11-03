@@ -2,6 +2,7 @@
 
 #include "NetworkSystem.h"
 #include "GhostSnapshot.h"
+#include "PlayerInfo.h"
 #include "RPC.h"
 
 #include <glm\glm.hpp>
@@ -12,7 +13,6 @@
 
 class Scene;
 class Entity;
-class LobbyEventListener;
 struct InputComponent;
 struct Packet;
 
@@ -26,7 +26,7 @@ enum ClientState {
 class NetworkClientSystem : public NetworkSystem
 {
 public:
-	NetworkClientSystem(Scene&);
+	NetworkClientSystem(Scene&, const std::string& username);
 
 	virtual void beginFrame() override;
 	virtual void update(Entity&, float deltaTick) override;
@@ -40,7 +40,7 @@ public:
 	// Join the server at the specified address
 	void joinServer(const sockaddr_in& address);
 
-	void setLobbyEventListener(LobbyEventListener*);
+	void updateLobby(const std::vector<PlayerInfo>& currentPlayers);
 
 	void createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform);
 	void createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const TransformComponent& transform);
@@ -60,6 +60,6 @@ private:
 	//std::vector<std::unique_ptr<GhostSnapshot>> m_ghostSnapshots;
 	sockaddr_in m_serverAddress;
 	ClientState m_clientState;
-	LobbyEventListener* m_lobbyEventListener;
+	std::string m_username;
 };
 

@@ -478,7 +478,7 @@ void Game::process(float deltaTick)
 	{
 		// If you are the host create the network system
 		if (m_networkSystem == nullptr)
-			m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene);
+			m_networkSystem = std::make_unique<NetworkClientSystem>(m_scene, m_userName);
 		
 		size_t numServers = 4;
 

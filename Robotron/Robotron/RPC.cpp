@@ -90,7 +90,7 @@ InBufferStream& operator>>(InBufferStream& ibs, RPCGroup& rpcGroup)
 }
 
 RPCDestroyGhost::RPCDestroyGhost(std::int32_t entityNetId)
-	: RemoteProcedureCall(entityNetId)
+	: m_entityNetId(entityNetId)
 {
 }
 
@@ -122,19 +122,9 @@ InBufferStream& RPCDestroyGhost::deserialize(InBufferStream& ibs)
 	return ibs >> m_entityNetId;
 }
 
-RemoteProcedureCall::RemoteProcedureCall(std::int32_t entityNetid)
-	: m_entityNetId{ entityNetid }
-{
-}
-
-std::int32_t RemoteProcedureCall::getEntityNetId()
-{
-	return m_entityNetId;
-}
-
 RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId,
 	const PlayerInfo& playerInfo, const TransformComponent& transform)
-	: RemoteProcedureCall(entityNetId)
+	: m_entityNetId(entityNetId)
 	, m_playerInfo(playerInfo)
 	, m_transform{ transform }
 {
@@ -171,7 +161,7 @@ InBufferStream& RPCCreatePlayerGhost::deserialize(InBufferStream& ibs)
 
 RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
 	const TransformComponent& transform)
-	: RemoteProcedureCall(entityNetId)
+	: m_entityNetId(entityNetId)
 	, m_modelId{ modelId }
 	, m_transform { transform }
 {
@@ -207,7 +197,7 @@ InBufferStream& RPCCreateGhost::deserialize(InBufferStream& ibs)
 }
 
 RPCRecordInput::RPCRecordInput(std::int32_t entityNetId, const InputComponent& input)
-	: RemoteProcedureCall(entityNetId)
+	: m_entityNetId(entityNetId)
 	, m_input(input)
 {
 }
@@ -259,4 +249,39 @@ void RPC::setClient(NetworkClientSystem* clientSystem)
 void RPC::setServer(NetworkServerSystem* serverSystem)
 {
 	g_serverSystem = serverSystem;
+}
+
+RPCLobbyUpdate::RPCLobbyUpdate(const std::vector<PlayerInfo>& playerInfoCollection)
+	: m_playerInfoCollection{ playerInfoCollection }
+{
+}
+
+void RPCLobbyUpdate::execute()
+{
+	if (g_clientSystem)
+		g_clientSystem->updateLobby(m_playerInfoCollection);
+	else {
+		// TODO: Add logging here
+		std::cout << "WARNING: Received lobby update RPC on a non-client, or RPC client not set" << std::endl;
+	}
+}
+
+OutBufferStream& RPCLobbyUpdate::serialize(OutBufferStream& obs) const
+{
+	obs << static_cast<std::uint8_t>(m_playerInfoCollection.size());
+	for (const PlayerInfo& playerInfo : m_playerInfoCollection)
+		obs << playerInfo;
+
+	return obs;
+}
+
+InBufferStream& RPCLobbyUpdate::deserialize(InBufferStream& ibs)
+{
+	std::uint8_t size;
+	ibs >> size;
+	m_playerInfoCollection.resize(size);
+	for (PlayerInfo& playerInfo : m_playerInfoCollection)
+		ibs >> playerInfo;
+
+	return ibs;
 }
