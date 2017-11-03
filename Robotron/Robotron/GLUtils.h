@@ -38,10 +38,6 @@ namespace GLUtils {
 	// This function will build the shader if it is not already built.
 	GLuint getMetalShader();
 
-	// Returns a handler to a shader that can take color vertices.
-	// This function will build the shader if it is not already built.
-	GLuint getColorShader();
-
 	// Returns a handler to the debug shader.
 	// This shader can draw meshes with a solid color.
 	// Change the materials debug color property to set which color to use.

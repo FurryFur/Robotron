@@ -20,6 +20,9 @@ Entity& EntityUtils::createQuad(Scene& scene, const TransformComponent& transfor
 
 
 	entity.model = GLPrimitives::getQuadModel();
+	entity.model.materials.at(0).shaderParams.glossiness = 0.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.specBias = 0;
 
 	setDefaultInputBindings(entity.inputMap);
 
@@ -238,6 +241,7 @@ void EntityUtils::setModelEnemyZombie(Entity& entity)
 	for (size_t i = 0; i < entity.model.materials.size(); ++i) {
 		entity.model.materials.at(i).shaderParams.glossiness = 0.9f;
 		entity.model.materials.at(i).shaderParams.metallicness = 0.0f;
+		entity.model.materials.at(i).shaderParams.specBias = 0.0f;
 	}
 }
 
@@ -246,8 +250,9 @@ void EntityUtils::setModelEnemySnake(Entity& entity)
 	entity.model = ModelUtils::loadModel("Assets/Models/hotdog/model.obj");
 
 	for (size_t i = 0; i < entity.model.materials.size(); ++i) {
-		entity.model.materials.at(i).shaderParams.glossiness = 1.0f;
+		entity.model.materials.at(i).shaderParams.glossiness = 0.9f;
 		entity.model.materials.at(i).shaderParams.metallicness = 0.0f;
+		entity.model.materials.at(i).shaderParams.specBias = 0.0f;
 	}
 }
 
@@ -256,8 +261,9 @@ void EntityUtils::setModelEnemyShooter(Entity& entity)
 	entity.model = ModelUtils::loadModel("Assets/Models/fox/model.obj");
 
 	for (size_t i = 0; i < entity.model.materials.size(); ++i) {
-		entity.model.materials.at(i).shaderParams.glossiness = 1.0f;
-		entity.model.materials.at(i).shaderParams.metallicness = 1.0f;
+		entity.model.materials.at(i).shaderParams.glossiness = 0.9f;
+		entity.model.materials.at(i).shaderParams.metallicness = 0.0f;
+		entity.model.materials.at(i).shaderParams.specBias = 0.0f;
 	}
 }
 
@@ -266,9 +272,10 @@ void EntityUtils::setModelScorePickup01(Entity& entity)
 	entity.model = GLPrimitives::getPyramidModel();
 
 	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/green.jpg");
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13;
 }
 
 void EntityUtils::setModelScorePickUp02(Entity& entity)
@@ -276,9 +283,10 @@ void EntityUtils::setModelScorePickUp02(Entity& entity)
 	entity.model = GLPrimitives::getPyramidModel();
 
 	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/green.jpg");
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13;
 }
 
 void EntityUtils::setModelHealthPickUp(Entity& entity)
@@ -286,9 +294,10 @@ void EntityUtils::setModelHealthPickUp(Entity& entity)
 	entity.model = GLPrimitives::getCubeModel();
 
 	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/green.jpg");
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13;
 }
 
 void EntityUtils::setModelPlayer(Entity& entity)
@@ -298,6 +307,7 @@ void EntityUtils::setModelPlayer(Entity& entity)
 	for (size_t i = 0; i < entity.model.materials.size(); ++i) {
 		entity.model.materials.at(i).shaderParams.glossiness = 1.0f;
 		entity.model.materials.at(i).shaderParams.metallicness = 0.0f;
+		entity.model.materials.at(i).shaderParams.specBias = 0;
 	}
 }
 
@@ -306,9 +316,12 @@ void EntityUtils::setModelPlayerBullet(Entity& entity)
 	entity.model = GLPrimitives::getSphereModel();
 
 	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/purple.png");
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/voronoi_purple.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13;
+
+	entity.transform.eulerAngles.x += M_PI_2;
 }
 
 void EntityUtils::setModelEnemyBullet(Entity& entity)
@@ -316,15 +329,22 @@ void EntityUtils::setModelEnemyBullet(Entity& entity)
 	entity.model = GLPrimitives::getSphereModel();
 
 	// Replace default texture
-	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/red.png");
-	entity.model.materials.at(0).shaderParams.glossiness = 0.5f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
+	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/voronoi_red.png");
+	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13;
+
+	entity.transform.eulerAngles.x += M_PI_2;
 }
 
 Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const TransformComponent& transform, std::int32_t entityNetId)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL, COMPONENT_TRANSFORM, 
 	                                    COMPONENT_NETWORK, COMPONENT_PHYSICS);
+
+
+	entity.transform = transform;
+	entity.network.id = entityNetId;
 
 	switch (modelId)
 	{
@@ -359,9 +379,6 @@ Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const TransformC
 		std::cout << "Error: Invalid modelID when trying to create entity ghost" << std::endl;
 		break;
 	}
-
-	entity.transform = transform;
-	entity.network.id = entityNetId;
 
 	return entity;
 }

@@ -45,9 +45,9 @@ Material processMaterial(const aiMaterial* _aiMaterial, const aiScene* scene, co
 	Material material;
 	material.willDrawDepth = true;
 
-	// TODO: Remove these and use texture maps instead
 	material.shaderParams.glossiness = 0.00001f;
 	material.shaderParams.metallicness = 0.00001f;
+	material.shaderParams.specBias = 0;
 
 	// 1. diffuse maps
 	std::vector<Texture> colorMaps = loadMaterialTextures(_aiMaterial, aiTextureType_DIFFUSE, textureDir);

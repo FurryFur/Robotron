@@ -122,22 +122,6 @@ GLuint GLUtils::getMetalShader()
 	return s_shader;
 }
 
-GLuint GLUtils::getColorShader()
-{
-	static GLuint s_shader;
-	static bool s_shaderBuilt = false;
-
-	if (!s_shaderBuilt) {
-		compileAndLinkShaders(
-			"Assets/Shaders/color_vert.glsl",
-			"Assets/Shaders/color_frag.glsl",
-			s_shader);
-		s_shaderBuilt = true;
-	}
-
-	return s_shader;
-}
-
 GLuint GLUtils::getDebugShader()
 {
 	static GLuint s_shader;

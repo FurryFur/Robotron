@@ -165,6 +165,16 @@ void InputSystem::update(Entity& entity)
 				entity.model.materials.at(i).shaderParams.glossiness = clamp(entity.model.materials.at(i).shaderParams.glossiness - 0.01f, 0.0001f, 1.0f);
 			}
 		}
+		if (glfwGetKey(m_window, GLFW_KEY_PAGE_UP) == GLFW_PRESS) {
+			for (size_t i = 0; i < entity.model.materials.size(); ++i) {
+				entity.model.materials.at(i).shaderParams.specBias = clamp(entity.model.materials.at(i).shaderParams.specBias + 0.01f, 0.0f, 0.96f);
+			}
+		}
+		if (glfwGetKey(m_window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS) {
+			for (size_t i = 0; i < entity.model.materials.size(); ++i) {
+				entity.model.materials.at(i).shaderParams.specBias = clamp(entity.model.materials.at(i).shaderParams.specBias - 0.01f, 0.0f, 0.9599f);
+			}
+		}
 	}
 
 	if (entity.hasComponents(COMPONENT_PLAYER, COMPONENT_INPUT, COMPONENT_INPUT_MAP)) {

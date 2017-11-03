@@ -388,12 +388,6 @@
     <None Include="Assets\Shaders\metal_frag.glsl">
       <Filter>Assets\Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\color_vert.glsl">
-      <Filter>Assets\Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\color_frag.glsl">
-      <Filter>Assets\Shaders</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\PlaneTexture.jpg">

@@ -215,9 +215,9 @@ void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& tra
 		}
 
 		// Set shader parameters
-		// TODO: Remove these and use texture maps instead
 		uniforms.metallicness = material.shaderParams.metallicness;
 		uniforms.glossiness = material.shaderParams.glossiness;
+		uniforms.specBias = material.shaderParams.specBias;
 
 		// Send uniform data to the GPU (MVP matrices, cameraPos and shaderParams)
 		GLuint blockIndex = glGetUniformBlockIndex(material.shader, "Uniforms");

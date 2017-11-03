@@ -15,6 +15,7 @@ layout (std140) uniform Uniforms {
 	vec4 cameraPos;
 	float metallicness;
 	float glossiness;
+	float specBias;
 } u;
 
 uniform sampler2D colorSampler;
@@ -62,7 +63,7 @@ void main(void)
 	vec3 LiIrr = texture(irradianceSampler, normal).rgb;
 
 	vec3 metallicness = clamp(u.metallicness + texture(metallicnessSampler, i.texCoord).rgb, vec3(0, 0, 0), vec3(1, 1, 1));
-	vec3 Cspec = mix(vec3(0.04, 0.04, 0.04), color, metallicness);
+	vec3 Cspec = mix(vec3(0.04, 0.04, 0.04) + u.specBias, color, metallicness);
 	vec3 Cdiff = mix(vec3(0, 0, 0), color, 1 - metallicness);
 	vec3 Fspec = fresnel(Cspec, lightDir, halfVector);
 	vec3 Fdiff = Cdiff * (1 - Fspec) / (1.0000001 - Cspec);

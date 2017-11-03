@@ -25,4 +25,5 @@ struct UniformFormat {
 	glm::vec4 cameraPos;
 	GLfloat metallicness;
 	GLfloat glossiness;
+	GLfloat specBias;
 };

@@ -17,6 +17,7 @@ layout (std140) uniform Uniforms {
 	vec4 cameraPos;
 	float metallicness;
 	float glossiness;
+	float specBias;
 } u;
 
 void main()

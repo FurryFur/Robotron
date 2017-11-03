@@ -318,8 +318,9 @@ const ModelComponent& GLPrimitives::getQuadModel()
 		material.shader = GLUtils::getDefaultShader();
 		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
 		material.willDrawDepth = true;
-		material.shaderParams.metallicness = 1.0f;
+		material.shaderParams.metallicness = 0.0f;
 		material.shaderParams.glossiness = 1.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		material.shaderParams.specBias = 0.0f;
 		model.materials.push_back(std::move(material));
 
 		isLoaded = true;
@@ -356,6 +357,7 @@ const ModelComponent& GLPrimitives::getSphereModel()
 		material.willDrawDepth = true;
 		material.shaderParams.metallicness = 0;
 		material.shaderParams.glossiness = 0; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		material.shaderParams.specBias = 0;
 		model.materials.push_back(std::move(material));
 
 		isLoaded = true;
@@ -390,8 +392,9 @@ const ModelComponent& GLPrimitives::getCylinderModel()
 		material.shader = GLUtils::getDefaultShader();
 		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/doge.jpg"));
 		material.willDrawDepth = true;
-		material.shaderParams.metallicness = 1;
+		material.shaderParams.metallicness = 0;
 		material.shaderParams.glossiness = 1.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		material.shaderParams.specBias = 0;
 		model.materials.push_back(std::move(material));
 	
 		isLoaded = true;
@@ -426,8 +429,9 @@ const ModelComponent& GLPrimitives::getPyramidModel()
 		material.shader = GLUtils::getDefaultShader();
 		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture.jpg"));
 		material.willDrawDepth = true;
-		material.shaderParams.metallicness = 1;
+		material.shaderParams.metallicness = 0;
 		material.shaderParams.glossiness = 1.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		material.shaderParams.specBias = 0;
 		model.materials.push_back(std::move(material));
 
 		isLoaded = true;
@@ -462,8 +466,9 @@ const ModelComponent& GLPrimitives::getCubeModel()
 		material.shader = GLUtils::getDefaultShader();
 		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
 		material.willDrawDepth = true;
-		material.shaderParams.metallicness = 1;
+		material.shaderParams.metallicness = 0;
 		material.shaderParams.glossiness = 1.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
+		material.shaderParams.specBias = 0;
 		model.materials.push_back(std::move(material));
 
 		isLoaded = true;
