@@ -83,7 +83,7 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 				}
 				break;
 			}
-		case JOINLOBBY:
+		case LOBBYSEARCH:
 			{
 				// The mouse is within the back button click
 				if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
@@ -117,7 +117,7 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 				// Join button clicked. Enter search for lobby screen.
 				if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 450 && Game::s_mousePosY <= 495 && Game::s_buttonState == JOINDOWN)
 				{
-					Game::s_gameState = JOINLOBBY;
+					Game::s_gameState = LOBBYSEARCH;
 				}
 
 				// Host button clicked. Enter host lobby screen.
@@ -144,7 +144,7 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 				}
 				break;
 			}
-		case JOINLOBBY:
+		case LOBBYSEARCH:
 			{
 				// The mouse is within the back button click
 				if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
@@ -398,7 +398,7 @@ void Game::renderMenuScreens()
 		}
 		break;
 	}
-	case JOINLOBBY:
+	case LOBBYSEARCH:
 	{
 		m_SearchLobbyBackButton.Render();
 		for (unsigned int i = 0; i < Game::m_uiSearchLobbyLabels.size(); ++i)
@@ -480,7 +480,7 @@ void Game::process(float deltaTick)
 		break;
 	}
 	// The game is at the search for lobby screen. A list of available lobbies are shown, clicking one allows the player to join it.
-	case JOINLOBBY:
+	case LOBBYSEARCH:
 	{
 		static NetworkClientSystem* s_client;
 		// If you are the host create the network system
