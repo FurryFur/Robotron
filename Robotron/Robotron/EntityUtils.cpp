@@ -20,8 +20,8 @@ Entity& EntityUtils::createQuad(Scene& scene, const TransformComponent& transfor
 
 
 	entity.model = GLPrimitives::getQuadModel();
-	entity.model.materials.at(0).shaderParams.glossiness = 0.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
 	entity.model.materials.at(0).shaderParams.specBias = 0;
 
 	setDefaultInputBindings(entity.inputMap);
