@@ -34,76 +34,76 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 	{
 		switch (Game::s_gameState)
 		{
-			case MAINMENU:
+		case MAINMENU:
+			{
+				if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 450 && Game::s_mousePosY <= 495)
 				{
-					if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 450 && Game::s_mousePosY <= 495)
-					{
-						Game::s_buttonClicked = true;
-						Game::s_buttonState = JOINDOWN;
-					}
+					Game::s_buttonClicked = true;
+					Game::s_buttonState = JOINDOWN;
+				}
 
-					// The mouse is within the host button click
-					else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 550 && Game::s_mousePosY <= 595)
-					{
-						Game::s_buttonClicked = true;
-						Game::s_buttonState = HOSTDOWN;
-					}
+				// The mouse is within the host button click
+				else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 550 && Game::s_mousePosY <= 595)
+				{
+					Game::s_buttonClicked = true;
+					Game::s_buttonState = HOSTDOWN;
+				}
 
-					// The mouse is within the quit button click
-					else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
-					{
-						Game::s_buttonClicked = true;
-						Game::s_buttonState = QUITDOWN;
-					}
-					break;
-				}
-			case HOSTSETUP:
+				// The mouse is within the quit button click
+				else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
 				{
-					// The mouse is within the back button click
-					if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
-					{
-						Game::s_buttonClicked = true;
-						Game::s_buttonState = BACKDOWN;
-					}
-					break;
+					Game::s_buttonClicked = true;
+					Game::s_buttonState = QUITDOWN;
 				}
-			case LOBBY:
-				{
-					// The mouse is within the back button click
-					if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
-					{
-						Game::s_buttonClicked = true;
-						Game::s_buttonState = BACKDOWN;
-					}
-					// The mouse is within the start button click
-					if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
-					{
-						Game::s_buttonClicked = true;
-						Game::s_buttonState = STARTDOWN;
-					}
-					break;
-				}
-			case JOINLOBBY:
-				{
-					// The mouse is within the back button click
-					if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
-					{
-						Game::s_buttonClicked = true;
-						Game::s_buttonState = BACKDOWN;
-					}
-					// Handlers the visual interaction of the server buttons.
-					for (size_t i = 0; i < Game::s_numServers; ++i)
-					{
-						// The mouse is within the join button click
-						if (Game::s_mousePosY >= 23.0f + i * 40.0f && Game::s_mousePosY <= 63.0f + i * 40.0f)
-						{
-							Game::s_serverNum = i;
-							Game::s_gameState = GAME;
-						}
-					}
-				}
-			default:
 				break;
+			}
+		case HOSTSETUP:
+			{
+				// The mouse is within the back button click
+				if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
+				{
+					Game::s_buttonClicked = true;
+					Game::s_buttonState = BACKDOWN;
+				}
+				break;
+			}
+		case LOBBY:
+			{
+				// The mouse is within the back button click
+				if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
+				{
+					Game::s_buttonClicked = true;
+					Game::s_buttonState = BACKDOWN;
+				}
+				// The mouse is within the start button click
+				if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
+				{
+					Game::s_buttonClicked = true;
+					Game::s_buttonState = STARTDOWN;
+				}
+				break;
+			}
+		case JOINLOBBY:
+			{
+				// The mouse is within the back button click
+				if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695)
+				{
+					Game::s_buttonClicked = true;
+					Game::s_buttonState = BACKDOWN;
+				}
+				// Handlers the visual interaction of the server buttons.
+				for (size_t i = 0; i < Game::s_numServers; ++i)
+				{
+					// The mouse is within the join button click
+					if (Game::s_mousePosY >= 23.0f + i * 40.0f && Game::s_mousePosY <= 63.0f + i * 40.0f)
+					{
+						Game::s_serverNum = i;
+						Game::s_gameState = GAME;
+					}
+				}
+			}
+		default:
+			break;
 		}
 	
 	}
@@ -112,72 +112,70 @@ void glfwGetMouseButtonCallBack(GLFWwindow* window, int button, int action, int 
 	{
 		switch (Game::s_gameState)
 		{
-			case MAINMENU:
-				{
-					// Join button clicked. Enter search for lobby screen.
-					if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 450 && Game::s_mousePosY <= 495 && Game::s_buttonState == JOINDOWN)
-					{
-						Game::s_gameState = JOINLOBBY;
-					}
-
-					// Host button clicked. Enter host lobby screen.
-					else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 550 && Game::s_mousePosY <= 595 && Game::s_buttonState == HOSTDOWN)
-					{
-						Game::s_gameState = HOSTSETUP;
-					}
-
-					// Quit button clicked. The program is closed.
-					else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == QUITDOWN)
-					{
-						glfwDestroyWindow(window);
-						glfwTerminate();
-						exit(EXIT_SUCCESS);
-					}
-					Game::s_buttonState = NOBUTTONDOWN;
-					break;
-				}
-			case HOSTSETUP:
-				{
-					// The mouse is within the back button click
-					if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
-					{
-						Game::s_gameState = MAINMENU;
-					}
-					Game::s_buttonState = NOBUTTONDOWN;
-					break;
-				}
-			case JOINLOBBY:
-				{
-					// The mouse is within the back button click
-					if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
-					{
-						Game::s_gameState = MAINMENU;
-					}
-					Game::s_buttonState = NOBUTTONDOWN;
-					break;
-				}
-			case LOBBY:
-				{
-					// The mouse is within the back button click
-					if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
-					{
-						Game::s_gameState = MAINMENU;
-					}
-					// The mouse is within the start button click
-					if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == STARTDOWN)
-					{
-						Game::s_buttonState = NOBUTTONDOWN;
-						Game::s_gameState = GAME;
-					}
-					Game::s_buttonState = NOBUTTONDOWN;
-					break;
-				}
-			default:
+		case MAINMENU:
 			{
-				Game::s_buttonState = NOBUTTONDOWN;
+				// Join button clicked. Enter search for lobby screen.
+				if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 450 && Game::s_mousePosY <= 495 && Game::s_buttonState == JOINDOWN)
+				{
+					Game::s_gameState = JOINLOBBY;
+				}
+
+				// Host button clicked. Enter host lobby screen.
+				else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 550 && Game::s_mousePosY <= 595 && Game::s_buttonState == HOSTDOWN)
+				{
+					Game::s_gameState = HOSTSETUP;
+				}
+
+				// Quit button clicked. The program is closed.
+				else if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == QUITDOWN)
+				{
+					glfwDestroyWindow(window);
+					glfwTerminate();
+					exit(EXIT_SUCCESS);
+				}
 				break;
 			}
+		case HOSTSETUP:
+			{
+				// The mouse is within the back button click
+				if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
+				{
+					Game::s_gameState = MAINMENU;
+				}
+				break;
+			}
+		case JOINLOBBY:
+			{
+				// The mouse is within the back button click
+				if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
+				{
+					Game::s_gameState = MAINMENU;
+				}
+				break;
+			}
+		case LOBBY:
+			{
+				// The mouse is within the back button click
+				if (Game::s_mousePosX >= 135.0f && Game::s_mousePosX <= 280.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == BACKDOWN)
+				{
+					Game::s_gameState = MAINMENU;
+				}
+				// The mouse is within the start button click
+				if (Game::s_mousePosX >= 635.0f && Game::s_mousePosX <= 780.0f && Game::s_mousePosY >= 650 && Game::s_mousePosY <= 695 && Game::s_buttonState == STARTDOWN)
+				{
+					Game::s_buttonState = NOBUTTONDOWN;
+					Game::s_gameState = GAME;
+				}
+				break;
+			}
+		default:
+		{
+			break;
 		}
+		
+		}
+		// Reset the buttonstate
+		Game::s_buttonState = NOBUTTONDOWN;
 	}
 }
 
@@ -382,37 +380,34 @@ void Game::executeOneFrame()
 
 void Game::renderMenuScreens()
 {
-	//glDepthMask(GL_TRUE);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	// Render the entities in the menu scene
 	m_renderSystem.beginRender();
 
-	// Update all the entities using all the systems.
+	//Update the render system for the entities in the scene
 	for (size_t i = 0; i < m_menuScene.getEntityCount(); ++i)
 		m_renderSystem.update(m_menuScene.getEntity(i));
 
-	// Render the main menu screen.
-	if (s_gameState == MAINMENU)
+	// Render the menu UIs.
+	switch(s_gameState)
+	{
+	case MAINMENU:
 	{
 		for (unsigned int i = 0; i < Game::m_uiMainMenuLabels.size(); ++i)
 		{
 			m_uiMainMenuLabels.at(i).Render();
 			m_userNameInput.Render();
 		}
-
-		//m_mousePosLabel.Render();
+		break;
 	}
-	// Render the host setup screen.
-	else if (s_gameState == JOINLOBBY)
+	case JOINLOBBY:
 	{
 		m_SearchLobbyBackButton.Render();
 		for (unsigned int i = 0; i < Game::m_uiSearchLobbyLabels.size(); ++i)
 		{
 			m_uiSearchLobbyLabels.at(i).Render();
 		}
+		break;
 	}
-	// Render the host setup screen.
-	else if (s_gameState == HOSTSETUP)
+	case HOSTSETUP:
 	{
 		for (unsigned int i = 0; i < Game::m_uiHostSetupLabels.size(); ++i)
 		{
@@ -420,15 +415,15 @@ void Game::renderMenuScreens()
 		}
 
 		m_serverNameInput.Render();
+		break;
 	}
-	// Render the host setup screen.
-	else if (s_gameState == LOBBY)
+	case LOBBY:
 	{
 		for (unsigned int i = 0; i < Game::m_uiLobbyLabels.size(); ++i)
 		{
 			m_uiLobbyLabels.at(i).Render();
 		}
-		// Render the game over labels only after the player has returned from the game
+		// Render the gameover labels only after the player has returned from the game
 		if (m_displayGameOverText == true)
 		{
 			for (unsigned int i = 0; i < Game::m_uiGameOverLabels.size(); ++i)
@@ -436,15 +431,20 @@ void Game::renderMenuScreens()
 				m_uiGameOverLabels.at(i).Render();
 			}
 		}
+		break;
 	}
+	default:
+	{
+		break;
+	}
+	}
+
 	//m_mousePosLabel.Render();
 	m_renderSystem.endRender();
-	//glfwSwapBuffers(m_window);
 }
 
 void Game::process(float deltaTick)
 {
-
 	// If not in the game state read the coordinates of the mouse and render the menu
 	if (s_gameState != GAME)
 	{
@@ -453,14 +453,16 @@ void Game::process(float deltaTick)
 	}
 	
 	// The Game is currently in the main menu. Here the player can search for a lobby by clicking join or host a lobby.
-	if (s_gameState == MAINMENU)
+	switch(s_gameState)
+	{
+	case MAINMENU:
 	{
 		// Reset the network
 		if (m_networkSystem != nullptr)
 			m_networkSystem.reset(nullptr);
-		
+
 		//Set the host to be false if the player is in the main menu
-		if(m_isHost)
+		if (m_isHost)
 			m_isHost = false;
 
 		if (s_buttonClicked == true)
@@ -468,17 +470,17 @@ void Game::process(float deltaTick)
 			m_audio.playButtonClick();
 			s_buttonClicked = false;
 		}
-		
+
 		// The mouse is within the join button click
 		checkButtonHighlight(635.0f, 780.0f, 450.0f, 495.0f, &m_uiMainMenuLabels.at(0), JOINDOWN);
 		// The mouse is within the host button click
 		checkButtonHighlight(635.0f, 780.0f, 550.0f, 595.0f, &m_uiMainMenuLabels.at(1), HOSTDOWN);
 		// The mouse is within the quit button click
 		checkButtonHighlight(635.0f, 780.0f, 650.0f, 695.0f, &m_uiMainMenuLabels.at(2), QUITDOWN);
-		
+		break;
 	}
 	// The game is at the search for lobby screen. A list of available lobbies are shown, clicking one allows the player to join it.
-	else if (s_gameState == JOINLOBBY)
+	case JOINLOBBY:
 	{
 		static NetworkClientSystem* s_client;
 		// If you are the host create the network system
@@ -511,28 +513,28 @@ void Game::process(float deltaTick)
 
 		// The mouse is within the back button click
 		checkButtonHighlight(135.0f, 280.0f, 650.0f, 695.0f, &m_SearchLobbyBackButton, BACKDOWN);
+		break;
 	}
-	// The game is at the host setup screen. Here the player can choose a name of a server before creating it.
-	else if (s_gameState == HOSTSETUP)
+	case HOSTSETUP:
 	{
 		// The mouse is within the back button click
 		checkButtonHighlight(135.0f, 280.0f, 650.0f, 695.0f, &m_uiHostSetupLabels.at(1), BACKDOWN);
+		break;
 	}
-	// The game is at the Lobby screen. Players wait here for the game to start. The host can start the game.
-	else if (s_gameState == LOBBY)
+	case LOBBY:
 	{
 		// If you are the host create the network system
-		if(m_isHost && m_networkSystem == nullptr)
+		if (m_isHost && m_networkSystem == nullptr)
 			m_networkSystem = std::make_unique<NetworkServerSystem>(m_scene, m_serverName);
 
 		// The mouse is within the back button click
 		checkButtonHighlight(135.0f, 280.0f, 650.0f, 695.0f, &m_uiLobbyLabels.at(1), BACKDOWN);
-		
+
 		// The mouse is within the start button click
 		checkButtonHighlight(635.0f, 780.0f, 650.0f, 695.0f, &m_uiLobbyLabels.at(2), STARTDOWN);
+		break;
 	}
-	// The game is in the gameplay screen.
-	else if (s_gameState == GAME)
+	case GAME:
 	{
 		if (m_isHost)
 		{
@@ -571,7 +573,7 @@ void Game::process(float deltaTick)
 		else
 		{
 			sockaddr_in& serverAddress = m_serverAddresses.at(s_serverNum);
-			
+
 			// Create a level if one does not exist
 			if (m_dummyLevel == nullptr)
 				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName);
@@ -580,7 +582,7 @@ void Game::process(float deltaTick)
 			m_dummyLevel->process(deltaTick, m_clock, *m_networkSystem);
 
 			// Check if the game has started and the client can start checking for loss
-			if (!m_checkLoss) 
+			if (!m_checkLoss)
 			{
 				for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 				{
@@ -597,7 +599,7 @@ void Game::process(float deltaTick)
 				m_displayGameOverText = true;
 				// Return to lobby
 				s_gameState = LOBBY;
-			
+
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);
 				auto keyFunc = [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -605,14 +607,16 @@ void Game::process(float deltaTick)
 					game->keyCallback(key, scancode, action, mods);
 				};
 				glfwSetKeyCallback(m_window, keyFunc);
-			
+
 				// Reset the level
 				m_dummyLevel.reset(nullptr);
 			}
 		}
+		break;
 	}
-	//m_mousePosLabel.setText("X: " + std::to_string(s_mousePosX) + " Y: " + std::to_string(s_mousePosY));
-
+	default:
+		break;
+	}
 	glfwPollEvents();
 }
 
