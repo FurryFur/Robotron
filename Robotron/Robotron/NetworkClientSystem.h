@@ -12,6 +12,7 @@
 
 class Scene;
 class Entity;
+class LobbyEventListener;
 struct InputComponent;
 struct Packet;
 
@@ -39,6 +40,8 @@ public:
 	// Join the server at the specified address
 	void joinServer(const sockaddr_in& address);
 
+	void setLobbyEventListener(LobbyEventListener*);
+
 	void createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform);
 	void createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const TransformComponent& transform);
 
@@ -48,7 +51,7 @@ public:
 	bool destroyIfExistsInNetwork(std::int32_t entityNetId);
 private:
 	// Check for and handle broadcast responses and join responses from server
-	void handleServerJoinPackets(const Packet&, const sockaddr_in& address);
+	void handlePreLobbyPackets(const Packet&, const sockaddr_in& address);
 
 	// Handle game state updates received from the server
 	void handleGamePackets(const Packet&, const sockaddr_in& address);
@@ -57,5 +60,6 @@ private:
 	//std::vector<std::unique_ptr<GhostSnapshot>> m_ghostSnapshots;
 	sockaddr_in m_serverAddress;
 	ClientState m_clientState;
+	LobbyEventListener* m_lobbyEventListener;
 };
 
