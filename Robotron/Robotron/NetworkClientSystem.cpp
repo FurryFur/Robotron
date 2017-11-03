@@ -7,6 +7,7 @@
 #include "GhostSnapshot.h"
 #include "RPC.h"
 #include "NetworkServerSystem.h"
+#include "LobbyEventListener.h"
 
 #include <glm\gtx\matrix_interpolation.hpp>
 #include <glm\gtx\compatibility.hpp>
@@ -41,7 +42,7 @@ void NetworkClientSystem::beginFrame()
 		{
 		case CLIENT_STATE_NO_SERVER:
 		case CLIENT_STATE_JOINING:
-			handleServerJoinPackets(m_recvPacket, address);
+			handlePreLobbyPackets(m_recvPacket, address);
 			break;
 		case CLIENT_STATE_IN_LOBBY:
 		case CLIENT_STATE_IN_GAME:
@@ -134,6 +135,11 @@ void NetworkClientSystem::joinServer(const sockaddr_in& address)
 	sendData(joinResq, address);
 }
 
+void NetworkClientSystem::setLobbyEventListener(LobbyEventListener* eventListener)
+{
+	m_lobbyEventListener = eventListener;
+}
+
 void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform)
 {
 	// Destroy existing entities with the same id before creating new ones
@@ -173,7 +179,7 @@ void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const Play
 	m_netEntities.at(entityNetId) = &newEntity;
 }
 
-void NetworkClientSystem::handleServerJoinPackets(const Packet& packet, const sockaddr_in& address)
+void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sockaddr_in& address)
 {
 	switch (packet.packetType)
 	{
@@ -182,16 +188,17 @@ void NetworkClientSystem::handleServerJoinPackets(const Packet& packet, const so
 	case PACKET_TYPE_BROADCAST_RESPONSE:
 		// If we receive a broadcast response from a server in this mode, simple inform the 
 		// lobby event listener.
-		//m_lobbyEventListener.handleBroadcastResponse(packet.serverName, address);
+		if (m_lobbyEventListener)
+			m_lobbyEventListener->handleBroadcastResponse(packet.serverName, address);
 
 		std::cout << "Received broadcast response from server: " 
 		          << packet.serverName << ", at address: " << toString(address)
 		          << std::endl;
 
 		// TODO: Remove auto join, replace with lobby
-		std::cout << "Attempting to auto join server: " << packet.serverName 
-		          << std::endl;
-		joinServer(address);
+		//std::cout << "Attempting to auto join server: " << packet.serverName 
+		//          << std::endl;
+		//joinServer(address);
 
 		break;
 	case PACKET_TYPE_JOIN_RESPONSE:
@@ -203,13 +210,13 @@ void NetworkClientSystem::handleServerJoinPackets(const Packet& packet, const so
 
 			std::cout << "Received join accept from server at address: " 
 			          << toString(address) << std::endl;
-			//m_lobbyEventListener.handleJoinAccepted();
+			m_lobbyEventListener->handleJoinAccepted();
 		} else {
 			m_clientState = CLIENT_STATE_NO_SERVER;
 
 			std::cout << "Received join reject from server at address: " 
 			          << toString(address) << std::endl;
-			//m_lobbyEventListener.handleJoinRejected();
+			m_lobbyEventListener->handleJoinRejected();
 		}
 		break;
 	default:
