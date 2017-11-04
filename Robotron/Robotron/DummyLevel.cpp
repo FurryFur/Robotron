@@ -9,6 +9,7 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
+//DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerIDNum)
 DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username)
 	: m_scene(scene)
 	, m_renderSystem(window, m_scene)
@@ -22,7 +23,7 @@ DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::stri
 	m_inputSystem.registerKeyObserver(this);
 
 	m_window = window;
-
+	//m_playerIDNum = playerIDNum;
 	// Set the UI position, scale, colour
 	m_playerHealth.setPosition(glm::vec2(10.0f, 10.0f));
 	m_playerHealth.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
@@ -88,7 +89,8 @@ void DummyLevel::process(float deltaTick, Clock& clock, NetworkSystem& networkSy
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) 
+		 && m_scene.getEntity(i).player.playerInfo.playerIDNum == m_playerIDNum)
 		{
 			// Update the UI with the player score and health.
 			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives()));
@@ -158,7 +160,8 @@ int DummyLevel::getPlayerScore()
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
+		 && m_scene.getEntity(i).player.playerInfo.playerIDNum == m_playerIDNum)
 			return m_scene.getEntity(i).player.playerInfo.getScore();
 	}
 	return 0;

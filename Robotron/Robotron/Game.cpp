@@ -211,7 +211,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 				// The mouse is within the join button click
 				if (m_mousePosY >= 23.0f + i * 40.0f && m_mousePosY <= 63.0f + i * 40.0f)
 				{
-					m_serverNum = i;
+					m_uiLobbyLabels.at(0).setText("Server: " + m_serverNames.at(i));
 					static_cast<NetworkClientSystem*>(m_networkSystem.get())->joinServer(m_serverAddresses.at(i));
 				}
 			}
@@ -696,11 +696,34 @@ void Game::handleJoinRejected()
 	std::cout << "Error: Failed to connect to the server.";
 }
 
-void Game::handleLobbyUpdate(const std::vector<PlayerInfo>&)
+void Game::handleLobbyUpdate(const std::vector<PlayerInfo>& playerList)
 {
 	// TODO: Add implementation here
 
 	//Check if m_numofConnectPlayers is different to the number connected
+	if (m_numConnectedPlayers != playerList.size())
+	{
+		m_uiPlayerNames.clear();
+		for (size_t i = 0; i < playerList.size(); ++i)
+		{
+			if (m_uiPlayerNames.size() >= i)
+			{
+				if (playerList.at(i).getScore() != 0)
+				{
+					std::string temp = playerList.at(i).username + ": ";
+					temp += playerList.at(i).getScore();
+					createTextLabel(temp, glm::vec2(180.0f, 550.0f - i * 40), &m_uiPlayerNames, 0.5f);
+				}
+				else 
+					createTextLabel(playerList.at(i).username, glm::vec2(180.0f, 550.0f - i * 40), &m_uiPlayerNames, 0.5f);
+			}
+			else
+				std::cout << "Error: Tried to create a label for a player that does not exist";
+		}
+
+		m_numConnectedPlayers = playerList.size();
+	}
 	//If so. clear m_uiPlayerNames and  push the names of each connected player onto m_uiPlayerNames using createTextLabel();
 	// Update m_numofConnectPlayers
+	
 }
