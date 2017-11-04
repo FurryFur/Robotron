@@ -178,7 +178,7 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 	std::unique_ptr<RemoteProcedureCall> rpc;
 	if (entity.hasComponents(COMPONENT_PLAYER)) {
 		// TODO: Replace this
-		rpc = std::make_unique<RPCCreatePlayerGhost>(id, entity.playerStats.playerInfo, entity.transform);
+		rpc = std::make_unique<RPCCreatePlayerGhost>(id, entity.player.playerInfo, entity.transform);
 	}
 	else if (entity.hasComponents(COMPONENT_ZOMBIE)) {
 		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_ZOMBIE,
@@ -335,7 +335,7 @@ void NetworkServerSystem::startGame()
 		transform.position.y = 1;
 		Entity& newPlayer = EntityUtils::createPlayer(m_scene, transform);
 		newPlayer.removeComponents(COMPONENT_INPUT_MAP); // Input will come from the clients
-		newPlayer.playerStats.playerInfo = addressClientInfoPair.second.playerInfo;
+		newPlayer.player.playerInfo = addressClientInfoPair.second.playerInfo;
 		addressClientInfoPair.second.playerEntity = &newPlayer;
 		addToNetworking(newPlayer);
 	}

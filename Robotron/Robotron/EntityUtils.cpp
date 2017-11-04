@@ -403,7 +403,7 @@ Entity & EntityUtils::createPlayerGhost(Scene& scene, const PlayerInfo& playerIn
 	entity.removeComponents(COMPONENT_PLAYER_CONTROL);
 	entity.removeComponents(COMPONENT_INPUT_MAP);
 	entity.network.id = entityNetId;
-	entity.playerStats.playerInfo = playerInfo;
+	entity.player.playerInfo = playerInfo;
 	return entity;
 }
 
