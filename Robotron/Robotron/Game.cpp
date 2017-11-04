@@ -283,6 +283,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			{
 				m_buttonState = NOBUTTONDOWN;
 				m_gameState = GAME;
+				m_networkSystem->startGame();
 			}
 			break;
 		}
