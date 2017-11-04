@@ -146,10 +146,10 @@ void NetworkClientSystem::joinServer(const sockaddr_in& address)
 void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPlayers)
 {
 	// TODO: Add logging here
-	//std::cout << "Received a lobby update, current players:" << std::endl;
-	//for (auto& playerInfo : currentPlayers) {
-	//	std::cout << playerInfo.username << std::endl;
-	//}
+	std::cout << "Received a lobby update, current players:" << std::endl;
+	for (auto& playerInfo : currentPlayers) {
+		std::cout << playerInfo.username << std::endl;
+	}
 
 	if (m_lobbyEventListener.size() > 0)
 	{

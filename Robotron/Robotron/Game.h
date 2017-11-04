@@ -91,6 +91,8 @@ private:
 
 	std::vector <TextLabel> m_uiPlayerNames; // Stores the client names so they can be displayed in the lobby.
 	size_t m_numConnectedPlayers; // Keeps track of the number of connected players. If this changes update the ui for player names
+	bool m_setPlayerIDNum;
+	std::uint8_t m_playerID;
 
 	GLFWwindow* m_window;
 	Clock m_clock;

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, NetworkSystem& networkSystem)
+Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem)
 	: m_scene(scene)
 	, m_networkSystem(networkSystem)
 	, m_renderSystem(window, m_scene)
@@ -30,7 +30,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	m_inSetupPhase = false;
 	m_descendingPlayers = false;
 	m_drawConnectPlayerStats = false;
-
+	m_playerID = playerID;
 	// Create 3D entities.
 	TransformComponent transform{};
 	transform.eulerAngles.x = static_cast<float>(M_PI / 2);
@@ -388,7 +388,9 @@ bool Level::checkPlayersAlive()
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if(m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo.getLives() > 0)
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER)
+			&& m_scene.getEntity(i).player.playerInfo.getLives() > 0
+			&& m_scene.getEntity(i).player.playerInfo.getLives() != 255)
 			return true;
 	}
 
@@ -404,6 +406,7 @@ void Level::respawnDeadPlayers(Clock& clock)
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER)
 		    && m_scene.getEntity(i).player.isRespawning == true
 		    && m_scene.getEntity(i).player.playerInfo.getLives() > 0
+			&& m_scene.getEntity(i).player.playerInfo.getLives() != 255
 		    && m_scene.getEntity(i).player.deathTime + 3.0f <= clock.GetCurTime())
 		{
 			m_scene.getEntity(i).player.isRespawning = false;
@@ -416,15 +419,18 @@ void Level::respawnDeadPlayers(Clock& clock)
 
 void Level::process(float deltaTick, Clock& clock)
 {			
-	
-
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
+		 && m_scene.getEntity(i).player.playerInfo.getPlayerID() == m_playerID)
 		{
 			// Update the UI with the player score and health.
-			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives()));
+			if(m_scene.getEntity(i).player.playerInfo.getLives() != 255)
+				m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives()));
+			else 
+				m_playerHealth.setText("Health: 0");
+
 			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getScore()));
 		}
 
@@ -562,7 +568,8 @@ int Level::getPlayerScore()
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
+		 && m_scene.getEntity(i).player.playerInfo.getPlayerID() == m_playerID)
 			return m_scene.getEntity(i).player.playerInfo.getScore();
 	}
 	return 0;
