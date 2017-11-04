@@ -27,6 +27,7 @@
 class DummyLevel : public IKeyObserver
 {
 public:
+	//DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerIDNum);
 	DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username);
 	~DummyLevel();
 
@@ -43,6 +44,7 @@ private:
 	InputSystem m_inputSystem;
 	PhysicsSystem m_physicsSystem;
 
+	std::uint8_t m_playerIDNum;
 	PlayerStatsMenu m_playerStatsMenu;
 
 	TextLabel m_playerHealth;

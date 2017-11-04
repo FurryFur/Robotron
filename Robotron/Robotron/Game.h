@@ -84,14 +84,13 @@ private:
 	double m_mousePosX;
 	double m_mousePosY;
 	size_t m_numServers; // The total number of successfully reached in broadcast
-	size_t m_serverNum; // The server number in the vector connected to
 	bool m_buttonClicked;
 	std::vector <TextLabel> m_uiSearchLobbyLabels; // Each label is repesents an available network to join. Also holds the back button.
 	std::vector<std::string> m_serverNames; // Stores the servernames when they are received from a broadcast.
 	std::vector<sockaddr_in> m_serverAddresses; // Stores the server addresses when they are received from a broadcast. 
 
 	std::vector <TextLabel> m_uiPlayerNames; // Stores the client names so they can be displayed in the lobby.
-	size_t m_numConnectPlayers; // Keeps track of the number of connected players. If this changes update the ui for player names
+	size_t m_numConnectedPlayers; // Keeps track of the number of connected players. If this changes update the ui for player names
 
 	GLFWwindow* m_window;
 	Clock m_clock;
