@@ -283,6 +283,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			{
 				m_buttonState = NOBUTTONDOWN;
 				m_gameState = GAME;
+				m_networkSystem->startGame();
 			}
 			break;
 		}
@@ -721,4 +722,9 @@ void Game::handleLobbyUpdate(const std::vector<PlayerInfo>& playerList)
 
 		m_numConnectedPlayers = playerList.size();
 	}
+}
+
+void Game::handleGameStart()
+{
+	// TODO: Add implementation here;
 }

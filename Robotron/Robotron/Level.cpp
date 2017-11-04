@@ -37,12 +37,12 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	transform.scale = glm::vec3{ 20.0f, 20.0f, 20.0f };
 	EntityUtils::createQuad(m_scene, transform);
 
-	transform = {};
-	transform.position = glm::vec3{ 0, 1, 0 };
-	Entity& player = EntityUtils::createPlayer(m_scene, transform);
-	player.addComponents(COMPONENT_NETWORK);
+	//transform = {};
+	//transform.position = glm::vec3{ 0, 1, 0 };
+	//Entity& player = EntityUtils::createPlayer(m_scene, transform);
+	//player.addComponents(COMPONENT_NETWORK);
 
-	player.player.playerInfo.username = username;
+	//player.player.playerInfo.username = username;
 
 	// Create the skybox
 	Entity& skybox = EntityUtils::createSkybox(m_scene, {

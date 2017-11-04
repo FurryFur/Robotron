@@ -66,6 +66,7 @@ public:
 	virtual void handleJoinAccepted() override;
 	virtual void handleJoinRejected() override;
 	virtual void handleLobbyUpdate(const std::vector<PlayerInfo>&) override;
+	virtual void handleGameStart() override;
 
 private:
 	void mouseButtonCallBack(GLFWwindow * window, int button, int action, int mods);

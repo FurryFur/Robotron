@@ -96,6 +96,13 @@ bool NetworkClientSystem::isInGame()
 	return m_clientState == CLIENT_STATE_IN_GAME;
 }
 
+void NetworkClientSystem::startGame()
+{
+	m_clientState = CLIENT_STATE_IN_GAME;
+
+	m_lobbyEventListener->handleGameStart();
+}
+
 void NetworkClientSystem::broadcastForServers()
 {
 	m_clientState = CLIENT_STATE_NO_SERVER;

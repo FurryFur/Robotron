@@ -38,8 +38,8 @@ public:
 	virtual void update(Entity&, float deltaTick) override;
 	virtual void endFrame() override;
 	virtual bool isInGame() override;
+	virtual void startGame() override;
 
-	void startGame();
 	void recordInput(std::int32_t entityNetId, const InputComponent& input);
 
 	static const USHORT s_kDefaultServerPort;

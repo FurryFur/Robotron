@@ -21,6 +21,7 @@ public:
 	virtual void update(Entity&, float deltaTick) = 0;
 	virtual void endFrame() = 0;
 	virtual bool isInGame() = 0;
+	virtual void startGame() = 0;
 
 	void registerLobbyEventListener(LobbyEventListener*);
 
