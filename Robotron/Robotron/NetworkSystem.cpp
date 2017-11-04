@@ -1,5 +1,6 @@
 #include "NetworkSystem.h"
 
+#include "socket.h"
 #include "InputComponent.h"
 #include "Packet.h"
 #include "Scene.h"
@@ -134,7 +135,7 @@ void NetworkSystem::bufferRpc(std::unique_ptr<RemoteProcedureCall> rpc)
 	rpcGroup.addRPC(std::move(rpc));
 }
 
-void NetworkSystem::setLobbyEventListener(LobbyEventListener* eventListener)
+void NetworkSystem::registerLobbyEventListener(LobbyEventListener* eventListener)
 {
-	m_lobbyEventListener = eventListener;
+	m_lobbyEventListener.push_back(eventListener);
 }

@@ -16,23 +16,25 @@
 
 #include "TextLabel.h"
 #include "Scene.h"
+#include "LobbyEventListener.h"
 
 #include <vector>
 
-class PlayerStatsMenu
+class PlayerStatsMenu : public LobbyEventListener
 {
 public:
 	PlayerStatsMenu(Scene& scene);
 	~PlayerStatsMenu();
 
-	// Updates the stats of all the connected players in the stats menu
-	void updateStats();
 	// Renders the stats of all the connected players in the stats menu
 	void renderStats();
 
+	virtual void handleLobbyUpdate(const std::vector<PlayerInfo>& playerInfo) override;
+	virtual void handleBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress) override;
+	virtual void handleJoinAccepted() override;
+	virtual void handleJoinRejected() override;
+	virtual void handleGameStart() override;
 private:
-	// Adds text labels equal to the number of players
-	void populateTextLabels();
 
 	Scene& m_scene;
 	std::vector<TextLabel> m_statsScreenLabels;

@@ -540,7 +540,7 @@ void Game::process(float deltaTick)
 			std::unique_ptr<NetworkClientSystem> temp = std::make_unique<NetworkClientSystem>(m_scene, m_userName);
 			s_client = temp.get();
 			m_networkSystem = std::move(temp);
-			s_client->setLobbyEventListener(this);
+			s_client->registerLobbyEventListener(this);
 			s_client->broadcastForServers();
 		}
 		// If he number of servers no longer = the number of buttons. Reset the buttons
@@ -583,7 +583,7 @@ void Game::process(float deltaTick)
 		// If you are the host create the network system
 		if (m_networkSystem == nullptr)
 			m_networkSystem = std::make_unique<NetworkServerSystem>(m_scene, m_userName, m_serverName);
-		m_networkSystem->setLobbyEventListener(this);
+		m_networkSystem->registerLobbyEventListener(this);
 
 		// The mouse is within the back button click
 		checkButtonHighlight(135.0f, 280.0f, 650.0f, 695.0f, &m_uiLobbyLabels.at(1), BACKDOWN);
@@ -598,10 +598,10 @@ void Game::process(float deltaTick)
 		{
 			// Create a level if one does not exist
 			if (m_level == nullptr)
-				m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_scene, m_userName);
+				m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_scene, m_userName, *m_networkSystem);
 
 			// Process the level
-			m_level->process(deltaTick, m_clock, *m_networkSystem);
+			m_level->process(deltaTick, m_clock);
 
 			// Check if all enemies are dead and spawn new ones if so
 			if (!m_level->checkEnemiesAlive())
@@ -632,17 +632,17 @@ void Game::process(float deltaTick)
 		{
 			// Create a level if one does not exist
 			if (m_dummyLevel == nullptr)
-				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName);
+				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName, *m_networkSystem);
 
 			// Process the level
-			m_dummyLevel->process(deltaTick, m_clock, *m_networkSystem);
+			m_dummyLevel->process(deltaTick, m_clock);
 
 			// Check if the game has started and the client can start checking for loss
 			if (!m_checkLoss)
 			{
 				for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 				{
-					if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo->getLives() > 0)
+					if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo.getLives() > 0)
 						m_checkLoss = true;
 				}
 			}
@@ -689,7 +689,7 @@ void Game::handleBroadcastResponse(const std::string& serverName, const sockaddr
 
 void Game::handleJoinAccepted()
 {
-	Game::m_gameState = CLIENTLOBBY;
+	m_gameState = CLIENTLOBBY;
 }
 
 void Game::handleJoinRejected()
@@ -699,8 +699,6 @@ void Game::handleJoinRejected()
 
 void Game::handleLobbyUpdate(const std::vector<PlayerInfo>& playerList)
 {
-	// TODO: Add implementation here
-
 	//Check if m_numofConnectPlayers is different to the number connected
 	if (m_numConnectedPlayers != playerList.size())
 	{
@@ -724,12 +722,9 @@ void Game::handleLobbyUpdate(const std::vector<PlayerInfo>& playerList)
 
 		m_numConnectedPlayers = playerList.size();
 	}
-	//If so. clear m_uiPlayerNames and  push the names of each connected player onto m_uiPlayerNames using createTextLabel();
-	// Update m_numofConnectPlayers
-	
 }
 
 void Game::handleGameStart()
 {
-	// TODO: Add implementation here;
+	m_gameState = GAME;
 }

@@ -51,8 +51,12 @@ void NetworkClientSystem::beginFrame()
 		}
 	}
 
-	if (m_clientState != CLIENT_STATE_NO_SERVER)
-		NetworkSystem::beginFrame();
+	// Check if we will send a packet this frame
+	NetworkSystem::beginFrame();
+
+	// Don't send packets if we have noone to send to
+	if (m_clientState == CLIENT_STATE_NO_SERVER)
+		m_willSendPcktThisFrame = false;
 }
 
 void NetworkClientSystem::update(Entity& entity, float deltaTick)
@@ -79,16 +83,14 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 
 void NetworkClientSystem::endFrame()
 {
-	if (m_clientState != CLIENT_STATE_NO_SERVER) {
-		if (m_willSendPcktThisFrame) {
-			m_sendPacket.packetType = PACKET_TYPE_NORMAL;
-			m_sendPacket.sequenceNum = m_curSeqenceNum;
+	if (m_willSendPcktThisFrame) {
+		m_sendPacket.packetType = PACKET_TYPE_NORMAL;
+		m_sendPacket.sequenceNum = m_curSeqenceNum;
 
-			sendData(m_sendPacket, m_serverAddress);
-		}
-
-		NetworkSystem::endFrame();
+		sendData(m_sendPacket, m_serverAddress);
 	}
+
+	NetworkSystem::endFrame();
 }
 
 bool NetworkClientSystem::isInGame()
@@ -100,7 +102,8 @@ void NetworkClientSystem::startGame()
 {
 	m_clientState = CLIENT_STATE_IN_GAME;
 
-	m_lobbyEventListener->handleGameStart();
+	for (auto eventListener : m_lobbyEventListener)
+		eventListener->handleGameStart();
 }
 
 void NetworkClientSystem::broadcastForServers()
@@ -143,13 +146,16 @@ void NetworkClientSystem::joinServer(const sockaddr_in& address)
 void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPlayers)
 {
 	// TODO: Add logging here
-	std::cout << "Received a lobby update, current players:" << std::endl;
-	for (auto& playerInfo : currentPlayers) {
-		std::cout << playerInfo.username << std::endl;
-	}
+	//std::cout << "Received a lobby update, current players:" << std::endl;
+	//for (auto& playerInfo : currentPlayers) {
+	//	std::cout << playerInfo.username << std::endl;
+	//}
 
-	if (m_clientState == CLIENT_STATE_IN_LOBBY && m_lobbyEventListener)
-		m_lobbyEventListener->handleLobbyUpdate(currentPlayers);
+	if (m_lobbyEventListener.size() > 0)
+	{
+		for (auto eventListener : m_lobbyEventListener)
+			eventListener->handleLobbyUpdate(currentPlayers);
+	}
 }
 
 void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform)
@@ -178,7 +184,7 @@ void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const Play
 
 	// TODO: Conditionally add the player controller if the username matches the clients username
 	// newEntity.addComponents(COMPONENT_PLAYER_CONTROL);
-	if (newEntity.player.playerInfo->getPlayerID() == m_clientPlayerID) {
+	if (newEntity.player.playerInfo.getPlayerID() == m_clientPlayerID) {
 		newEntity.addComponents(COMPONENT_INPUT_MAP);
 		newEntity.inputMap.mouseInputEnabled = false;
 		newEntity.inputMap.leftBtnMap = GLFW_KEY_A;
@@ -202,8 +208,11 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 	case PACKET_TYPE_BROADCAST_RESPONSE:
 		// If we receive a broadcast response from a server in this mode, simple inform the 
 		// lobby event listener.
-		if (m_lobbyEventListener)
-			m_lobbyEventListener->handleBroadcastResponse(packet.serverName, address);
+		if (m_lobbyEventListener.size() > 0)
+		{
+			for (auto eventListener : m_lobbyEventListener)
+				eventListener->handleBroadcastResponse(packet.serverName, address);
+		}
 
 		std::cout << "Received broadcast response from server: " 
 		          << packet.serverName << ", at address: " << toString(address)
@@ -222,15 +231,21 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 
 			std::cout << "Received join accept from server at address: " 
 			          << toString(address) << std::endl;
-			if (m_lobbyEventListener)
-				m_lobbyEventListener->handleJoinAccepted();
+			if (m_lobbyEventListener.size() > 0)
+			{
+				for (auto eventListener : m_lobbyEventListener)
+					eventListener->handleJoinAccepted();
+			}
 		} else {
 			m_clientState = CLIENT_STATE_NO_SERVER;
 
 			std::cout << "Received join reject from server at address: " 
 			          << toString(address) << std::endl;
-			if (m_lobbyEventListener)
-				m_lobbyEventListener->handleJoinRejected();
+			if (m_lobbyEventListener.size() > 0)
+			{
+				for (auto eventListener : m_lobbyEventListener)
+					eventListener->handleJoinRejected();
+			}
 		}
 		break;
 	default:
@@ -252,12 +267,15 @@ void NetworkClientSystem::handleGamePackets(const Packet& packet, const sockaddr
 	// Get figure out which remote procedure calls we got from the server
 	// that we haven't seen before.
 	std::uint32_t seqNumRecvd = packet.sequenceNum;
-	std::uint32_t bufferOffset = std::min((seqNumRecvd - m_lastSeqNumSeen - 1),
-		(static_cast<std::uint32_t>(rpcGroups.size() - 1)));
+	std::int32_t bufferOffset = static_cast<std::int32_t>(seqNumRecvd - m_lastSeqNumSeen - 1);
+	if (bufferOffset > rpcGroups.size() - 1) {
+		std::cout << "WARNING: Missed packet count exceeds redundancy buffer size, may miss Remote Procedure Calls" << std::endl;
+		bufferOffset = static_cast<std::int32_t>(rpcGroups.size()) - 1;
+	}
 
 	// Execute RPCs received from server
-	for (int i = bufferOffset; i >= 0; --i) {
-		const RPCGroup& rpcGroup = rpcGroups.at(i);
+	for (std::int32_t i = bufferOffset; i >= 0; --i) {
+ 		const RPCGroup& rpcGroup = rpcGroups.at(i);
 		for (auto& rpc : rpcGroup.getRpcs()) {
 			rpc->execute();
 		}
@@ -286,6 +304,9 @@ void NetworkClientSystem::handleGamePackets(const Packet& packet, const sockaddr
 					// TODO: Add logging here
 					std::cout << "Warning: Client received snapshot of deleted ghost" << std::endl;
 				}
+			} else {
+				// TODO: Add logging here
+				std::cout << "Warning: Client received snapshot of non-existant ghost" << std::endl;
 			}
 		}
 

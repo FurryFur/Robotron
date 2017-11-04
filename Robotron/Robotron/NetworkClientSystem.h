@@ -1,11 +1,6 @@
 #pragma once
 
 #include "NetworkSystem.h"
-#include "GhostSnapshot.h"
-#include "PlayerInfo.h"
-#include "RPC.h"
-
-#include <glm\glm.hpp>
 
 #include <vector>
 #include <memory>
@@ -13,8 +8,10 @@
 
 class Scene;
 class Entity;
+class PlayerInfo;
 struct InputComponent;
 struct Packet;
+struct sockaddr_in;
 
 enum ClientState {
 	CLIENT_STATE_NO_SERVER,

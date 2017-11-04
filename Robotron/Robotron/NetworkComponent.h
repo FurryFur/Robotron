@@ -1,5 +1,6 @@
 #pragma once
 
+#include "socket.h"
 #include "InputComponent.h"
 
 #include <glm\glm.hpp>
@@ -35,4 +36,8 @@ struct NetworkComponent {
 	// can then decide whether to fast forward the entities current
 	// input state to the last version it has seen.
 	bool receivedInputThisFrame;
+
+	// Set by the server for entities that receive input from remote
+	// clients. Used to lookup client-info by entity client address.
+	sockaddr_in clientAddress;
 };

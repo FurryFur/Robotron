@@ -272,9 +272,6 @@ glm::vec3 followLeader(glm::vec3 targetPosition, glm::vec3 targetVelocity, glm::
 
 void steer(Entity& entity, const glm::vec3& steeringAcceleration)
 {
-	glm::vec3 velocity = entity.physics.velocity;
-	entity.transform.eulerAngles.y = std::atan2f(-velocity.z, velocity.x) - static_cast<float>(M_PI_2);
-
 	// Weight the acceleration according to entities acceleration weight
 	entity.physics.acceleration = steeringAcceleration * entity.controlVars.accelerationWeight;
 
