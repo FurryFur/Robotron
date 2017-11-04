@@ -175,8 +175,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transf
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS
 									  | COMPONENT_PLAYER);
 
-	entity.playerStats.playerInfo.lives = 500;
-	entity.playerStats.playerInfo.score = 0;
+	entity.playerStats.playerInfo.setLives(255);
 	entity.playerStats.extraLifeThreshhold = 1000;
 	entity.transform = transform; // Scale the player model up by default
 	entity.transform.scale *= 5.0f;

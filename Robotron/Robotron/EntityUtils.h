@@ -28,7 +28,7 @@ struct VertexFormat;
 struct Mesh;
 struct InputComponent;
 struct InputMapComponent;
-struct PlayerInfo;
+class PlayerInfo;
 
 enum ModelID : std::uint8_t {
 	MODEL_PLAYER_BULLET,

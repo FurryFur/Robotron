@@ -281,9 +281,6 @@
     <ClInclude Include="Enemy03ControlSystem.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="RPC.h">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
@@ -364,6 +361,9 @@
     </ClInclude>
     <ClInclude Include="CameraComponent.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkComponent.h">
+      <Filter>Header Files\Networking</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

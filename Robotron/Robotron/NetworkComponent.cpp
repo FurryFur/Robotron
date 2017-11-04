@@ -1,5 +1,7 @@
 #include "NetworkComponent.h"
 
+#include "PlayerInfo.h"
+
 NetworkComponent::NetworkComponent()
 	: id{ -1 }
 	, isNewEntity{ true }

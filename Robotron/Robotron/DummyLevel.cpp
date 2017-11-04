@@ -91,8 +91,8 @@ void DummyLevel::process(float deltaTick, Clock& clock, NetworkSystem& networkSy
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
 		{
 			// Update the UI with the player score and health.
-			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.lives));
-			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.score));
+			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.getLives()));
+			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.getScore()));
 		}
 	}
 
@@ -146,7 +146,7 @@ bool DummyLevel::checkPlayersAlive()
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).playerStats.playerInfo.lives > 0)
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).playerStats.playerInfo.getLives() > 0)
 			return true;
 	}
 
@@ -159,7 +159,7 @@ int DummyLevel::getPlayerScore()
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
-			return m_scene.getEntity(i).playerStats.playerInfo.score;
+			return m_scene.getEntity(i).playerStats.playerInfo.getScore();
 	}
 	return 0;
 }

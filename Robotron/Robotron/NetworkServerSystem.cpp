@@ -123,8 +123,6 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 	          << std::endl;
 
 	ClientInfo client;
-	client.playerInfo.lives = 5;
-	client.playerInfo.score = 0;
 	client.playerInfo.username = packet.username;
 	m_clients.insert(std::make_pair(address, client));
 

@@ -26,8 +26,8 @@ void PlayerStatsMenu::updateStats()
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 		{
 			m_statsScreenLabels.at(playerNum).setText((m_scene.getEntity(i).playerStats.playerInfo.username)
-				+ " Lives: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.lives)
-				+ " Score: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.score));
+				+ " Lives: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.getLives())
+				+ " Score: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.getScore()));
 			++playerNum;
 		}
 	}
