@@ -174,7 +174,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transf
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS
 									  | COMPONENT_PLAYER);
 
-	entity.playerStats.playerInfo.lives = 100;
+	entity.playerStats.playerInfo.lives = 500;
 	entity.playerStats.playerInfo.score = 0;
 	entity.playerStats.extraLifeThreshhold = 1000;
 	entity.transform = transform; // Scale the player model up by default
@@ -318,7 +318,7 @@ void EntityUtils::setModelPlayerBullet(Entity& entity)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/voronoi_purple.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
 	entity.model.materials.at(0).shaderParams.specBias = 0.13;
 
 	entity.transform.eulerAngles.x += M_PI_2;
@@ -331,7 +331,7 @@ void EntityUtils::setModelEnemyBullet(Entity& entity)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/voronoi_red.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
 	entity.model.materials.at(0).shaderParams.specBias = 0.13;
 
 	entity.transform.eulerAngles.x += M_PI_2;
