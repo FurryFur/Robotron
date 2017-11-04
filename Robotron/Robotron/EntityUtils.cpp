@@ -10,7 +10,9 @@
 #include "PlayerInfo.h"
 
 #include <glm\gtc\matrix_transform.hpp>
+
 #include <iostream>
+#include <memory>
 
 Entity& EntityUtils::createQuad(Scene& scene, const TransformComponent& transform)
 {
@@ -175,7 +177,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transf
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS
 									  | COMPONENT_PLAYER);
 
-	entity.player.playerInfo.setLives(255);
+	entity.player.playerInfo->setLives(255);
 	entity.player.extraLifeThreshhold = 1000;
 	entity.transform = transform; // Scale the player model up by default
 	entity.transform.scale *= 5.0f;
@@ -383,13 +385,13 @@ Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const TransformC
 	return entity;
 }
 
-Entity & EntityUtils::createPlayerGhost(Scene& scene, const PlayerInfo& playerInfo, const TransformComponent& transform, std::int32_t entityNetId)
+Entity& EntityUtils::createPlayerGhost(Scene& scene, const PlayerInfo& playerInfo, const TransformComponent& transform, std::int32_t entityNetId)
 {
 	Entity& entity = createPlayer(scene, transform);
 	entity.removeComponents(COMPONENT_PLAYER_CONTROL);
 	entity.removeComponents(COMPONENT_INPUT_MAP);
 	entity.network.id = entityNetId;
-	entity.player.playerInfo = playerInfo;
+	*entity.player.playerInfo = playerInfo;
 	return entity;
 }
 

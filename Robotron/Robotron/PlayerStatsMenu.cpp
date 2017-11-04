@@ -25,9 +25,9 @@ void PlayerStatsMenu::updateStats()
 		// Update all the players stats in their text label
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 		{
-			m_statsScreenLabels.at(playerNum).setText((m_scene.getEntity(i).player.playerInfo.username)
-				+ " Lives: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives())
-				+ " Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getScore()));
+			m_statsScreenLabels.at(playerNum).setText((m_scene.getEntity(i).player.playerInfo->username)
+				+ " Lives: " + std::to_string(m_scene.getEntity(i).player.playerInfo->getLives())
+				+ " Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo->getScore()));
 			++playerNum;
 		}
 	}

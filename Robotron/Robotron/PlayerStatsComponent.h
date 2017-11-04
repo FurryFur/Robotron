@@ -15,8 +15,10 @@
 
 #include "PlayerInfo.h"
 
+#include <memory>
+
 struct PlayerStatsComponent {
-	PlayerInfo playerInfo; // the username, score, lives.
+	std::unique_ptr<PlayerInfo> playerInfo; // the username, score, lives.
 	int extraLifeTrack; // Keeps track of the players score until they get a new life. Refreshes when they do.
 	int extraLifeThreshhold; // How many points the player needs to get another life
 	bool isRespawning; // Is true when they are dead and will respawn

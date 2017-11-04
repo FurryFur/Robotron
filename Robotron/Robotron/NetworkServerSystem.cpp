@@ -180,7 +180,7 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 	std::unique_ptr<RemoteProcedureCall> rpc;
 	if (entity.hasComponents(COMPONENT_PLAYER)) {
 		// TODO: Replace this
-		rpc = std::make_unique<RPCCreatePlayerGhost>(id, entity.player.playerInfo, entity.transform);
+		rpc = std::make_unique<RPCCreatePlayerGhost>(id, *entity.player.playerInfo, entity.transform);
 	}
 	else if (entity.hasComponents(COMPONENT_ZOMBIE)) {
 		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_ZOMBIE,
@@ -291,7 +291,7 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 	}
 
 	// Notify clients of updates to player lives and score
-	if (entity.hasComponents(COMPONENT_PLAYER) && entity.player.playerInfo.hasChanged()) {
+	if (entity.hasComponents(COMPONENT_PLAYER) && entity.player.playerInfo->hasChanged()) {
 		std::vector<PlayerInfo> currentPlayers = getPlayers();
 		bufferRpc(std::make_unique<RPCUpdatePlayers>(currentPlayers));
 
@@ -350,11 +350,11 @@ void NetworkServerSystem::startGame()
 	TransformComponent transform{};
 	transform.position.y = 1;
 	m_serverPlayer = &EntityUtils::createPlayer(m_scene, transform);
-	m_serverPlayer->player.playerInfo = m_serverPlayerInfo;
+	m_serverPlayer->player.playerInfo.reset(&m_serverPlayerInfo);
 	for (auto& addressClientInfoPair : m_clients) {
 		Entity& newPlayer = EntityUtils::createPlayer(m_scene, transform);
 		newPlayer.removeComponents(COMPONENT_INPUT_MAP); // Input will come from the clients
-		newPlayer.player.playerInfo = addressClientInfoPair.second.playerInfo;
+		newPlayer.player.playerInfo.reset(&addressClientInfoPair.second.playerInfo);
 		addressClientInfoPair.second.playerEntity = &newPlayer;
 		addToNetworking(newPlayer);
 	}
