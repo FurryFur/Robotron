@@ -32,7 +32,7 @@ public:
 
 class NetworkServerSystem : public NetworkSystem {
 public:
-	NetworkServerSystem(Scene&, const std::string& serverName);
+	NetworkServerSystem(Scene&, const std::string& username, const std::string& serverName);
 
 	virtual void beginFrame() override;
 	virtual void update(Entity&, float deltaTick) override;
@@ -48,6 +48,7 @@ private:
 	std::string m_serverName;
 	std::unordered_map<sockaddr_in, ClientInfo> m_clients;
 	ServerState m_serverState;
+	PlayerInfo m_serverPlayerInfo;
 	Entity* m_serverPlayer;
 
 	using SnapshotBufT = decltype(m_sendPacket.ghostSnapshotBuffer);

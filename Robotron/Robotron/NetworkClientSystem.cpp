@@ -171,12 +171,14 @@ void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const Play
 
 	// TODO: Conditionally add the player controller if the username matches the clients username
 	// newEntity.addComponents(COMPONENT_PLAYER_CONTROL);
-	newEntity.addComponents(COMPONENT_INPUT_MAP);
-	newEntity.inputMap.mouseInputEnabled = false;
-	newEntity.inputMap.leftBtnMap = GLFW_KEY_A;
-	newEntity.inputMap.rightBtnMap = GLFW_KEY_D;
-	newEntity.inputMap.forwardBtnMap = GLFW_KEY_W;
-	newEntity.inputMap.backwardBtnMap = GLFW_KEY_S;
+	if (newEntity.player.playerInfo.getPlayerID() == m_clientPlayerID) {
+		newEntity.addComponents(COMPONENT_INPUT_MAP);
+		newEntity.inputMap.mouseInputEnabled = false;
+		newEntity.inputMap.leftBtnMap = GLFW_KEY_A;
+		newEntity.inputMap.rightBtnMap = GLFW_KEY_D;
+		newEntity.inputMap.forwardBtnMap = GLFW_KEY_W;
+		newEntity.inputMap.backwardBtnMap = GLFW_KEY_S;
+	}
 
 	// Add entity to network system tracking
 	if (entityNetId >= m_netEntities.size())
@@ -212,6 +214,7 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 			// m_clientState = CLIENT_STATE_IN_LOBBY;
 			// For now just jump straight into the game
 			m_clientState = CLIENT_STATE_IN_GAME;
+			m_clientPlayerID = packet.playerID;
 
 			std::cout << "Received join accept from server at address: " 
 			          << toString(address) << std::endl;

@@ -17,7 +17,7 @@
 
 const USHORT NetworkServerSystem::s_kDefaultServerPort = 8456;
 
-NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& serverName)
+NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& username, const std::string& serverName)
 	: NetworkSystem(scene)
 	, m_serverState{ SERVER_STATE_LOBBY_MODE }
 	, m_serverName{ serverName }
@@ -25,6 +25,8 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& server
 	m_socket.initialise(s_kDefaultServerPort);
 	allocateRecvBuffer();
 	RPC::setServer(this);
+
+	m_serverPlayerInfo.username = username;
 
 	// TODO: Create client connection code instead of hard coding single
 	// client
@@ -123,11 +125,13 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 	          << std::endl;
 
 	ClientInfo client;
+	client.playerInfo.setUniquePlayerID();
 	client.playerInfo.username = packet.username;
 	m_clients.insert(std::make_pair(address, client));
 
 	Packet joinResp;
 	joinResp.packetType = PACKET_TYPE_JOIN_RESPONSE;
+	joinResp.playerID = client.playerInfo.getPlayerID();
 	joinResp.joinAccepted = true; // Just always accept join requests for now
 	sendData(joinResp, address);
 
@@ -223,6 +227,7 @@ std::vector<PlayerInfo> NetworkServerSystem::getPlayers()
 {
 	// TODO: Add server player info as well
 	std::vector<PlayerInfo> playerInfo;
+	playerInfo.push_back(m_serverPlayerInfo);
 	for (auto& client : m_clients) {
 		playerInfo.push_back(client.second.playerInfo);
 	}
@@ -342,6 +347,7 @@ void NetworkServerSystem::startGame()
 	TransformComponent transform{};
 	transform.position.y = 1;
 	m_serverPlayer = &EntityUtils::createPlayer(m_scene, transform);
+	m_serverPlayer->player.playerInfo = m_serverPlayerInfo;
 	for (auto& addressClientInfoPair : m_clients) {
 		Entity& newPlayer = EntityUtils::createPlayer(m_scene, transform);
 		newPlayer.removeComponents(COMPONENT_INPUT_MAP); // Input will come from the clients

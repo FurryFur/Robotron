@@ -14,16 +14,17 @@ public:
 	PlayerInfo();
 
 	std::string username;
-	std::uint8_t playerID; // The unique number the player is. ONLY CHANGED IN ENTITY AddComponent()
 
 	std::uint8_t getLives() const;
 	std::uint32_t getScore() const;
+	std::uint8_t getPlayerID();
 	void setLives(std::uint8_t);
 	void addLives(std::uint8_t);
 	void subtractLives(std::uint8_t);
 	void setScore(std::uint32_t);
 	void addScore(std::uint32_t);
 	void subtractScore(std::uint32_t);
+	void setUniquePlayerID();
 
 	// Checks if the lives or score of the player have
 	// changed SINCE THIS FUNCTION WAS LAST CALLED.
@@ -35,6 +36,7 @@ public:
 private:
 	std::uint8_t m_lives;
 	std::uint32_t m_score;
+	std::uint8_t m_playerID;
 	
 	mutable bool m_hasChanged;
 };

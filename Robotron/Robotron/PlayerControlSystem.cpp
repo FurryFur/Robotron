@@ -162,7 +162,7 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 		Entity& bullet = EntityUtils::createPlayerBullet(m_scene, transform);
 
 		bullet.physics.velocity = bulletVelocity;
-		bullet.playerBullet.playerIDNum = entity.player.playerInfo.playerID;
+		bullet.playerBullet.playerIDNum = entity.player.playerInfo.getPlayerID();
 		m_audio.playSFX(PLAYER_SHOOT);
 	}
 }

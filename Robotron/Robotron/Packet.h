@@ -35,6 +35,7 @@ struct Packet {
 
 	// Join response packet contents
 	bool joinAccepted;
+	std::uint8_t playerID;
 
 	// Normal packet contents
 	std::uint32_t sequenceNum;
