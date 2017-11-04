@@ -48,6 +48,7 @@ private:
 	std::string m_serverName;
 	std::unordered_map<sockaddr_in, ClientInfo> m_clients;
 	ServerState m_serverState;
+	Entity* m_serverPlayer;
 
 	using SnapshotBufT = decltype(m_sendPacket.ghostSnapshotBuffer);
 

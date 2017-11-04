@@ -67,6 +67,10 @@ void Entity::addComponents(size_t componentMask)
 	if (matches(componentMask, COMPONENT_PLAYER)) {
 		m_componentMask |= COMPONENT_PLAYER;
 		player = {};
+		// Create the player's unique ID num
+		static std::uint8_t freeId = 0;
+		player.playerInfo.playerID = freeId;
+		++freeId;
 	}
 	if (matches(componentMask, COMPONENT_INPUT)) {
 		m_componentMask |= COMPONENT_INPUT;
