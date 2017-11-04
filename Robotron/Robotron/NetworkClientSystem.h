@@ -31,6 +31,7 @@ public:
 	virtual void update(Entity&, float deltaTick) override;
 	virtual void endFrame() override;
 	virtual bool isInGame() override;
+	virtual void startGame() override;
 
 	// Sends out a broadcast message for servers on the local network.
 	// Changes the state of the client to CLIENT_STATE_NO_SERVER.

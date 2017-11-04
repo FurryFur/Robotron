@@ -57,6 +57,9 @@ InBufferStream& RPCGroup::deserialize(InBufferStream& ibs)
 		case RPC_UPDATE_PLAYERS:
 			rpc = std::make_unique<RPCUpdatePlayers>();
 			break;
+		case RPC_START_GAME:
+			rpc = std::make_unique<RPCStartGame>();
+			break;
 		default:
 			ibs.setError(IBS_ERROR_CORRUPT_DATA);
 			break;
@@ -286,5 +289,25 @@ InBufferStream& RPCUpdatePlayers::deserialize(InBufferStream& ibs)
 	for (PlayerInfo& playerInfo : m_currentPlayers)
 		ibs >> playerInfo;
 
+	return ibs;
+}
+
+void RPCStartGame::execute()
+{
+	if (g_clientSystem)
+		g_clientSystem->startGame();
+	else {
+		// TODO: Add logging here
+		std::cout << "WARNING: Received a Start Game RPC on a non-client, or RPC client not set" << std::endl;
+	}
+}
+
+OutBufferStream& RPCStartGame::serialize(OutBufferStream& obs) const
+{
+	return obs << RPC_START_GAME;
+}
+
+InBufferStream& RPCStartGame::deserialize(InBufferStream& ibs)
+{
 	return ibs;
 }

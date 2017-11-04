@@ -343,6 +343,9 @@ void NetworkServerSystem::startGame()
 {
 	m_serverState = SERVER_STATE_IN_GAME;
 
+	// Tell the clients to start their game instance
+	bufferRpc(std::make_unique<RPCStartGame>());
+
 	// Create entities for each player to possess
 	TransformComponent transform{};
 	transform.position.y = 1;

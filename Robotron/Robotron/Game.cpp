@@ -704,3 +704,8 @@ void Game::handleLobbyUpdate(const std::vector<PlayerInfo>&)
 	//If so. clear m_uiPlayerNames and  push the names of each connected player onto m_uiPlayerNames using createTextLabel();
 	// Update m_numofConnectPlayers
 }
+
+void Game::handleGameStart()
+{
+	// TODO: Add implementation here;
+}

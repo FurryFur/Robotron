@@ -22,7 +22,8 @@ enum RPCType : std::uint8_t {
 	RPC_CREATE_GHOST,
 	RPC_DESTROY_GHOST,
 	RPC_RECORD_INPUT,
-	RPC_UPDATE_PLAYERS
+	RPC_UPDATE_PLAYERS,
+	RPC_START_GAME
 };
 
 namespace RPC {
@@ -116,6 +117,15 @@ public:
 
 private:
 	std::vector<PlayerInfo> m_currentPlayers;
+};
+
+// A remote procedure call sent from the server to start the game
+// on the client machines
+class RPCStartGame : public RemoteProcedureCall {
+public:
+	virtual void execute() override;
+	virtual OutBufferStream& serialize(OutBufferStream&) const override;
+	virtual InBufferStream& deserialize(InBufferStream&) override;
 };
 
 // Remote procedure call collection.
