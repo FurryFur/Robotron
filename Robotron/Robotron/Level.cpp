@@ -333,9 +333,13 @@ void Level::initalizeNextLevel()
 			m_scene.destroyEntity(m_scene.getEntity(i));
 		}
 
-		// Move the player back to the centre point of the level
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 		{
+			// If there is a dead player, give them an extra life.
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).playerStats.playerInfo.lives == 0)
+				++m_scene.getEntity(i).playerStats.playerInfo.lives;
+			
+			// Move the players back to the centre point of the level
 			m_scene.getEntity(i).transform.position.x = 0.0f;
 			m_scene.getEntity(i).transform.position.z = 0.0f;
 		}

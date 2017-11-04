@@ -40,7 +40,6 @@ void NetworkClientSystem::beginFrame()
 		switch (m_clientState)
 		{
 		case CLIENT_STATE_NO_SERVER:
-		case CLIENT_STATE_JOINING:
 			handlePreLobbyPackets(m_recvPacket, address);
 			break;
 		case CLIENT_STATE_IN_LOBBY:
@@ -52,7 +51,8 @@ void NetworkClientSystem::beginFrame()
 		}
 	}
 
-	NetworkSystem::beginFrame();
+	if (m_clientState != CLIENT_STATE_NO_SERVER)
+		NetworkSystem::beginFrame();
 }
 
 void NetworkClientSystem::update(Entity& entity, float deltaTick)
@@ -79,14 +79,16 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 
 void NetworkClientSystem::endFrame()
 {
-	if (m_willSendPcktThisFrame) {
-		m_sendPacket.packetType = PACKET_TYPE_NORMAL;
-		m_sendPacket.sequenceNum = m_curSeqenceNum;
+	if (m_clientState != CLIENT_STATE_NO_SERVER) {
+		if (m_willSendPcktThisFrame) {
+			m_sendPacket.packetType = PACKET_TYPE_NORMAL;
+			m_sendPacket.sequenceNum = m_curSeqenceNum;
 
-		sendData(m_sendPacket, m_serverAddress);
+			sendData(m_sendPacket, m_serverAddress);
+		}
+
+		NetworkSystem::endFrame();
 	}
-
-	NetworkSystem::endFrame();
 }
 
 bool NetworkClientSystem::isInGame()
@@ -123,8 +125,6 @@ void NetworkClientSystem::broadcastForServers()
 
 void NetworkClientSystem::joinServer(const sockaddr_in& address)
 {
-	m_clientState = CLIENT_STATE_JOINING;
-
 	m_serverAddress = address;
 
 	Packet joinResq;
@@ -201,9 +201,9 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 		          << std::endl;
 
 		// TODO: Remove auto join, replace with lobby
-		std::cout << "Attempting to auto join server: " << packet.serverName 
-		          << std::endl;
-		joinServer(address);
+		//std::cout << "Attempting to auto join server: " << packet.serverName 
+		//          << std::endl;
+		//joinServer(address);
 
 		break;
 	case PACKET_TYPE_JOIN_RESPONSE:

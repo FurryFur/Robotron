@@ -34,6 +34,7 @@ enum GameState
 	LOBBYSEARCH,
 	HOSTSETUP,
 	LOBBY,
+	DUMMYLOBBY,
 	GAME
 };
 
@@ -61,6 +62,9 @@ public:
 	static size_t s_numServers; // The total number of successfully reached in broadcast
 	static size_t s_serverNum; // The server number in the vector connected to
 	static bool s_buttonClicked;
+	static std::vector <TextLabel> s_uiSearchLobbyLabels; // Each label is repesents an available network to join. Also holds the back button.
+	static std::vector<std::string> s_serverNames; // Stores the servernames when they are received from a broadcast.
+	static std::vector<sockaddr_in> s_serverAddresses; // Stores the server addresses when they are received from a broadcast. 
 
 	static void registerKeyObserver(IKeyObserver * observer);
 
@@ -75,7 +79,7 @@ public:
 	virtual void handleLobbyUpdate(const std::vector<PlayerInfo>&) override;
 
 private:
-
+	void mouseButtonCallBack(GLFWwindow * window, int button, int action, int mods);
 	// Creates a text label
 	void createTextLabel(std::string labelText, glm::vec2 position, std::vector<TextLabel>* screenVector, float scale = 1.0f);
 	// Checks if the mouse is within the coords of a button. Glow white if not click. Glow red if clicked down on.
@@ -96,13 +100,9 @@ private:
 	std::vector <TextLabel> m_uiHostSetupLabels;
 	std::vector <TextLabel> m_uiLobbyLabels;
 	std::vector <TextLabel> m_uiGameOverLabels;
-	std::vector <TextLabel> m_uiSearchLobbyLabels; // Each label is repesents an available network to join. Also holds the back button.
 	TextLabel m_SearchLobbyBackButton;
 
 	std::unique_ptr<NetworkSystem> m_networkSystem;
-
-	std::vector<std::string> m_serverNames; // Stores the servernames when they are received from a broadcast.
-	std::vector<sockaddr_in> m_serverAddresses; // Stores the server addresses when they are received from a broadcast. 
 
 	std::unique_ptr<Level> m_level;
 	std::unique_ptr<DummyLevel> m_dummyLevel;
