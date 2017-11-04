@@ -49,7 +49,7 @@
 class Level : public IKeyObserver
 {
 public:
-	Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username);
+	Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, NetworkSystem& networkSystem);
 	~Level();
 
 	// Increases the level count of the game and spawns the next enemies.
@@ -58,7 +58,7 @@ public:
 	bool checkEnemiesAlive();
 	// Returns true if there are still alive players in the level.
 	bool checkPlayersAlive();
-	void process(float deltaTick, Clock& clock, NetworkSystem& networkSystem);
+	void process(float deltaTick, Clock& clock);
 	void triggerNextLevel();
 	// Get the player's score
 	int getPlayerScore();
@@ -70,6 +70,7 @@ private:
 	void processSetUpPhase();
 
 	Scene& m_scene;
+	NetworkSystem& m_networkSystem;
 	Audio m_audio;
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;

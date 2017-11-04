@@ -3,8 +3,9 @@
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username)
+Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, NetworkSystem& networkSystem)
 	: m_scene(scene)
+	, m_networkSystem(networkSystem)
 	, m_renderSystem(window, m_scene)
 	, m_playerControlSystem(m_scene, audio)
 	, m_inputSystem(window, m_scene, clock)
@@ -22,6 +23,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	Scene::makeSceneCurrent(&m_scene);
 	m_audio = audio;
 	m_inputSystem.registerKeyObserver(this);
+	m_networkSystem.registerLobbyEventListener(&m_playerStatsMenu);
 
 	m_window = window;
 	m_levelNum = -1;
@@ -412,7 +414,7 @@ void Level::respawnDeadPlayers(Clock& clock)
 	}
 }
 
-void Level::process(float deltaTick, Clock& clock, NetworkSystem& networkSystem)
+void Level::process(float deltaTick, Clock& clock)
 {			
 	
 
@@ -460,7 +462,7 @@ void Level::process(float deltaTick, Clock& clock, NetworkSystem& networkSystem)
 		m_playerbulletsystem.update(entity);
 		m_enemybulletsystem.update(entity);
 		m_physicsSystem.update(entity, deltaTick);
-		networkSystem.update(entity, deltaTick);
+		m_networkSystem.update(entity, deltaTick);
 		m_renderSystem.update(entity);
 	}
 
@@ -474,7 +476,7 @@ void Level::process(float deltaTick, Clock& clock, NetworkSystem& networkSystem)
 	// Draw all the player stats only if the flag is set to true.
 	if (m_drawConnectPlayerStats)
 	{
-		m_playerStatsMenu.updateStats();
+		//m_playerStatsMenu.updateStats();
 		m_playerStatsMenu.renderStats();
 	}
 

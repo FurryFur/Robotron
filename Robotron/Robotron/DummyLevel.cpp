@@ -10,8 +10,9 @@
 #include <glm\gtc\matrix_transform.hpp>
 
 //DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerIDNum)
-DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username)
+DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, NetworkSystem& networkSystem)
 	: m_scene(scene)
+	, m_networkSystem(networkSystem)
 	, m_renderSystem(window, m_scene)
 	, m_inputSystem(window, m_scene, clock)
 	, m_playerScore("Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
@@ -21,6 +22,9 @@ DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::stri
 {
 	Scene::makeSceneCurrent(&m_scene);
 	m_inputSystem.registerKeyObserver(this);
+
+
+	m_networkSystem.registerLobbyEventListener(&m_playerStatsMenu);
 
 	m_window = window;
 	//m_playerIDNum = playerIDNum;
@@ -84,7 +88,7 @@ DummyLevel::~DummyLevel()
 {
 }
 
-void DummyLevel::process(float deltaTick, Clock& clock, NetworkSystem& networkSystem)
+void DummyLevel::process(float deltaTick, Clock& clock)
 {
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
@@ -101,22 +105,21 @@ void DummyLevel::process(float deltaTick, Clock& clock, NetworkSystem& networkSy
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
-	networkSystem.beginFrame();
 
 	// Update all the entities using all the systems.
 	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
 		Entity& entity = m_scene.getEntity(i);
 		m_inputSystem.update(entity);
 		m_physicsSystem.update(entity, deltaTick);
-		networkSystem.update(entity, deltaTick);
+		m_networkSystem.update(entity, deltaTick);
 		m_renderSystem.update(entity);
 	}
 
 	// Draw all the player stats only if the flag is set to true.
 	if (m_drawConnectPlayerStats)
 	{
-		m_playerStatsMenu.updateStats();
-		m_playerStatsMenu.renderStats();
+		//m_playerStatsMenu.updateStats();
+			m_playerStatsMenu.renderStats();
 	}
 
 	m_playerScore.Render();
@@ -124,7 +127,6 @@ void DummyLevel::process(float deltaTick, Clock& clock, NetworkSystem& networkSy
 
 	// Do operations that should happen at the end of the frame.
 	m_renderSystem.endRender();
-	networkSystem.endFrame();
 }
 
 void DummyLevel::keyCallback(int key, int scancode, int action, int mods)

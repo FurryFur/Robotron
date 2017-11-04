@@ -139,9 +139,11 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 	std::vector<PlayerInfo> currentPlayers = getPlayers();
 	bufferRpc(std::make_unique<RPCUpdatePlayers>(currentPlayers));
 	
-	if (m_serverState == SERVER_STATE_LOBBY_MODE && m_lobbyEventListener)
-		m_lobbyEventListener->handleLobbyUpdate(getPlayers());
-
+	if (m_serverState == SERVER_STATE_LOBBY_MODE && m_lobbyEventListener.size() > 0)
+	{
+		for (auto eventListener : m_lobbyEventListener)
+			eventListener->handleLobbyUpdate(getPlayers());
+	}
 	// TODO: Don't auto start the game, stay in lobby until game is started
 	//startGame();
 }
@@ -295,8 +297,11 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 		std::vector<PlayerInfo> currentPlayers = getPlayers();
 		bufferRpc(std::make_unique<RPCUpdatePlayers>(currentPlayers));
 
-		if (m_lobbyEventListener)
-			m_lobbyEventListener->handleLobbyUpdate(currentPlayers);
+		if (m_lobbyEventListener.size() > 0)
+		{
+			for (auto eventListener : m_lobbyEventListener)
+				eventListener->handleLobbyUpdate(currentPlayers);
+		}
 	}
 }
 

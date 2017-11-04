@@ -22,7 +22,7 @@ public:
 	virtual void endFrame() = 0;
 	virtual bool isInGame() = 0;
 
-	void setLobbyEventListener(LobbyEventListener*);
+	void registerLobbyEventListener(LobbyEventListener*);
 
 private:
 	std::vector<char> m_recvBuffer;
@@ -44,7 +44,7 @@ protected:
 	CSocket m_socket;
 	Scene& m_scene;
 	std::vector<Entity*> m_netEntities;
-	LobbyEventListener* m_lobbyEventListener;
+	std::vector<LobbyEventListener*> m_lobbyEventListener;
 
 	// Determines whether the implementing client/server will send out a packet
 	// this frame or not

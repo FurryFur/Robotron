@@ -28,16 +28,17 @@ class DummyLevel : public IKeyObserver
 {
 public:
 	//DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerIDNum);
-	DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username);
+	DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, NetworkSystem& networkSystem);
 	~DummyLevel();
 
-	void process(float deltaTick, Clock& clock, NetworkSystem& networkSystem);
+	void process(float deltaTick, Clock& clock);
 
 	// Returns true if there are still alive players in the level.
 	bool checkPlayersAlive();
 	// Get the player's score
 	int getPlayerScore();
 private:
+	NetworkSystem& m_networkSystem;
 	Scene& m_scene;
 	GLFWwindow* m_window;
 	RenderSystem m_renderSystem;

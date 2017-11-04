@@ -134,7 +134,7 @@ void NetworkSystem::bufferRpc(std::unique_ptr<RemoteProcedureCall> rpc)
 	rpcGroup.addRPC(std::move(rpc));
 }
 
-void NetworkSystem::setLobbyEventListener(LobbyEventListener* eventListener)
+void NetworkSystem::registerLobbyEventListener(LobbyEventListener* eventListener)
 {
-	m_lobbyEventListener = eventListener;
+	m_lobbyEventListener.push_back(eventListener);
 }

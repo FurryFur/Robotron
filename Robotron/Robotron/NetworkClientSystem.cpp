@@ -141,8 +141,11 @@ void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPl
 		std::cout << playerInfo.username << std::endl;
 	}
 
-	if (m_clientState == CLIENT_STATE_IN_LOBBY && m_lobbyEventListener)
-		m_lobbyEventListener->handleLobbyUpdate(currentPlayers);
+	if (m_lobbyEventListener.size() > 0)
+	{
+		for (auto eventListener : m_lobbyEventListener)
+			eventListener->handleLobbyUpdate(currentPlayers);
+	}
 }
 
 void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform)
@@ -195,8 +198,11 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 	case PACKET_TYPE_BROADCAST_RESPONSE:
 		// If we receive a broadcast response from a server in this mode, simple inform the 
 		// lobby event listener.
-		if (m_lobbyEventListener)
-			m_lobbyEventListener->handleBroadcastResponse(packet.serverName, address);
+		if (m_lobbyEventListener.size() > 0)
+		{
+			for (auto eventListener : m_lobbyEventListener)
+				eventListener->handleBroadcastResponse(packet.serverName, address);
+		}
 
 		std::cout << "Received broadcast response from server: " 
 		          << packet.serverName << ", at address: " << toString(address)
@@ -215,15 +221,21 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 
 			std::cout << "Received join accept from server at address: " 
 			          << toString(address) << std::endl;
-			if (m_lobbyEventListener)
-				m_lobbyEventListener->handleJoinAccepted();
+			if (m_lobbyEventListener.size() > 0)
+			{
+				for (auto eventListener : m_lobbyEventListener)
+					eventListener->handleJoinAccepted();
+			}
 		} else {
 			m_clientState = CLIENT_STATE_NO_SERVER;
 
 			std::cout << "Received join reject from server at address: " 
 			          << toString(address) << std::endl;
-			if (m_lobbyEventListener)
-				m_lobbyEventListener->handleJoinRejected();
+			if (m_lobbyEventListener.size() > 0)
+			{
+				for (auto eventListener : m_lobbyEventListener)
+					eventListener->handleJoinRejected();
+			}
 		}
 		break;
 	default:
