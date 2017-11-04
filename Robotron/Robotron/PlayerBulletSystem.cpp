@@ -69,15 +69,16 @@ void PlayerBulletSystem::update(Entity& entity)
 			m_scene.destroyEntity(entity);
 			// Damage the enemy.
 			--m_scene.getEntity(i).aiVariables.lives;
-			// Check if the enemy is below 0 health before killing them and adding the score to the players score
+			// Check if the enemy is below 0 health before killing them and adding the score to the correct players score
 			if (m_scene.getEntity(i).aiVariables.lives <= 0)
 			{
 				for (size_t j = 0; j < m_scene.getEntityCount(); ++j)
 				{
-					if (m_scene.getEntity(j).hasComponentsAny(COMPONENT_PLAYER_CONTROL))
+					if (m_scene.getEntity(j).hasComponentsAny(COMPONENT_PLAYER) 
+						&& entity.playerBullet.playerIDNum == m_scene.getEntity(j).player.playerInfo.playerIDNum)
 					{
-						m_scene.getEntity(j).playerStats.playerInfo.addScore(m_scene.getEntity(i).aiVariables.score);
-						m_scene.getEntity(j).playerStats.extraLifeTrack += m_scene.getEntity(i).aiVariables.score;
+						m_scene.getEntity(j).player.playerInfo.addScore(m_scene.getEntity(i).aiVariables.score);
+						m_scene.getEntity(j).player.extraLifeTrack += m_scene.getEntity(i).aiVariables.score;
 					}
 				}
 

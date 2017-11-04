@@ -4,6 +4,7 @@
 #include "ModelComponent.h"
 #include "ControlComponent.h"
 #include "PlayerStatsComponent.h"
+#include "PlayerBulletComponent.h"
 #include "LogicComponent.h"
 #include "InputMapComponent.h"
 #include "PhysicsComponent.h"
@@ -28,7 +29,7 @@ enum ComponentMask {
 	COMPONENT_SCOREPICKUP = 1 << 12,
 	COMPONENT_PLAYERBULLET = 1 << 13,
 	COMPONENT_ENEMYBULLET = 1 << 14,
-	COMPONENT_PLAYER = 1 << 15
+	COMPONENT_PLAYER = 1 << 15,
 };
 
 class Entity {
@@ -37,7 +38,8 @@ public:
 	PhysicsComponent physics;
 	ModelComponent model;
 	ControlComponent controlVars;
-	PlayerStatsComponent playerStats;
+	PlayerStatsComponent player;
+	PlayerBulletComponent playerBullet;
 	InputComponent input;
 	InputMapComponent inputMap;
 	LogicComponent logicVars;
