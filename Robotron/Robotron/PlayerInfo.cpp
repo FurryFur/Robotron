@@ -3,8 +3,7 @@
 #include "BufferStream.h"
 
 PlayerInfo::PlayerInfo()
-	: username{ "Anonymous" }
-	, m_lives{ s_kDefaultLives }
+	: m_lives{ s_kDefaultLives }
 	, m_score{ 0 }
 	, m_hasChanged{ false }
 {

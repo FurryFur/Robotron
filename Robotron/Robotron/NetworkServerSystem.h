@@ -1,11 +1,8 @@
 #pragma once
 
 #include "NetworkSystem.h"
-#include "socket.h"
-#include "RPC.h"
-#include "ClientInfo.h"
-#include "InputComponent.h"
 #include "PlayerInfo.h"
+#include "ClientInfo.h"
 
 #include <vector>
 #include <unordered_map>
@@ -16,6 +13,8 @@
 class Scene;
 class Entity;
 struct Packet;
+struct sockaddr_in;
+struct InputComponent;
 
 enum ServerState {
 	SERVER_STATE_LOBBY_MODE,

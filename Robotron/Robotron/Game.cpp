@@ -642,7 +642,7 @@ void Game::process(float deltaTick)
 			{
 				for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 				{
-					if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo->getLives() > 0)
+					if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo.getLives() > 0)
 						m_checkLoss = true;
 				}
 			}
@@ -689,7 +689,7 @@ void Game::handleBroadcastResponse(const std::string& serverName, const sockaddr
 
 void Game::handleJoinAccepted()
 {
-	Game::m_gameState = CLIENTLOBBY;
+	m_gameState = CLIENTLOBBY;
 }
 
 void Game::handleJoinRejected()
@@ -726,5 +726,5 @@ void Game::handleLobbyUpdate(const std::vector<PlayerInfo>& playerList)
 
 void Game::handleGameStart()
 {
-	// TODO: Add implementation here;
+	m_gameState = GAME;
 }

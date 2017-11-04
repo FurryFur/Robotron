@@ -1,5 +1,7 @@
 #include "NetworkServerSystem.h"
 
+#include "socket.h"
+#include "PlayerInfo.h"
 #include "Scene.h"
 #include "Packet.h"
 #include "Entity.h"
@@ -27,6 +29,7 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& userna
 	RPC::setServer(this);
 
 	m_serverPlayerInfo.username = username;
+	m_serverPlayerInfo.setUniquePlayerID();
 
 	// TODO: Create client connection code instead of hard coding single
 	// client
@@ -67,11 +70,14 @@ void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr
 	// that we haven't seen before.
 	std::uint32_t seqNumSeen = clientIt->second.lastSeqNumSeen;
 	std::uint32_t seqNumRecvd = packet.sequenceNum;
-	std::uint32_t bufferOffset = std::min((seqNumRecvd - seqNumSeen - 1),
-			                              (static_cast<std::uint32_t>(packet.rpcGroupBuffer.size() - 1)));
+	std::int32_t bufferOffset = static_cast<std::int32_t>(seqNumRecvd - seqNumSeen - 1);
+	if (bufferOffset > packet.rpcGroupBuffer.size() - 1) {
+		std::cout << "WARNING: Missed packet count exceeds redundancy buffer size, may miss Remote Procedure Calls" << std::endl;
+		bufferOffset = static_cast<std::int32_t>(packet.rpcGroupBuffer.size()) - 1;
+	}
 		
 	// Execute RPCs received from client
-	for (int i = bufferOffset; i >= 0; --i) {
+	for (std::int32_t i = bufferOffset; i >= 0; --i) {
 		const RPCGroup& rpcGroup = packet.rpcGroupBuffer.at(i);
 		for (auto& rpc : rpcGroup.getRpcs()) {
 			// TODO: Add check to make sure rpc is being executed
@@ -155,18 +161,17 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 	std::int32_t id = entity.network.id;
 
 	// Check if we can reuse the entities current id
-	if (0 <= id && id < m_netEntities.size())
+	if (0 <= id && id < m_netEntities.size()) {
 		// Reuse existing id from old entity
 		m_netEntities.at(id) = &entity;
-	else {
+	} else {
 		// Check for a free id
 		auto freeIt = std::find(m_netEntities.begin(), m_netEntities.end(), nullptr);
 		if (freeIt != m_netEntities.end()) {
 			// Assign the new entity a free id if found
 			entity.network.id = static_cast<std::int32_t>(std::distance(m_netEntities.begin(), freeIt));
 			*freeIt = &entity;
-		}
-		else {
+		} else {
 			// Otherwise assign the new entity a brand new id
 			entity.network.id = static_cast<std::int32_t>(m_netEntities.size());
 			m_netEntities.push_back(&entity);
@@ -182,7 +187,7 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 	std::unique_ptr<RemoteProcedureCall> rpc;
 	if (entity.hasComponents(COMPONENT_PLAYER)) {
 		// TODO: Replace this
-		rpc = std::make_unique<RPCCreatePlayerGhost>(id, *entity.player.playerInfo, entity.transform);
+		rpc = std::make_unique<RPCCreatePlayerGhost>(id, entity.player.playerInfo, entity.transform);
 	}
 	else if (entity.hasComponents(COMPONENT_ZOMBIE)) {
 		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_ZOMBIE,
@@ -262,7 +267,13 @@ void NetworkServerSystem::beginFrame()
 		}
 	}
 	
+	// Check if we will send packets this frame
 	NetworkSystem::beginFrame();
+
+	// Don't send packets if we have noone to send to
+	if (m_clients.size() == 0) {
+		m_willSendPcktThisFrame = false;
+	}
 }
 
 void NetworkServerSystem::update(Entity& entity, float deltaTick)
@@ -293,7 +304,18 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 	}
 
 	// Notify clients of updates to player lives and score
-	if (entity.hasComponents(COMPONENT_PLAYER) && entity.player.playerInfo->hasChanged()) {
+	if (entity.hasComponents(COMPONENT_PLAYER) && entity.player.playerInfo.hasChanged()) {
+		PlayerInfo& playerInfo = entity.player.playerInfo;
+		
+		if (playerInfo.getPlayerID() == m_serverPlayerInfo.getPlayerID()) {
+			// Update server player-info on change
+			m_serverPlayerInfo = playerInfo;
+		} else {
+			// Update client player-info on change
+			m_clients.at(entity.network.clientAddress).playerInfo = playerInfo;
+		}
+
+
 		std::vector<PlayerInfo> currentPlayers = getPlayers();
 		bufferRpc(std::make_unique<RPCUpdatePlayers>(currentPlayers));
 
@@ -355,11 +377,12 @@ void NetworkServerSystem::startGame()
 	TransformComponent transform{};
 	transform.position.y = 1;
 	m_serverPlayer = &EntityUtils::createPlayer(m_scene, transform);
-	m_serverPlayer->player.playerInfo.reset(&m_serverPlayerInfo);
+	m_serverPlayer->player.playerInfo = m_serverPlayerInfo;
 	for (auto& addressClientInfoPair : m_clients) {
 		Entity& newPlayer = EntityUtils::createPlayer(m_scene, transform);
 		newPlayer.removeComponents(COMPONENT_INPUT_MAP); // Input will come from the clients
-		newPlayer.player.playerInfo.reset(&addressClientInfoPair.second.playerInfo);
+		newPlayer.network.clientAddress = addressClientInfoPair.first;
+		newPlayer.player.playerInfo = addressClientInfoPair.second.playerInfo;
 		addressClientInfoPair.second.playerEntity = &newPlayer;
 		addToNetworking(newPlayer);
 	}

@@ -94,11 +94,11 @@ void DummyLevel::process(float deltaTick, Clock& clock)
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) 
-		 && m_scene.getEntity(i).player.playerInfo->getPlayerID() == m_playerIDNum)
+		 && m_scene.getEntity(i).player.playerInfo.getPlayerID() == m_playerIDNum)
 		{
 			// Update the UI with the player score and health.
-			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo->getLives()));
-			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo->getScore()));
+			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives()));
+			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getScore()));
 		}
 	}
 
@@ -150,7 +150,7 @@ bool DummyLevel::checkPlayersAlive()
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo->getLives() > 0)
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo.getLives() > 0)
 			return true;
 	}
 
@@ -163,8 +163,8 @@ int DummyLevel::getPlayerScore()
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
-		 && m_scene.getEntity(i).player.playerInfo->getPlayerID() == m_playerIDNum)
-			return m_scene.getEntity(i).player.playerInfo->getScore();
+		 && m_scene.getEntity(i).player.playerInfo.getPlayerID() == m_playerIDNum)
+			return m_scene.getEntity(i).player.playerInfo.getScore();
 	}
 	return 0;
 }

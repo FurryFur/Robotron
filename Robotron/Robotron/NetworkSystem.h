@@ -1,6 +1,5 @@
 #pragma once
 
-#include "socket.h"
 #include "BufferStream.h"
 #include "Packet.h"
 
@@ -12,6 +11,7 @@ class Entity;
 class RemoteProcedureCall;
 class LobbyEventListener;
 struct Packet;
+struct sockaddr_in;
 
 class NetworkSystem {
 public:

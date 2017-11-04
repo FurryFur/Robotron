@@ -1,5 +1,6 @@
 #include "NetworkSystem.h"
 
+#include "socket.h"
 #include "InputComponent.h"
 #include "Packet.h"
 #include "Scene.h"

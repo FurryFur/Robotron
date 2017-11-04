@@ -54,8 +54,8 @@ void PlayerStatsMenu::handleLobbyUpdate(const std::vector<PlayerInfo>& playerInf
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < playerInfo.size(); ++i)
 	{
-		m_statsScreenLabels.at(i).setText((playerInfo.at(i)->username)
-			+ " Lives: " + std::to_string(playerInfo.at(i)->getLives())
-			+ " Score: " + std::to_string(playerInfo.at(i)->getScore()));
+		m_statsScreenLabels.at(i).setText((playerInfo.at(i).username)
+			+ " Lives: " + std::to_string(playerInfo.at(i).getLives())
+			+ " Score: " + std::to_string(playerInfo.at(i).getScore()));
 	}
 }

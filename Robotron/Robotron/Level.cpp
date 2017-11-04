@@ -326,11 +326,11 @@ void Level::initalizeNextLevel()
 			{
 				if (m_scene.getEntity(i).aiVariables.lifePickUp != true)
 				{
-					m_scene.getEntity(i).aiVariables.followEntity->player.playerInfo->addScore(m_scene.getEntity(i).aiVariables.score);
+					m_scene.getEntity(i).aiVariables.followEntity->player.playerInfo.addScore(m_scene.getEntity(i).aiVariables.score);
 					m_scene.getEntity(i).aiVariables.followEntity->player.extraLifeTrack += m_scene.getEntity(i).aiVariables.score;
 				}
 				else
-					m_scene.getEntity(i).aiVariables.followEntity->player.playerInfo->addLives(1);
+					m_scene.getEntity(i).aiVariables.followEntity->player.playerInfo.addLives(1);
 			}
 			m_scene.destroyEntity(m_scene.getEntity(i));
 		}
@@ -338,8 +338,8 @@ void Level::initalizeNextLevel()
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 		{
 			// If there is a dead player, give them an extra life.
-			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo->getLives() == 0)
-				m_scene.getEntity(i).player.playerInfo->addLives(1);
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo.getLives() == 0)
+				m_scene.getEntity(i).player.playerInfo.addLives(1);
 			
 			// Move the players back to the centre point of the level
 			m_scene.getEntity(i).transform.position.x = 0.0f;
@@ -388,7 +388,7 @@ bool Level::checkPlayersAlive()
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if(m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo->getLives() > 0)
+		if(m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo.getLives() > 0)
 			return true;
 	}
 
@@ -403,7 +403,7 @@ void Level::respawnDeadPlayers(Clock& clock)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER)
 		    && m_scene.getEntity(i).player.isRespawning == true
-		    && m_scene.getEntity(i).player.playerInfo->getLives() > 0
+		    && m_scene.getEntity(i).player.playerInfo.getLives() > 0
 		    && m_scene.getEntity(i).player.deathTime + 3.0f <= clock.GetCurTime())
 		{
 			m_scene.getEntity(i).player.isRespawning = false;
@@ -424,8 +424,8 @@ void Level::process(float deltaTick, Clock& clock)
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
 		{
 			// Update the UI with the player score and health.
-			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo->getLives()));
-			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo->getScore()));
+			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives()));
+			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getScore()));
 		}
 
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
@@ -438,7 +438,7 @@ void Level::process(float deltaTick, Clock& clock)
 				// Increase the threshold by 500 every time it is reached
 				m_scene.getEntity(i).player.extraLifeThreshhold += 500;
 				// Increase the player's life by 1.
-				m_scene.getEntity(i).player.playerInfo->addLives(1);
+				m_scene.getEntity(i).player.playerInfo.addLives(1);
 			}
 		}
 	}
@@ -563,7 +563,7 @@ int Level::getPlayerScore()
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
-			return m_scene.getEntity(i).player.playerInfo->getScore();
+			return m_scene.getEntity(i).player.playerInfo.getScore();
 	}
 	return 0;
 }
