@@ -210,10 +210,7 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 		break;
 	case PACKET_TYPE_JOIN_RESPONSE:
 		if (packet.joinAccepted) {
-			// TODO: Change this back to CLIENT_STATE_IN_LOBBY once lobby is working
-			// m_clientState = CLIENT_STATE_IN_LOBBY;
-			// For now just jump straight into the game
-			m_clientState = CLIENT_STATE_IN_GAME;
+			m_clientState = CLIENT_STATE_IN_LOBBY;
 			m_clientPlayerID = packet.playerID;
 
 			std::cout << "Received join accept from server at address: " 
