@@ -30,6 +30,10 @@ void PlayerStatsMenu::handleJoinRejected()
 {
 }
 
+void PlayerStatsMenu::handleGameStart()
+{
+}
+
 void PlayerStatsMenu::handleLobbyUpdate(const std::vector<PlayerInfo>& playerInfo)
 {
 	// If no text labels exist, populate them

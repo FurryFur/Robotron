@@ -100,7 +100,8 @@ void NetworkClientSystem::startGame()
 {
 	m_clientState = CLIENT_STATE_IN_GAME;
 
-	m_lobbyEventListener->handleGameStart();
+	for (auto eventListener : m_lobbyEventListener)
+		eventListener->handleGameStart();
 }
 
 void NetworkClientSystem::broadcastForServers()

@@ -30,9 +30,10 @@ public:
 	void renderStats();
 
 	virtual void handleLobbyUpdate(const std::vector<PlayerInfo>& playerInfo) override;
-	virtual void handleBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress);
-	virtual void handleJoinAccepted();
-	virtual void handleJoinRejected();
+	virtual void handleBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress) override;
+	virtual void handleJoinAccepted() override;
+	virtual void handleJoinRejected() override;
+	virtual void handleGameStart() override;
 private:
 
 	Scene& m_scene;
