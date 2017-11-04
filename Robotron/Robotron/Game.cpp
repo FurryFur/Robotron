@@ -122,8 +122,6 @@ Game::Game(GLFWwindow* window, Audio audio)
 	
 	// Create the game over text label
 	createTextLabel("Game over man, game over!", glm::vec2(100.0f, 612.0f), &m_uiGameOverLabels);
-	// Create the final score text label
-	createTextLabel("Final Score: ", glm::vec2(100.0f, 562.0f), &m_uiGameOverLabels, 0.8f);
 }
 
 
@@ -512,6 +510,10 @@ void Game::process(float deltaTick)
 		if (m_networkSystem != nullptr)
 			m_networkSystem.reset(nullptr);
 
+		// Reset the player's ID num
+		if(m_setPlayerIDNum)
+			m_setPlayerIDNum = false;
+
 		//Set the host to be false if the player is in the main menu
 		if (m_isHost)
 			m_isHost = false;
@@ -598,7 +600,7 @@ void Game::process(float deltaTick)
 		{
 			// Create a level if one does not exist
 			if (m_level == nullptr)
-				m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_scene, m_userName, *m_networkSystem);
+				m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_scene, m_userName, m_playerID, *m_networkSystem);
 
 			// Process the level
 			m_level->process(deltaTick, m_clock);
@@ -611,7 +613,6 @@ void Game::process(float deltaTick)
 			if (!m_level->checkPlayersAlive())
 			{
 				// Trigger the game over text to dispay and update it
-				m_uiGameOverLabels.at(1).setText("Final Score: " + std::to_string(m_level->getPlayerScore()));
 				m_displayGameOverText = true;
 				// Return to lobby
 				m_gameState = LOBBY;
@@ -632,7 +633,7 @@ void Game::process(float deltaTick)
 		{
 			// Create a level if one does not exist
 			if (m_dummyLevel == nullptr)
-				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName, *m_networkSystem);
+				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName, m_playerID, *m_networkSystem);
 
 			// Process the level
 			m_dummyLevel->process(deltaTick, m_clock);
@@ -651,10 +652,9 @@ void Game::process(float deltaTick)
 			if (m_checkLoss && !m_dummyLevel->checkPlayersAlive())
 			{
 				// Trigger the game over text to dispay and update it
-				m_uiGameOverLabels.at(1).setText("Final Score: " + std::to_string(m_dummyLevel->getPlayerScore()));
 				m_displayGameOverText = true;
 				// Return to lobby
-				m_gameState = LOBBY;
+				m_gameState = CLIENTLOBBY;
 
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);
@@ -699,6 +699,13 @@ void Game::handleJoinRejected()
 
 void Game::handleLobbyUpdate(const std::vector<PlayerInfo>& playerList)
 {
+	//Set the ID num equal to the number of connected players
+	if (!m_setPlayerIDNum)
+	{
+		m_playerID = playerList.size() - 1;
+		m_setPlayerIDNum = true;
+	}
+	
 	//Check if m_numofConnectPlayers is different to the number connected
 	if (m_numConnectedPlayers != playerList.size())
 	{

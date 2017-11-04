@@ -49,7 +49,7 @@
 class Level : public IKeyObserver
 {
 public:
-	Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, NetworkSystem& networkSystem);
+	Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem);
 	~Level();
 
 	// Increases the level count of the game and spawns the next enemies.
@@ -88,7 +88,7 @@ private:
 
 	TextLabel m_playerHealth;
 	TextLabel m_playerScore;
-
+	std::uint8_t m_playerID;
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	int m_levelNum;
 	bool m_inSetupPhase;
