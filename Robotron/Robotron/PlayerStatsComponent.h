@@ -21,4 +21,5 @@ struct PlayerStatsComponent {
 	int extraLifeThreshhold; // How many points the player needs to get another life
 	bool isRespawning; // Is true when they are dead and will respawn
 	double deathTime; // The time it takes for them to respawn
+	size_t playerIDNum; // The unique number the player is.
 };

@@ -34,7 +34,7 @@ enum GameState
 	LOBBYSEARCH,
 	HOSTSETUP,
 	LOBBY,
-	DUMMYLOBBY,
+	CLIENTLOBBY,
 	GAME
 };
 
@@ -55,17 +55,6 @@ public:
 	Game(GLFWwindow* window, Audio audio);
 	~Game();
 
-	static GameState s_gameState;
-	static ButtonState s_buttonState;
-	static double s_mousePosX;
-	static double s_mousePosY;
-	static size_t s_numServers; // The total number of successfully reached in broadcast
-	static size_t s_serverNum; // The server number in the vector connected to
-	static bool s_buttonClicked;
-	static std::vector <TextLabel> s_uiSearchLobbyLabels; // Each label is repesents an available network to join. Also holds the back button.
-	static std::vector<std::string> s_serverNames; // Stores the servernames when they are received from a broadcast.
-	static std::vector<sockaddr_in> s_serverAddresses; // Stores the server addresses when they are received from a broadcast. 
-
 	static void registerKeyObserver(IKeyObserver * observer);
 
 	static std::vector<IKeyObserver*> s_keyObservers;
@@ -81,12 +70,27 @@ public:
 private:
 	void mouseButtonCallBack(GLFWwindow * window, int button, int action, int mods);
 	// Creates a text label
-	void createTextLabel(std::string labelText, glm::vec2 position, std::vector<TextLabel>* screenVector, float scale = 1.0f);
+	void createTextLabel(std::string labelText, glm::vec2 position, std::vector<TextLabel>* screen, float scale = 1.0f);
 	// Checks if the mouse is within the coords of a button. Glow white if not click. Glow red if clicked down on.
 	void checkButtonHighlight(float minX, float maxX, float minY, float maxY, TextLabel* button, ButtonState buttonType);
 	void renderMenuScreens();
 	void process(float deltaTick);
 	void keyCallback(int key, int scancode, int action, int mods);
+
+
+	GameState m_gameState;
+	ButtonState m_buttonState;
+	double m_mousePosX;
+	double m_mousePosY;
+	size_t m_numServers; // The total number of successfully reached in broadcast
+	size_t m_serverNum; // The server number in the vector connected to
+	bool m_buttonClicked;
+	std::vector <TextLabel> m_uiSearchLobbyLabels; // Each label is repesents an available network to join. Also holds the back button.
+	std::vector<std::string> m_serverNames; // Stores the servernames when they are received from a broadcast.
+	std::vector<sockaddr_in> m_serverAddresses; // Stores the server addresses when they are received from a broadcast. 
+
+	std::vector <TextLabel> m_uiPlayerNames; // Stores the client names so they can be displayed in the lobby.
+	size_t m_numConnectPlayers; // Keeps track of the number of connected players. If this changes update the ui for player names
 
 	GLFWwindow* m_window;
 	Clock m_clock;

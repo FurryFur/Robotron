@@ -47,7 +47,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 	
 	// If the player dies. Stop following them.
 	if (entity.aiVariables.followEntity != NULL
-     && entity.aiVariables.followEntity->playerStats.isRespawning == true)
+     && entity.aiVariables.followEntity->player.isRespawning == true)
 	{
 		entity.aiVariables.followEntity = NULL;
 	}
@@ -85,7 +85,7 @@ void ScorePickUpSystem::update(Entity& entity, float deltaTick)
 		acceleration = followLeader(glm::vec3(entity.aiVariables.followEntity->transform.position), entity.aiVariables.followEntity->physics.velocity, entity.aiVariables.followEntity->aiVariables.previousVelocity, glm::vec3(entity.transform.position), entity.physics.velocity, entity.controlVars.maxMoveSpeed);
 
 		std::vector<Entity*> nearbyNeighbours;
-		// Find all the closest Enemy01 neighbours and store them in a vector.
+		// Find all the closest scorepickup neighbours and store them in a vector.
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_SCOREPICKUP) &&

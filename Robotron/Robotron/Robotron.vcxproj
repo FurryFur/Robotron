@@ -221,6 +221,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="GhostSnapshot.h" />
     <ClInclude Include="LobbyEventListener.h" />
     <ClInclude Include="PhysicsSystem.h" />
+    <ClInclude Include="PlayerBulletComponent.h" />
     <ClInclude Include="ServerInfo.h" />
     <ClInclude Include="PlayerStatsMenu.h" />
     <ClInclude Include="StreamableEvictQueue.h" />

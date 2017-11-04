@@ -174,9 +174,9 @@ Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transf
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS
 									  | COMPONENT_PLAYER);
 
-	entity.playerStats.playerInfo.lives = 500;
-	entity.playerStats.playerInfo.score = 0;
-	entity.playerStats.extraLifeThreshhold = 1000;
+	entity.player.playerInfo.lives = 500;
+	entity.player.playerInfo.score = 0;
+	entity.player.extraLifeThreshhold = 1000;
 	entity.transform = transform; // Scale the player model up by default
 	entity.transform.scale *= 5.0f;
 
@@ -195,6 +195,19 @@ Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transf
 	entity.controlVars.orientationSensitivity = 0.05f;
 	entity.controlVars.worldSpaceMove = true;
 	entity.controlVars.firingSpeed = 0.5f;
+
+	// Create the player's unique ID num
+	size_t playerIDNum = 0;
+	// Cycle over all the entities in the scene
+	for (size_t i = 0; i < scene.getEntityCount(); ++i)
+	{
+		// If the entitiy is a player, increase the number by one
+		if (scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
+		{
+			++playerIDNum;
+		}
+	}
+	entity.player.playerIDNum = playerIDNum;
 
 	return entity;
 }

@@ -40,7 +40,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	Entity& player = EntityUtils::createPlayer(m_scene, transform);
 	player.addComponents(COMPONENT_NETWORK);
 
-	player.playerStats.playerInfo.username = username;
+	player.player.playerInfo.username = username;
 
 	// Create the skybox
 	Entity& skybox = EntityUtils::createSkybox(m_scene, {
@@ -324,11 +324,11 @@ void Level::initalizeNextLevel()
 			{
 				if (m_scene.getEntity(i).aiVariables.lifePickUp != true)
 				{
-					m_scene.getEntity(i).aiVariables.followEntity->playerStats.playerInfo.score += m_scene.getEntity(i).aiVariables.score;
-					m_scene.getEntity(i).aiVariables.followEntity->playerStats.extraLifeTrack += m_scene.getEntity(i).aiVariables.score;
+					m_scene.getEntity(i).aiVariables.followEntity->player.playerInfo.score += m_scene.getEntity(i).aiVariables.score;
+					m_scene.getEntity(i).aiVariables.followEntity->player.extraLifeTrack += m_scene.getEntity(i).aiVariables.score;
 				}
 				else
-					++m_scene.getEntity(i).aiVariables.followEntity->playerStats.playerInfo.lives;
+					++m_scene.getEntity(i).aiVariables.followEntity->player.playerInfo.lives;
 			}
 			m_scene.destroyEntity(m_scene.getEntity(i));
 		}
@@ -336,8 +336,8 @@ void Level::initalizeNextLevel()
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 		{
 			// If there is a dead player, give them an extra life.
-			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).playerStats.playerInfo.lives == 0)
-				++m_scene.getEntity(i).playerStats.playerInfo.lives;
+			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo.lives == 0)
+				++m_scene.getEntity(i).player.playerInfo.lives;
 			
 			// Move the players back to the centre point of the level
 			m_scene.getEntity(i).transform.position.x = 0.0f;
@@ -386,7 +386,7 @@ bool Level::checkPlayersAlive()
 	// Cycle through all the entites in the scene.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if(m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).playerStats.playerInfo.lives > 0)
+		if(m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo.lives > 0)
 			return true;
 	}
 
@@ -400,11 +400,11 @@ void Level::respawnDeadPlayers(Clock& clock)
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER)
-		    && m_scene.getEntity(i).playerStats.isRespawning == true
-		    && m_scene.getEntity(i).playerStats.playerInfo.lives > 0
-		    && m_scene.getEntity(i).playerStats.deathTime + 3.0f <= clock.GetCurTime())
+		    && m_scene.getEntity(i).player.isRespawning == true
+		    && m_scene.getEntity(i).player.playerInfo.lives > 0
+		    && m_scene.getEntity(i).player.deathTime + 3.0f <= clock.GetCurTime())
 		{
-			m_scene.getEntity(i).playerStats.isRespawning = false;
+			m_scene.getEntity(i).player.isRespawning = false;
 			m_scene.getEntity(i).transform.position = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
 			m_descendingPlayers = true;
 			m_audio.playSFX(PLAYER_SPAWNING);
@@ -422,21 +422,21 @@ void Level::process(float deltaTick, Clock& clock, NetworkSystem& networkSystem)
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
 		{
 			// Update the UI with the player score and health.
-			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.lives));
-			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).playerStats.playerInfo.score));
+			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo.lives));
+			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo.score));
 		}
 
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 		{
 			// Check that the player has enough score to get an extra life
-			if (m_scene.getEntity(i).playerStats.extraLifeTrack >= m_scene.getEntity(i).playerStats.extraLifeThreshhold)
+			if (m_scene.getEntity(i).player.extraLifeTrack >= m_scene.getEntity(i).player.extraLifeThreshhold)
 			{
 				// Reset the tracker.
-				m_scene.getEntity(i).playerStats.extraLifeTrack = 0;
+				m_scene.getEntity(i).player.extraLifeTrack = 0;
 				// Increase the threshold by 500 every time it is reached
-				m_scene.getEntity(i).playerStats.extraLifeThreshhold += 500;
+				m_scene.getEntity(i).player.extraLifeThreshhold += 500;
 				// Increase the player's life by 1.
-				++m_scene.getEntity(i).playerStats.playerInfo.lives;
+				++m_scene.getEntity(i).player.playerInfo.lives;
 			}
 		}
 	}
@@ -528,7 +528,7 @@ void Level::processSetUpPhase()
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
-				m_scene.getEntity(i).playerStats.isRespawning = true;
+				m_scene.getEntity(i).player.isRespawning = true;
 		}
 		m_inSetupPhase = false;
 		m_setUpTick = 0;
@@ -561,7 +561,7 @@ int Level::getPlayerScore()
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL))
-			return m_scene.getEntity(i).playerStats.playerInfo.score;
+			return m_scene.getEntity(i).player.playerInfo.score;
 	}
 	return 0;
 }
