@@ -571,6 +571,13 @@ void Game::process(float deltaTick)
 	}
 	case HOSTSETUP:
 	{
+		//Set the ID num equal to zero as you are the host
+		if (!m_setPlayerIDNum)
+		{
+			m_playerID = 0;
+			m_setPlayerIDNum = true;
+		}
+		
 		// The mouse is within the back button click
 		checkButtonHighlight(135.0f, 280.0f, 650.0f, 695.0f, &m_uiHostSetupLabels.at(1), BACKDOWN);
 		break;
@@ -597,7 +604,7 @@ void Game::process(float deltaTick)
 	case GAME:
 	{
 		if (m_isHost)
-		{
+		{			
 			// Create a level if one does not exist
 			if (m_level == nullptr)
 				m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_scene, m_userName, m_playerID, *m_networkSystem);

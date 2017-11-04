@@ -16,9 +16,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	, m_playerbulletsystem(m_scene, audio)
 	, m_enemybulletsystem(m_scene)
 	, m_physicsSystem(m_scene)
-	, m_playerScore("Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
-	, m_playerHealth("Health: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
-	, m_playerStatsMenu(m_scene)
+	, m_playerStatsMenu(m_scene, playerID)
 {
 	Scene::makeSceneCurrent(&m_scene);
 	m_audio = audio;
@@ -73,15 +71,6 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	// Setup the camera
 	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
 	m_renderSystem.setCamera(&cameraEntity);
-
-	// Set the UI position, scale, colour
-	m_playerHealth.setPosition(glm::vec2(10.0f, 10.0f));
-	m_playerHealth.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_playerHealth.setScale(0.5f);
-
-	m_playerScore.setPosition(glm::vec2(10.0f, 40.0f));
-	m_playerScore.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_playerScore.setScale(0.5f);
 }
 
 
@@ -422,18 +411,6 @@ void Level::process(float deltaTick, Clock& clock)
 	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
-		 && m_scene.getEntity(i).player.playerInfo.getPlayerID() == m_playerID)
-		{
-			// Update the UI with the player score and health.
-			if(m_scene.getEntity(i).player.playerInfo.getLives() != 255)
-				m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives()));
-			else 
-				m_playerHealth.setText("Health: 0");
-
-			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getScore()));
-		}
-
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
 		{
 			// Check that the player has enough score to get an extra life
@@ -485,6 +462,7 @@ void Level::process(float deltaTick, Clock& clock)
 		//m_playerStatsMenu.updateStats();
 		m_playerStatsMenu.renderStats();
 	}
+	m_playerStatsMenu.renderUI();
 
 	// When respawning, players spawn above the level.
 	// This checks if they are above the level everyframe
@@ -502,9 +480,6 @@ void Level::process(float deltaTick, Clock& clock)
 			}
 		}
 	}
-
-	m_playerScore.Render();
-	m_playerHealth.Render();
 
 	// Do operations that should happen at the end of the frame.
 	m_renderSystem.endRender();

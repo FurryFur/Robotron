@@ -83,11 +83,8 @@ private:
 	PlayerBulletSystem m_playerbulletsystem;
 	EnemyBulletSystem m_enemybulletsystem;
 	PhysicsSystem m_physicsSystem;
-
 	PlayerStatsMenu m_playerStatsMenu;
 
-	TextLabel m_playerHealth;
-	TextLabel m_playerScore;
 	std::uint8_t m_playerID;
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	int m_levelNum;

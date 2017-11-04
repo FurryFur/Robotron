@@ -17,7 +17,7 @@ public:
 
 	std::uint8_t getLives() const;
 	std::uint32_t getScore() const;
-	std::uint8_t getPlayerID();
+	std::uint8_t getPlayerID() const;
 	void setLives(std::uint8_t);
 	void addLives(std::uint8_t);
 	void subtractLives(std::uint8_t);

@@ -23,12 +23,13 @@
 class PlayerStatsMenu : public LobbyEventListener
 {
 public:
-	PlayerStatsMenu(Scene& scene);
+	PlayerStatsMenu(Scene& scene, std::uint8_t playerID);
 	~PlayerStatsMenu();
 
 	// Renders the stats of all the connected players in the stats menu
 	void renderStats();
-
+	void renderUI();
+	std::uint8_t m_playerID;
 	virtual void handleLobbyUpdate(const std::vector<PlayerInfo>& playerInfo) override;
 	virtual void handleBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress) override;
 	virtual void handleJoinAccepted() override;
@@ -38,5 +39,8 @@ private:
 
 	Scene& m_scene;
 	std::vector<TextLabel> m_statsScreenLabels;
+
+	TextLabel m_playerHealth;
+	TextLabel m_playerScore;
 };
 

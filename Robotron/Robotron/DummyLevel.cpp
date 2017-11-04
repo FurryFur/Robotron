@@ -15,9 +15,7 @@ DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::stri
 	, m_networkSystem(networkSystem)
 	, m_renderSystem(window, m_scene)
 	, m_inputSystem(window, m_scene, clock)
-	, m_playerScore("Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
-	, m_playerHealth("Health: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
-	, m_playerStatsMenu(m_scene)
+	, m_playerStatsMenu(m_scene, playerID)
 	, m_physicsSystem(m_scene)
 {
 	Scene::makeSceneCurrent(&m_scene);
@@ -27,15 +25,7 @@ DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::stri
 	m_networkSystem.registerLobbyEventListener(&m_playerStatsMenu);
 
 	m_window = window;
-	//m_playerIDNum = playerIDNum;
 	// Set the UI position, scale, colour
-	m_playerHealth.setPosition(glm::vec2(10.0f, 10.0f));
-	m_playerHealth.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_playerHealth.setScale(0.5f);
-
-	m_playerScore.setPosition(glm::vec2(10.0f, 40.0f));
-	m_playerScore.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_playerScore.setScale(0.5f);
 
 	// Create 3D entities.
 	TransformComponent transform{};
@@ -72,15 +62,6 @@ DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::stri
 	// Setup the camera
 	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
 	m_renderSystem.setCamera(&cameraEntity);
-
-	// Set the UI position, scale, colour
-	m_playerHealth.setPosition(glm::vec2(10.0f, 10.0f));
-	m_playerHealth.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_playerHealth.setScale(0.5f);
-
-	m_playerScore.setPosition(glm::vec2(10.0f, 40.0f));
-	m_playerScore.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
-	m_playerScore.setScale(0.5f);
 }
 
 
@@ -90,21 +71,6 @@ DummyLevel::~DummyLevel()
 
 void DummyLevel::process(float deltaTick, Clock& clock)
 {
-	// Cycle over all objects in the scene and find the player object
-	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
-	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) 
-		 && m_scene.getEntity(i).player.playerInfo.getPlayerID() == m_playerID)
-		{
-			// Update the UI with the player score and health.
-			if (m_scene.getEntity(i).player.playerInfo.getLives() != 255)
-				m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives()));
-			else
-				m_playerHealth.setText("Health: 0");
-			m_playerScore.setText("Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getScore()));
-		}
-	}
-
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
@@ -124,10 +90,7 @@ void DummyLevel::process(float deltaTick, Clock& clock)
 		//m_playerStatsMenu.updateStats();
 			m_playerStatsMenu.renderStats();
 	}
-
-	m_playerScore.Render();
-	m_playerHealth.Render();
-
+	m_playerStatsMenu.renderUI();
 	// Do operations that should happen at the end of the frame.
 	m_renderSystem.endRender();
 }
