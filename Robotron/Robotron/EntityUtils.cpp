@@ -7,6 +7,7 @@
 #include "Scene.h"
 #include "Entity.h"
 #include "ModelUtils.h"
+#include "PlayerInfo.h"
 
 #include <glm\gtc\matrix_transform.hpp>
 #include <iostream>
@@ -288,7 +289,7 @@ void EntityUtils::setModelScorePickup01(Entity& entity)
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
 	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
-	entity.model.materials.at(0).shaderParams.specBias = 0.13;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13f;
 }
 
 void EntityUtils::setModelScorePickUp02(Entity& entity)
@@ -299,7 +300,7 @@ void EntityUtils::setModelScorePickUp02(Entity& entity)
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
 	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
-	entity.model.materials.at(0).shaderParams.specBias = 0.13;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13f;
 }
 
 void EntityUtils::setModelHealthPickUp(Entity& entity)
@@ -310,7 +311,7 @@ void EntityUtils::setModelHealthPickUp(Entity& entity)
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/random-texture3.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
 	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
-	entity.model.materials.at(0).shaderParams.specBias = 0.13;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13f;
 }
 
 void EntityUtils::setModelPlayer(Entity& entity)
@@ -320,7 +321,7 @@ void EntityUtils::setModelPlayer(Entity& entity)
 	for (size_t i = 0; i < entity.model.materials.size(); ++i) {
 		entity.model.materials.at(i).shaderParams.glossiness = 1.0f;
 		entity.model.materials.at(i).shaderParams.metallicness = 0.0f;
-		entity.model.materials.at(i).shaderParams.specBias = 0;
+		entity.model.materials.at(i).shaderParams.specBias = 0.0f;
 	}
 }
 
@@ -331,10 +332,10 @@ void EntityUtils::setModelPlayerBullet(Entity& entity)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/voronoi_purple.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
-	entity.model.materials.at(0).shaderParams.specBias = 0.13;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13f;
 
-	entity.transform.eulerAngles.x += M_PI_2;
+	entity.transform.eulerAngles.x += static_cast<float>(M_PI_2);
 }
 
 void EntityUtils::setModelEnemyBullet(Entity& entity)
@@ -344,10 +345,10 @@ void EntityUtils::setModelEnemyBullet(Entity& entity)
 	// Replace default texture
 	entity.model.materials.at(0).colorMaps.at(0) = GLUtils::loadTexture("Assets/Textures/voronoi_red.png");
 	entity.model.materials.at(0).shaderParams.glossiness = 1.0f;
-	entity.model.materials.at(0).shaderParams.metallicness = 1.0f;
-	entity.model.materials.at(0).shaderParams.specBias = 0.13;
+	entity.model.materials.at(0).shaderParams.metallicness = 0.0f;
+	entity.model.materials.at(0).shaderParams.specBias = 0.13f;
 
-	entity.transform.eulerAngles.x += M_PI_2;
+	entity.transform.eulerAngles.x += static_cast<float>(M_PI_2);
 }
 
 Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const TransformComponent& transform, std::int32_t entityNetId)
@@ -396,12 +397,13 @@ Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const TransformC
 	return entity;
 }
 
-Entity & EntityUtils::createPlayerGhost(Scene& scene, const TransformComponent& transform, std::int32_t entityNetId)
+Entity & EntityUtils::createPlayerGhost(Scene& scene, const PlayerInfo& playerInfo, const TransformComponent& transform, std::int32_t entityNetId)
 {
 	Entity& entity = createPlayer(scene, transform);
 	entity.removeComponents(COMPONENT_PLAYER_CONTROL);
 	entity.removeComponents(COMPONENT_INPUT_MAP);
 	entity.network.id = entityNetId;
+	entity.playerStats.playerInfo = playerInfo;
 	return entity;
 }
 

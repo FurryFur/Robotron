@@ -167,7 +167,7 @@ void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const Play
 	if (destroyIfExistsInNetwork(entityNetId))
 		std::cout << "INFO: Overwritting entity with network id: " << entityNetId << std::endl;
 
-	Entity& newEntity = EntityUtils::createPlayerGhost(m_scene, transform, entityNetId);
+	Entity& newEntity = EntityUtils::createPlayerGhost(m_scene, playerInfo, transform, entityNetId);
 
 	// TODO: Conditionally add the player controller if the username matches the clients username
 	// newEntity.addComponents(COMPONENT_PLAYER_CONTROL);
