@@ -14,7 +14,6 @@ public:
 	PlayerInfo();
 
 	std::string username;
-	std::uint8_t playerIDNum; // The unique number the player is.
 
 	std::uint8_t getLives() const;
 	std::uint32_t getScore() const;

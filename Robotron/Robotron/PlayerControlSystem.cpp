@@ -94,7 +94,7 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 			&& glm::length(m_scene.getEntity(i).transform.position - pos) < 1)		    // the player is within range to be damaged by it
 		{
 			entity.player.deathTime = clock.GetCurTime();
-			entity.player.playerInfo.subtractLives(1);
+			entity.player.playerInfo->subtractLives(1);
 			entity.player.isRespawning = true;
 			entity.transform.position = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
 
@@ -162,7 +162,7 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 		Entity& bullet = EntityUtils::createPlayerBullet(m_scene, transform);
 
 		bullet.physics.velocity = bulletVelocity;
-		bullet.playerBullet.playerIDNum = entity.player.playerInfo.getPlayerID();
+		bullet.playerBullet.playerIDNum = entity.player.playerInfo->getPlayerID();
 		m_audio.playSFX(PLAYER_SHOOT);
 	}
 }
