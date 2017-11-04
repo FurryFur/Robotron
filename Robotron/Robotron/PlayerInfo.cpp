@@ -56,6 +56,18 @@ void PlayerInfo::subtractScore(std::uint32_t scoreToSubtract)
 	m_hasChanged = true;
 }
 
+void PlayerInfo::setUniquePlayerID()
+{
+	static std::uint8_t s_freeID = 0;
+	m_playerID = s_freeID;
+	++s_freeID;
+}
+
+std::uint8_t PlayerInfo::getPlayerID()
+{
+	return m_playerID;
+}
+
 bool PlayerInfo::hasChanged() const
 {
 	bool tmp = m_hasChanged;
@@ -65,12 +77,12 @@ bool PlayerInfo::hasChanged() const
 
 OutBufferStream & PlayerInfo::serialize(OutBufferStream& obs) const
 {
-	return obs << username << m_lives << m_score;
+	return obs << m_playerID << username << m_lives << m_score;
 }
 
 InBufferStream & PlayerInfo::deserialize(InBufferStream& ibs)
 {
-	return ibs >> username >> m_lives >> m_score;
+	return ibs >> m_playerID >> username >> m_lives >> m_score;
 }
 
 OutBufferStream& operator<<(OutBufferStream& obs, const PlayerInfo& playerInfo)

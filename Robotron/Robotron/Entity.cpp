@@ -67,6 +67,7 @@ void Entity::addComponents(size_t componentMask)
 	if (matches(componentMask, COMPONENT_PLAYER)) {
 		m_componentMask |= COMPONENT_PLAYER;
 		player = {};
+		player.playerInfo.setUniquePlayerID();
 	}
 	if (matches(componentMask, COMPONENT_INPUT)) {
 		m_componentMask |= COMPONENT_INPUT;

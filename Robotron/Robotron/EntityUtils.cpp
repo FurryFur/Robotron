@@ -196,11 +196,6 @@ Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transf
 	entity.controlVars.worldSpaceMove = true;
 	entity.controlVars.firingSpeed = 0.5f;
 
-	// Create the player's unique ID num
-	static std::uint8_t freeId = 0;
-	entity.player.playerInfo.playerIDNum = freeId;
-	++freeId;
-
 	return entity;
 }
 

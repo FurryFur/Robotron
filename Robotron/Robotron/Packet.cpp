@@ -19,7 +19,7 @@ OutBufferStream& Packet::serialize(OutBufferStream& obs) const
 		obs << username;
 		break;
 	case PACKET_TYPE_JOIN_RESPONSE:
-		obs << joinAccepted;
+		obs << joinAccepted << playerID;
 		break;
 	case PACKET_TYPE_NORMAL:
 		obs << sequenceNum << ghostSnapshotBuffer << rpcGroupBuffer;
@@ -46,7 +46,7 @@ InBufferStream& Packet::deserialize(InBufferStream& ibs)
 		ibs >> username;
 		break;
 	case PACKET_TYPE_JOIN_RESPONSE:
-		ibs >> joinAccepted;
+		ibs >> joinAccepted >> playerID;
 		break;
 	case PACKET_TYPE_NORMAL:
 		ibs >> sequenceNum >> ghostSnapshotBuffer >> rpcGroupBuffer;

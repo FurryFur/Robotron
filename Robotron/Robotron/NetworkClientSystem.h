@@ -60,5 +60,6 @@ private:
 	sockaddr_in m_serverAddress;
 	ClientState m_clientState;
 	std::string m_username;
+	std::uint8_t m_clientPlayerID;
 };
 

@@ -581,7 +581,7 @@ void Game::process(float deltaTick)
 	{
 		// If you are the host create the network system
 		if (m_networkSystem == nullptr)
-			m_networkSystem = std::make_unique<NetworkServerSystem>(m_scene, m_serverName);
+			m_networkSystem = std::make_unique<NetworkServerSystem>(m_scene, m_userName, m_serverName);
 		m_networkSystem->setLobbyEventListener(this);
 
 		// The mouse is within the back button click
