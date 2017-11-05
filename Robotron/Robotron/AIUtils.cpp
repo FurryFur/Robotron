@@ -126,7 +126,7 @@ glm::vec3 wander(Entity& entity)
 		float randomX = (b * radius * cos(2 * 3.14f * a / b));
 		float randomZ = (b * radius * sin(2 * 3.14f * a / b));
 
-		glm::vec3 circleCenter = (currentVelocity / glm::length(currentVelocity)) * maxMoveSpeed * 100.0f;
+		glm::vec3 circleCenter = (currentVelocity / glm::length(currentVelocity)) * maxMoveSpeed;
 
 		// Wander to somewhere on a circle in front of the player
 		targetPosition = { (currentPosition.x + circleCenter.x + randomX)
@@ -135,7 +135,7 @@ glm::vec3 wander(Entity& entity)
 
 		entity.aiVariables.wanderPosition = targetPosition;
 	}
-
+	//RenderSystem::drawDebugArrow(currentPosition, targetPosition);
 	//RenderSystem::drawDebugArrow(currentPosition, targetPosition, { 0, 0, 1 });
 
 	return seekWithArrival(targetPosition, currentPosition, currentVelocity, maxMoveSpeed);
