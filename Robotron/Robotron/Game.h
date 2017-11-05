@@ -35,6 +35,7 @@ enum GameState
 	HOSTSETUP,
 	LOBBY,
 	CLIENTLOBBY,
+	GAMEOVER,
 	GAME
 };
 
@@ -106,7 +107,7 @@ private:
 	std::vector <TextLabel> m_uiHostSetupLabels;
 	std::vector <TextLabel> m_uiLobbyLabels;
 	std::vector <TextLabel> m_uiGameOverLabels;
-	TextLabel m_SearchLobbyBackButton;
+	TextLabel m_BackButton;
 
 	std::unique_ptr<NetworkSystem> m_networkSystem;
 
@@ -117,7 +118,6 @@ private:
 	TextLabel m_serverNameInput; // displays the servername
 	std::string m_userName; // the username of the player
 	TextLabel m_userNameInput; //displays the suervername
-	bool m_displayGameOverText; // flags wether the player reach the menu screen via a game over
 	bool m_isHost; // A flag to tell the system that the player is running the game as the host
 	bool m_checkLoss; // A flag to check loss. Cliennt only checks for loss after they have connected properly
 	

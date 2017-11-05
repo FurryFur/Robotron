@@ -25,7 +25,7 @@ Game::Game(GLFWwindow* window, Audio audio)
 	, m_userNameInput("", "Assets/Fonts/NYCTALOPIATILT.TTF")
 	, m_menuScene{}
 	, m_renderSystem(window, m_menuScene)
-	, m_SearchLobbyBackButton("Back", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	, m_BackButton("Back", "Assets/Fonts/NYCTALOPIATILT.TTF")
 {
 	m_clock.Process();
 	m_window = window;
@@ -110,8 +110,8 @@ Game::Game(GLFWwindow* window, Audio audio)
 	m_serverNameInput.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 
 	// Create the search lobby back text
-	m_SearchLobbyBackButton.setPosition(glm::vec2(137.0f, 112.0f));
-	m_SearchLobbyBackButton.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+	m_BackButton.setPosition(glm::vec2(137.0f, 112.0f));
+	m_BackButton.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 
 	// Create the lobby server name text label
 	createTextLabel("", glm::vec2(100.0f, 712.0f), &m_uiLobbyLabels);
@@ -195,6 +195,16 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			}
 			break;
 		}
+		case GAMEOVER:
+		{
+			// The mouse is within the back button click
+			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695)
+			{
+				m_buttonClicked = true;
+				m_buttonState = BACKDOWN;
+			}
+			break;
+		}
 		case LOBBYSEARCH:
 		{
 			// The mouse is within the back button click
@@ -261,6 +271,15 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			break;
 		}
 		case LOBBYSEARCH:
+		{
+			// The mouse is within the back button click
+			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
+			{
+				m_resetGame = true;
+			}
+			break;
+		}
+		case GAMEOVER:
 		{
 			// The mouse is within the back button click
 			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
@@ -421,19 +440,24 @@ void Game::renderMenuScreens()
 			m_uiMainMenuLabels.at(i).Render();
 			m_userNameInput.Render();
 		}
-		// Render the gameover labels only after the player has returned from the game
-		if (m_displayGameOverText == true)
+		break;
+	}
+	case GAMEOVER:
+	{
+		for (unsigned int i = 0; i < m_uiGameOverLabels.size(); ++i)
 		{
-			for (unsigned int i = 0; i < m_uiGameOverLabels.size(); ++i)
-			{
-				m_uiGameOverLabels.at(i).Render();
-			}
+			m_uiGameOverLabels.at(i).Render();
 		}
+		for (unsigned int i = 0; i < m_uiPlayerNames.size(); ++i)
+		{
+			m_uiPlayerNames.at(i).Render();
+		}
+		m_BackButton.Render();
 		break;
 	}
 	case LOBBYSEARCH:
 	{
-		m_SearchLobbyBackButton.Render();
+		m_BackButton.Render();
 		for (unsigned int i = 0; i < m_uiSearchLobbyLabels.size(); ++i)
 		{
 			m_uiSearchLobbyLabels.at(i).Render();
@@ -563,7 +587,7 @@ void Game::process(float deltaTick)
 		}
 
 		// The mouse is within the back button click
-		checkButtonHighlight(135.0f, 280.0f, 650.0f, 695.0f, &m_SearchLobbyBackButton, BACKDOWN);
+		checkButtonHighlight(135.0f, 280.0f, 650.0f, 695.0f, &m_BackButton, BACKDOWN);
 		break;
 	}
 	case HOSTSETUP:
@@ -616,10 +640,8 @@ void Game::process(float deltaTick)
 			// Check if all players are dead and return to lobby if so
 			if (!m_level->checkPlayersAlive())
 			{
-				// Trigger the game over text to dispay and update it
-				m_displayGameOverText = true;
 				// Return to main menu
-				m_resetGame = true;
+				m_gameState = GAMEOVER;
 
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);
@@ -655,10 +677,8 @@ void Game::process(float deltaTick)
 			// Check if all players are dead and return to lobby if so
 			if (m_checkLoss && !m_dummyLevel->checkPlayersAlive())
 			{
-				// Trigger the game over text to dispay and update it
-				m_displayGameOverText = true;
 				// Return to main menu
-				m_resetGame = true;
+				m_gameState = GAMEOVER;
 
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);
@@ -720,8 +740,7 @@ void Game::handleLobbyUpdate(const std::vector<PlayerInfo>& playerList)
 			{
 				if (playerList.at(i).getScore() != 0)
 				{
-					std::string temp = playerList.at(i).username + ": ";
-					temp += playerList.at(i).getScore();
+					std::string temp = playerList.at(i).username + ": " + std::to_string(playerList.at(i).getScore());
 					createTextLabel(temp, glm::vec2(180.0f, 550.0f - i * 40), &m_uiPlayerNames, 0.5f);
 				}
 				else 
