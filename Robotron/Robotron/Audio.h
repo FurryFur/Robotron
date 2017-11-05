@@ -16,7 +16,9 @@
 
 #include <fmod.hpp>
 
-enum sound
+class NetworkServerSystem;
+
+enum Sound
 {
 	ENEMY_DEAD,
 	ENEMY_HIT,
@@ -38,8 +40,10 @@ public:
 	void playBgMusic();
 	void playButtonClick();
 
-	// Play a game play sound effect
-	void playSFX(sound sound);
+	// Play a game play Sound effect
+	void playSFX(Sound sound);
+
+	void setNetworkAudioServer(NetworkServerSystem* audioServer);
 
 private:
 	bool InitFmod();
@@ -63,5 +67,7 @@ private:
 	FMOD::Sound* m_playerDescending;
 	FMOD::Sound* m_enemyShoot;
 	FMOD::Sound* m_scorePickup;
+
+	NetworkServerSystem* m_networkAudioServer;
 };
 

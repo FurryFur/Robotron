@@ -536,7 +536,7 @@ void Game::process(float deltaTick)
 		// If you are the host create the network system
 		if (m_networkSystem == nullptr)
 		{
-			std::unique_ptr<NetworkClientSystem> temp = std::make_unique<NetworkClientSystem>(m_scene, m_userName);
+			std::unique_ptr<NetworkClientSystem> temp = std::make_unique<NetworkClientSystem>(m_scene, m_audio, m_userName);
 			s_client = temp.get();
 			m_networkSystem = std::move(temp);
 			s_client->registerLobbyEventListener(this);

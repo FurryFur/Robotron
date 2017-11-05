@@ -3,6 +3,7 @@
 #include "NetworkSystem.h"
 #include "PlayerInfo.h"
 #include "ClientInfo.h"
+#include "Audio.h"
 
 #include <vector>
 #include <unordered_map>
@@ -40,6 +41,7 @@ public:
 	virtual void startGame() override;
 
 	void recordInput(std::int32_t entityNetId, const InputComponent& input);
+	void sendAudio(Sound);
 
 	static const USHORT s_kDefaultServerPort;
 private:

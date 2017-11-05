@@ -1,6 +1,6 @@
 #include "Audio.h"
 
-
+#include "NetworkServerSystem.h"
 
 Audio::Audio()
 {
@@ -52,7 +52,7 @@ void Audio::playButtonClick()
 	m_audioMgr->playSound(m_buttonClick, 0, false, &m_sfxChannel);
 }
 
-void Audio::playSFX(sound sound)
+void Audio::playSFX(Sound sound)
 {
 	if(sound == ENEMY_DEAD)
 		m_audioMgr->playSound(m_enemyDead, 0, false, &m_sfxChannel);
@@ -73,6 +73,12 @@ void Audio::playSFX(sound sound)
 	else if (sound == PLAYER_DESCENDING)
 		m_audioMgr->playSound(m_playerDescending, 0, false, &m_sfxChannel);
 
-	//TODO: SEND A NETWORK PACKET THAT SOUND SHOULD PLAY
+	if (m_networkAudioServer)
+		m_networkAudioServer->sendAudio(sound);
+}
+
+void Audio::setNetworkAudioServer(NetworkServerSystem * audioServer)
+{
+	m_networkAudioServer = audioServer;
 }
 

@@ -110,7 +110,7 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 			transform.scale = glm::vec3{ 0.5f, 0.5f, 0.5f };
 			Entity& bullet = EntityUtils::createEnemyBullet(m_scene, transform);
 			
-			// Bullet shoot sound effect
+			// Bullet shoot Sound effect
 			m_audio.playSFX(ENEMY_SHOOT);
 
 			//Find a position to shoot at where the player will be

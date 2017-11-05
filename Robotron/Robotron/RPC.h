@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "EntityUtils.h"
 #include "PlayerInfo.h"
+#include "Audio.h"
 
 #include <glm\glm.hpp>
 
@@ -23,7 +24,8 @@ enum RPCType : std::uint8_t {
 	RPC_DESTROY_GHOST,
 	RPC_RECORD_INPUT,
 	RPC_UPDATE_PLAYERS,
-	RPC_START_GAME
+	RPC_START_GAME,
+	RPC_PLAY_AUDIO
 };
 
 namespace RPC {
@@ -127,6 +129,22 @@ public:
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
 	virtual InBufferStream& deserialize(InBufferStream&) override;
 };
+
+// A remote procedure call sent from the server to play audio sound 
+// effects client game machines
+class RPCPlayAudio : public RemoteProcedureCall {
+public:
+	RPCPlayAudio() = default;
+	RPCPlayAudio(Sound);
+
+	virtual void execute() override;
+	virtual OutBufferStream & serialize(OutBufferStream &) const override;
+	virtual InBufferStream & deserialize(InBufferStream &) override;
+
+private:
+	Sound m_sound;
+};
+
 
 // Remote procedure call collection.
 // These should be grouped by packet sequence number.

@@ -60,6 +60,9 @@ InBufferStream& RPCGroup::deserialize(InBufferStream& ibs)
 		case RPC_START_GAME:
 			rpc = std::make_unique<RPCStartGame>();
 			break;
+		case RPC_PLAY_AUDIO:
+			rpc = std::make_unique<RPCPlayAudio>();
+			break;
 		default:
 			ibs.setError(IBS_ERROR_CORRUPT_DATA);
 			break;
@@ -310,4 +313,30 @@ OutBufferStream& RPCStartGame::serialize(OutBufferStream& obs) const
 InBufferStream& RPCStartGame::deserialize(InBufferStream& ibs)
 {
 	return ibs;
+}
+
+RPCPlayAudio::RPCPlayAudio(Sound sound)
+	: m_sound{ sound }
+{
+}
+
+void RPCPlayAudio::execute()
+{
+	if (g_clientSystem)
+		g_clientSystem->playAudio(m_sound);
+	else {
+		// TODO: Add logging here
+		std::cout << "WARNING: Received a Play Audio RPC on a non-client, or RPC client not set" << std::endl;
+	}
+}
+
+OutBufferStream& RPCPlayAudio::serialize(OutBufferStream& obs) const
+{
+	return obs << RPCType::RPC_PLAY_AUDIO << m_sound;
+}
+
+InBufferStream& RPCPlayAudio::deserialize(InBufferStream& ibs)
+{
+	// TODO: Add error checking for non-junk enum values
+	return ibs >> m_sound;
 }

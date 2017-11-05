@@ -9,6 +9,7 @@
 class Scene;
 class Entity;
 class PlayerInfo;
+class Audio;
 struct InputComponent;
 struct Packet;
 struct sockaddr_in;
@@ -22,7 +23,7 @@ enum ClientState {
 class NetworkClientSystem : public NetworkSystem
 {
 public:
-	NetworkClientSystem(Scene&, const std::string& username);
+	NetworkClientSystem(Scene&, Audio& audioSystem, const std::string& username);
 
 	virtual void beginFrame() override;
 	virtual void update(Entity&, float deltaTick) override;
@@ -37,9 +38,18 @@ public:
 	// Join the server at the specified address
 	void joinServer(const sockaddr_in& address);
 
+	// Update player information such as lives and score and new players.
+	// This should be called via Remote Procedure Calls sent from the server.
 	void updatePlayers(const std::vector<PlayerInfo>& currentPlayers);
 
+	// Plays sound effects on the client.
+	// This should be called via Remote Procedure Calls sent from the server.
+	void playAudio(Sound);
+
+	// This should be called via Remote Procedure Calls sent from the server.
 	void createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform);
+
+	// This should be called via Remote Procedure Calls sent from the server.
 	void createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const TransformComponent& transform);
 
 	// Destroys the entity if one exists at the specified
@@ -59,5 +69,6 @@ private:
 	ClientState m_clientState;
 	std::string m_username;
 	std::uint8_t m_clientPlayerID;
+	Audio& m_audioSystem;
 };
 

@@ -434,6 +434,11 @@ void NetworkServerSystem::recordInput(std::int32_t entityNetId, const InputCompo
 	}
 }
 
+void NetworkServerSystem::sendAudio(Sound sound)
+{
+	bufferRpc(std::make_unique<RPCPlayAudio>(sound));
+}
+
 void NetworkServerSystem::broadcastToClients(const Packet& packet)
 {
 	for (auto& addressClientInfoPair : m_clients) {

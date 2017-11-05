@@ -17,11 +17,12 @@
 #include <iostream>
 #include <cstdint>
 
-NetworkClientSystem::NetworkClientSystem(Scene& scene, const std::string& username)
+NetworkClientSystem::NetworkClientSystem(Scene& scene, Audio& audioSystem, const std::string& username)
 	: NetworkSystem(scene)
 	, m_lastSeqNumSeen{ 0 }
 	, m_clientState{ CLIENT_STATE_NO_SERVER }
 	, m_username{ username }
+	, m_audioSystem{ audioSystem }
 {
 	m_socket.initialise(4567);
 	allocateRecvBuffer();
@@ -156,6 +157,11 @@ void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPl
 		for (auto eventListener : m_lobbyEventListener)
 			eventListener->handleLobbyUpdate(currentPlayers);
 	}
+}
+
+void NetworkClientSystem::playAudio(Sound)
+{
+
 }
 
 void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform)
