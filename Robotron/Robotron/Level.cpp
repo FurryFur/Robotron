@@ -419,6 +419,13 @@ void Level::process(float deltaTick, Clock& clock)
 				// Increase the player's life by 1.
 				m_scene.getEntity(i).player.playerInfo.addLives(1);
 			}
+
+			if (clock.GetCurTime() <= (m_scene.getEntity(i).player.invunTimer + (m_scene.getEntity(i).player.lastSpawnTime)))
+			{
+				m_scene.getEntity(i).spotlight.color = glm::vec3(0.0f, 5.6f, 0.0f);
+			}
+			else
+				m_scene.getEntity(i).spotlight.color = glm::vec3(0.5f, 0.75f, 1.5f) * 4.0f;
 		}
 	}
 
