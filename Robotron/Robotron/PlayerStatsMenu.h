@@ -23,7 +23,7 @@
 class PlayerStatsMenu : public NetworkEventListener
 {
 public:
-	PlayerStatsMenu(Scene& scene, std::uint8_t playerID);
+	PlayerStatsMenu(Scene& scene, std::uint8_t playerID, const std::vector<PlayerInfo>& playerInfo);
 	~PlayerStatsMenu();
 
 	void renderStats(); // Renders the stats of all the connected players in the stats menu

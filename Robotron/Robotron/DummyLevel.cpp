@@ -10,12 +10,12 @@
 #include <glm\gtc\matrix_transform.hpp>
 
 //DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerIDNum)
-DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem)
+DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem, const std::vector<PlayerInfo>& playerInfo)
 	: m_scene(scene)
 	, m_networkSystem(networkSystem)
 	, m_renderSystem(window, m_scene)
 	, m_inputSystem(window, m_scene, clock)
-	, m_playerStatsMenu(m_scene, playerID)
+	, m_playerStatsMenu(m_scene, playerID, playerInfo)
 	, m_physicsSystem(m_scene)
 {
 	Scene::makeSceneCurrent(&m_scene);

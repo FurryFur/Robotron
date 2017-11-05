@@ -2,10 +2,10 @@
 
 
 
-PlayerStatsMenu::PlayerStatsMenu(Scene& scene, std::uint8_t playerID)
+PlayerStatsMenu::PlayerStatsMenu(Scene& scene, std::uint8_t playerID, const std::vector<PlayerInfo>& playerInfo)
 	:m_scene(scene)
 	, m_playerScore("Score: 0", "Assets/Fonts/NYCTALOPIATILT.TTF")
-	, m_playerHealth("", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	, m_playerHealth("Health: 5", "Assets/Fonts/NYCTALOPIATILT.TTF")
 {
 	m_playerID = playerID;
 
@@ -19,19 +19,38 @@ PlayerStatsMenu::PlayerStatsMenu(Scene& scene, std::uint8_t playerID)
 
 	m_playersAlive = true;
 
-	for (size_t i = 0; i < m_scene.getEntityCount(); ++i)
+	// If no text labels exist, populate them
+	if (m_statsScreenLabels.size() != playerInfo.size())
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER))
+		m_statsScreenLabels.clear();
+		for (size_t i = 0; i < playerInfo.size(); ++i)
 		{
-			m_playerHealth.setText("Health: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives()));
-			TextLabel playerInfo(m_scene.getEntity(i).player.playerInfo.username
-				+" Lives: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getLives())
-				+ " Score: " + std::to_string(m_scene.getEntity(i).player.playerInfo.getScore())				
-				, "Assets/Fonts/NYCTALOPIATILT.TTF");
+
+			TextLabel playerInfo("Player", "Assets/Fonts/NYCTALOPIATILT.TTF");
 			playerInfo.setScale(0.3f);
 			playerInfo.setPosition(glm::vec2(1030.0f, 770.0f - (i * 15)));
 			playerInfo.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 			m_statsScreenLabels.push_back(playerInfo);
+		}
+	}
+
+	for (unsigned int i = 0; i < playerInfo.size(); ++i)
+	{
+		// Update the tab screen stats
+		m_statsScreenLabels.at(i).setText((playerInfo.at(i).username)
+			+ " Lives: " + std::to_string(playerInfo.at(i).getLives())
+			+ " Score: " + std::to_string(playerInfo.at(i).getScore()));
+
+		// Cycle over all objects in the scene and find the player object
+		if (playerInfo.at(i).getPlayerID() == m_playerID)
+		{
+			// Update the UI with the player score and health.
+			if (playerInfo.at(i).getLives() != 255)
+				m_playerHealth.setText("Health: " + std::to_string(playerInfo.at(i).getLives()));
+			else
+				m_playerHealth.setText("Health: 0");
+
+			m_playerScore.setText("Score: " + std::to_string(playerInfo.at(i).getScore()));
 		}
 	}
 }

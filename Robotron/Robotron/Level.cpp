@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem)
+Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem, const std::vector<PlayerInfo>& playerInfo)
 	: m_scene(scene)
 	, m_networkSystem(networkSystem)
 	, m_renderSystem(window, m_scene)
@@ -16,7 +16,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	, m_playerbulletsystem(m_scene, audio)
 	, m_enemybulletsystem(m_scene)
 	, m_physicsSystem(m_scene)
-	, m_playerStatsMenu(m_scene, playerID)
+	, m_playerStatsMenu(m_scene, playerID, playerInfo)
 {
 	Scene::makeSceneCurrent(&m_scene);
 	m_audio = audio;
