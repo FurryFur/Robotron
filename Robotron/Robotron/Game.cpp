@@ -761,3 +761,8 @@ void Game::handleGameStart()
 {
 	m_gameState = GAME;
 }
+
+void Game::handleDisconnect()
+{
+	m_resetGame = true;
+}
