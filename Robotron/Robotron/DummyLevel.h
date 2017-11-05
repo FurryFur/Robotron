@@ -48,9 +48,6 @@ private:
 	std::uint8_t m_playerID;
 	PlayerStatsMenu m_playerStatsMenu;
 
-	TextLabel m_playerHealth;
-	TextLabel m_playerScore;
-
 	//stores the level current on. effects enemy spawn rate and spawn positioning
 	bool m_drawConnectPlayerStats;
 

@@ -64,7 +64,7 @@ void PlayerInfo::setUniquePlayerID()
 	++s_freeID;
 }
 
-std::uint8_t PlayerInfo::getPlayerID()
+std::uint8_t PlayerInfo::getPlayerID() const
 {
 	return m_playerID;
 }
