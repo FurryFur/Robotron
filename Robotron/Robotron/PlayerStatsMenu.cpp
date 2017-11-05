@@ -4,8 +4,8 @@
 
 PlayerStatsMenu::PlayerStatsMenu(Scene& scene, std::uint8_t playerID)
 	:m_scene(scene)
-	, m_playerScore("Score: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
-	, m_playerHealth("Health: ", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	, m_playerScore("Score: 0", "Assets/Fonts/NYCTALOPIATILT.TTF")
+	, m_playerHealth("Health: 5", "Assets/Fonts/NYCTALOPIATILT.TTF")
 {
 	m_playerID = playerID;
 
@@ -16,6 +16,8 @@ PlayerStatsMenu::PlayerStatsMenu(Scene& scene, std::uint8_t playerID)
 	m_playerScore.setPosition(glm::vec2(10.0f, 40.0f));
 	m_playerScore.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
 	m_playerScore.setScale(0.5f);
+
+	m_playersAlive = true;
 }
 
 
@@ -35,6 +37,11 @@ void PlayerStatsMenu::renderUI()
 	m_playerHealth.Render();
 }
 
+bool PlayerStatsMenu::checkPlayersAlive()
+{
+	return m_playersAlive;
+}
+
 void PlayerStatsMenu::handleBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress)
 {
 }
@@ -49,6 +56,17 @@ void PlayerStatsMenu::handleJoinRejected()
 
 void PlayerStatsMenu::handleGameStart()
 {
+}
+
+bool checkAlive(const std::vector<PlayerInfo>& playerInfo)
+{
+	for (unsigned int i = 0; i < playerInfo.size(); ++i)
+	{
+		if (playerInfo.at(i).getLives() != 255
+		 && playerInfo.at(i).getLives() > 0)
+			return true;
+	}
+	return false;
 }
 
 void PlayerStatsMenu::handleLobbyUpdate(const std::vector<PlayerInfo>& playerInfo)
@@ -68,17 +86,14 @@ void PlayerStatsMenu::handleLobbyUpdate(const std::vector<PlayerInfo>& playerInf
 		}
 	}
 
-	// Cycle over all objects in the scene and find the player object
 	for (unsigned int i = 0; i < playerInfo.size(); ++i)
 	{
+		// Update the tab screen stats
 		m_statsScreenLabels.at(i).setText((playerInfo.at(i).username)
 			+ " Lives: " + std::to_string(playerInfo.at(i).getLives())
 			+ " Score: " + std::to_string(playerInfo.at(i).getScore()));
-	}
 
-	// Cycle over all objects in the scene and find the player object
-	for (unsigned int i = 0; i < playerInfo.size(); ++i)
-	{
+		// Cycle over all objects in the scene and find the player object
 		if (playerInfo.at(i).getPlayerID() == m_playerID)
 		{
 			// Update the UI with the player score and health.
@@ -90,4 +105,16 @@ void PlayerStatsMenu::handleLobbyUpdate(const std::vector<PlayerInfo>& playerInf
 			m_playerScore.setText("Score: " + std::to_string(playerInfo.at(i).getScore()));
 		}
 	}
+
+	if (!platersConnected)
+	{
+		for (unsigned int i = 0; i < playerInfo.size(); ++i)
+		{
+			if (playerInfo.at(i).getLives() > 0
+			 && playerInfo.at(i).getLives() != 255)
+				platersConnected = true;
+		}
+	}
+	else
+		m_playersAlive = checkAlive(playerInfo);
 }

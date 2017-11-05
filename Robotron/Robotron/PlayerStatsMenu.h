@@ -26,9 +26,10 @@ public:
 	PlayerStatsMenu(Scene& scene, std::uint8_t playerID);
 	~PlayerStatsMenu();
 
-	// Renders the stats of all the connected players in the stats menu
-	void renderStats();
-	void renderUI();
+	void renderStats(); // Renders the stats of all the connected players in the stats menu
+	void renderUI(); // Renders the players menu with their personal score/health
+	bool checkPlayersAlive(); // Checks if all the players are dead
+
 	std::uint8_t m_playerID;
 	virtual void handleLobbyUpdate(const std::vector<PlayerInfo>& playerInfo) override;
 	virtual void handleBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress) override;
@@ -36,7 +37,8 @@ public:
 	virtual void handleJoinRejected() override;
 	virtual void handleGameStart() override;
 private:
-
+	bool platersConnected; // A flag to check the players are properly connected before checking if they are dead
+	bool m_playersAlive;
 	Scene& m_scene;
 	std::vector<TextLabel> m_statsScreenLabels;
 

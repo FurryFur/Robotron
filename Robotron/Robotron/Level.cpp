@@ -374,16 +374,7 @@ bool Level::checkEnemiesAlive()
 // Check atleast one player is still alive. If return false, trigger the game to end.
 bool Level::checkPlayersAlive()
 {
-	// Cycle through all the entites in the scene.
-	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
-	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER)
-			&& m_scene.getEntity(i).player.playerInfo.getLives() > 0
-			&& m_scene.getEntity(i).player.playerInfo.getLives() != 255)
-			return true;
-	}
-
-	return false;
+	return m_playerStatsMenu.checkPlayersAlive();
 }
 
 // If enough time has passed since their death and they have lives remaining, the player is respawned.
