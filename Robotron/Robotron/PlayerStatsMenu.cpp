@@ -115,6 +115,7 @@ void PlayerStatsMenu::handleLobbyUpdate(const std::vector<PlayerInfo>& playerInf
 				platersConnected = true;
 		}
 	}
-	else
+	else {
 		m_playersAlive = checkAlive(playerInfo);
+	}
 }

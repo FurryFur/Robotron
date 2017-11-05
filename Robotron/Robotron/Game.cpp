@@ -416,6 +416,14 @@ void Game::renderMenuScreens()
 			m_uiMainMenuLabels.at(i).Render();
 			m_userNameInput.Render();
 		}
+		// Render the gameover labels only after the player has returned from the game
+		if (m_displayGameOverText == true)
+		{
+			for (unsigned int i = 0; i < m_uiGameOverLabels.size(); ++i)
+			{
+				m_uiGameOverLabels.at(i).Render();
+			}
+		}
 		break;
 	}
 	case LOBBYSEARCH:
@@ -449,14 +457,6 @@ void Game::renderMenuScreens()
 		{
 			m_uiPlayerNames.at(i).Render();
 		}
-		// Render the gameover labels only after the player has returned from the game
-		if (m_displayGameOverText == true)
-		{
-			for (unsigned int i = 0; i < m_uiGameOverLabels.size(); ++i)
-			{
-				m_uiGameOverLabels.at(i).Render();
-			}
-		}
 		break;
 	}
 	case CLIENTLOBBY:
@@ -467,14 +467,6 @@ void Game::renderMenuScreens()
 		for (unsigned int i = 0; i < m_uiPlayerNames.size(); ++i)
 		{
 			m_uiPlayerNames.at(i).Render();
-		}
-		// Render the gameover labels only after the player has returned from the game
-		if (m_displayGameOverText == true)
-		{
-			for (unsigned int i = 0; i < m_uiGameOverLabels.size(); ++i)
-			{
-				m_uiGameOverLabels.at(i).Render();
-			}
 		}
 		break;
 	}
@@ -622,7 +614,7 @@ void Game::process(float deltaTick)
 				// Trigger the game over text to dispay and update it
 				m_displayGameOverText = true;
 				// Return to lobby
-				m_gameState = LOBBY;
+				m_gameState = MAINMENU;
 
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);
@@ -661,7 +653,7 @@ void Game::process(float deltaTick)
 				// Trigger the game over text to dispay and update it
 				m_displayGameOverText = true;
 				// Return to lobby
-				m_gameState = CLIENTLOBBY;
+				m_gameState = MAINMENU;
 
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);
