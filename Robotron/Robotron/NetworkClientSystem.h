@@ -48,10 +48,10 @@ public:
 	void playAudio(Sound);
 
 	// This should be called via Remote Procedure Calls sent from the server.
-	void createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform);
+	void createGhost(std::int32_t entityNetId, ModelID modelId);
 
 	// This should be called via Remote Procedure Calls sent from the server.
-	void createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const TransformComponent& transform);
+	void createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo);
 
 	// Destroys the entity if one exists at the specified
 	// network id.

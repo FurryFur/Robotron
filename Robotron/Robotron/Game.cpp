@@ -129,6 +129,8 @@ Game::Game(GLFWwindow* window, Audio audio)
 
 Game::~Game()
 {
+	if (m_networkSystem)
+		m_networkSystem->removeEventListener(this);
 }
 
 void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods)
@@ -565,7 +567,7 @@ void Game::process(float deltaTick)
 			std::unique_ptr<NetworkClientSystem> temp = std::make_unique<NetworkClientSystem>(m_scene, m_audio, m_userName);
 			s_client = temp.get();
 			m_networkSystem = std::move(temp);
-			s_client->registerLobbyEventListener(this);
+			s_client->registerEventListener(this);
 			s_client->broadcastForServers();
 		}
 		// If he number of servers no longer = the number of buttons. Reset the buttons
@@ -617,8 +619,8 @@ void Game::process(float deltaTick)
 			auto tmp = std::make_unique<NetworkServerSystem>(m_scene, m_userName, m_serverName);
 			m_audio.setNetworkAudioServer(tmp.get());
 			m_networkSystem = std::move(tmp);
+			m_networkSystem->registerEventListener(this);
 		}
-		m_networkSystem->registerLobbyEventListener(this);
 
 		// The mouse is within the back button click
 		checkButtonHighlight(135.0f, 280.0f, 650.0f, 695.0f, &m_uiLobbyLabels.at(1), BACKDOWN);

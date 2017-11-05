@@ -69,8 +69,8 @@ void NetworkClientSystem::beginFrame()
 		auto timeSinceLastPacket = now - m_tLastPacketRecvd;
 		if (timeSinceLastPacket > NetworkSystem::s_kKeepAliveTimout) {
 			m_clientState = CLIENT_STATE_NO_SERVER;
-			if (m_netEventListener.size() > 0) {
-				for (auto eventListener : m_netEventListener)
+			if (m_eventListeners.size() > 0) {
+				for (auto eventListener : m_eventListeners)
 					eventListener->onDisconnect();
 			}
 		}
@@ -127,7 +127,7 @@ void NetworkClientSystem::startGame()
 {
 	m_clientState = CLIENT_STATE_IN_GAME;
 
-	for (auto eventListener : m_netEventListener)
+	for (auto eventListener : m_eventListeners)
 		eventListener->onGameStart();
 }
 
@@ -176,9 +176,9 @@ void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPl
 	//	std::cout << playerInfo.username << std::endl;
 	//}
 
-	if (m_netEventListener.size() > 0)
+	if (m_eventListeners.size() > 0)
 	{
-		for (auto eventListener : m_netEventListener)
+		for (auto eventListener : m_eventListeners)
 			eventListener->onPlayersUpdated(currentPlayers);
 	}
 }
@@ -188,14 +188,14 @@ void NetworkClientSystem::playAudio(Sound sound)
 	m_audioSystem.playSFX(sound);
 }
 
-void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform)
+void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId)
 {
 	// Destroy existing entities with the same id before creating new ones
 	// TODO: Add logging here
 	if (destroyIfExistsInNetwork(entityNetId))
 		std::cout << "INFO: Overwritting entity with network id: " << entityNetId << std::endl;
 
-	Entity& newEntity = EntityUtils::createGhost(m_scene, modelId, transform, entityNetId);
+	Entity& newEntity = EntityUtils::createGhost(m_scene, modelId, entityNetId);
 
 	// Add entity to network system tracking
 	if (entityNetId >= m_netEntities.size())
@@ -203,14 +203,14 @@ void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId,
 	m_netEntities.at(entityNetId) = &newEntity;
 }
 
-void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo, const TransformComponent& transform)
+void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo)
 {
 	// Destroy existing entities with the same id before creating new ones
 	// TODO: Add logging here
 	if (destroyIfExistsInNetwork(entityNetId))
 		std::cout << "INFO: Overwritting entity with network id: " << entityNetId << std::endl;
 
-	Entity& newEntity = EntityUtils::createPlayerGhost(m_scene, playerInfo, transform, entityNetId);
+	Entity& newEntity = EntityUtils::createPlayerGhost(m_scene, playerInfo, entityNetId);
 
 	// TODO: Conditionally add the player controller if the username matches the clients username
 	// newEntity.addComponents(COMPONENT_PLAYER_CONTROL);
@@ -239,9 +239,9 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 	case PACKET_TYPE_BROADCAST_RESPONSE:
 		// If we receive a broadcast response from a server in this mode, simple inform the 
 		// lobby event listener.
-		if (m_netEventListener.size() > 0)
+		if (m_eventListeners.size() > 0)
 		{
-			for (auto eventListener : m_netEventListener)
+			for (auto eventListener : m_eventListeners)
 				eventListener->onBroadcastResponse(packet.serverName, address);
 		}
 
@@ -262,9 +262,9 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 
 			std::cout << "Received join accept from server at address: " 
 			          << toString(address) << std::endl;
-			if (m_netEventListener.size() > 0)
+			if (m_eventListeners.size() > 0)
 			{
-				for (auto eventListener : m_netEventListener)
+				for (auto eventListener : m_eventListeners)
 					eventListener->onJoinAccepted();
 			}
 		} else {
@@ -272,9 +272,9 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 
 			std::cout << "Received join reject from server at address: " 
 			          << toString(address) << std::endl;
-			if (m_netEventListener.size() > 0)
+			if (m_eventListeners.size() > 0)
 			{
-				for (auto eventListener : m_netEventListener)
+				for (auto eventListener : m_eventListeners)
 					eventListener->onJoinRejected();
 			}
 		}

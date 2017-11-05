@@ -48,8 +48,7 @@ InBufferStream& operator>>(InBufferStream&, RemoteProcedureCall&);
 class RPCCreatePlayerGhost : public RemoteProcedureCall {
 public:
 	RPCCreatePlayerGhost() = default;
-	RPCCreatePlayerGhost(std::int32_t entityNetId, const PlayerInfo&,
-		const TransformComponent& transform);
+	RPCCreatePlayerGhost(std::int32_t entityNetId, const PlayerInfo&);
 
 	virtual void execute() override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
@@ -58,14 +57,12 @@ public:
 private:
 	std::int32_t m_entityNetId;
 	PlayerInfo m_playerInfo;
-	TransformComponent m_transform;
 };
 
 class RPCCreateGhost : public RemoteProcedureCall {
 public:
 	RPCCreateGhost() = default;
-	RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
-		const TransformComponent& transform);
+	RPCCreateGhost(std::int32_t entityNetId, ModelID modelId);
 
 	virtual void execute() override;
 	virtual OutBufferStream& serialize(OutBufferStream&) const override;
@@ -74,7 +71,6 @@ public:
 private:
 	std::int32_t m_entityNetId;
 	ModelID m_modelId;
-	TransformComponent m_transform;
 };
 
 class RPCDestroyGhost : public RemoteProcedureCall {

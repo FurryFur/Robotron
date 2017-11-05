@@ -95,10 +95,10 @@ namespace EntityUtils {
 	void setModelEnemyBullet(Entity&);
 
 	// Create a simple dummy entity that will be controlled by a remote controller
-	Entity& createGhost(Scene&, ModelID, const TransformComponent&, std::int32_t entityNetId);
+	Entity& createGhost(Scene&, ModelID, std::int32_t entityNetId);
 
 	// Create local player object that will have it's inputs sent to a remote controller
-	Entity& createPlayerGhost(Scene&, const PlayerInfo&, const TransformComponent&, std::int32_t entityNetId);
+	Entity& createPlayerGhost(Scene&, const PlayerInfo&, std::int32_t entityNetId);
 
 	// Creates a cylinder with the specified radius and height.
 	Entity& createCylinder(Scene&, float radius = 1, float height = 1, const TransformComponent& transform = {});

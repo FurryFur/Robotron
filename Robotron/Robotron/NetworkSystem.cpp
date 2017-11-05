@@ -52,21 +52,6 @@ void NetworkSystem::beginFrame()
 
 void NetworkSystem::endFrame()
 {
-	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
-		Entity& entity = m_scene.getEntity(i);
-		if (entity.hasComponents(COMPONENT_NETWORK)) {
-			bool inNetworkList = false;
-			for (size_t j = 0; j < m_netEntities.size(); ++j) {
-				Entity* netEntity = m_netEntities.at(j);
-				if (netEntity && entity.network.id == netEntity->network.id) {
-					inNetworkList = true;
-				}
-			}
-			if (!inNetworkList)
-				std::cout << "WARNING: NETWORK ENTITY MISSING FROM NETWORK LIST, CUR ID: " << entity.network.id << std::endl;
-		}
-	}
-
 	if (m_willSendPcktThisFrame) {
 		++m_curSeqenceNum;
 		// New RPC group for new sequence number
@@ -156,7 +141,23 @@ void NetworkSystem::bufferRpc(std::unique_ptr<RemoteProcedureCall> rpc)
 	rpcGroup.addRPC(std::move(rpc));
 }
 
-void NetworkSystem::registerLobbyEventListener(NetworkEventListener* eventListener)
+void NetworkSystem::registerEventListener(NetworkEventListener* eventListener)
 {
-	m_netEventListener.push_back(eventListener);
+	if (eventListener)
+		m_eventListeners.push_back(eventListener);
+	else {
+		// TODO: Add logging here
+		std::cout << "WARNING: Tried to register nullptr as a Network Event Listener" << std::endl;
+	}
+}
+
+void NetworkSystem::removeEventListener(NetworkEventListener* eventListener)
+{
+	auto removeIt = std::remove(m_eventListeners.begin(), m_eventListeners.end(), eventListener);
+	if (removeIt != m_eventListeners.end())
+		m_eventListeners.erase(removeIt);
+	else {
+		// TODO: Add logging here
+		std::cout << "WARNING: Tried to remove a Network Event Listener that wasn't registered with the network system" << std::endl;
+	}
 }

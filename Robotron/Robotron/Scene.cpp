@@ -68,12 +68,10 @@ void Scene::registerEventListener(SceneEventListener* eventListener)
 
 void Scene::removeEventListener(SceneEventListener* eventListener)
 {
-	auto eraseResult = m_eventListeners.erase(
-		std::remove(m_eventListeners.begin(), m_eventListeners.end(), eventListener), 
-		m_eventListeners.end()
-	);
-
-	if (eraseResult == m_eventListeners.end()) {
+	auto removeIt = std::remove(m_eventListeners.begin(), m_eventListeners.end(), eventListener);
+	if (removeIt != m_eventListeners.end())
+		m_eventListeners.erase(removeIt);
+	else {
 		// TODO: Add logging here
 		std::cout << "WARNING: Tried to remove a Scene Event Listener that wasn't registered with the scene" << std::endl;
 	}

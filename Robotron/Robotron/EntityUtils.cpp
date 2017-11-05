@@ -374,13 +374,11 @@ void EntityUtils::setModelEnemyBullet(Entity& entity)
 	entity.transform.eulerAngles.x += static_cast<float>(M_PI_2);
 }
 
-Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const TransformComponent& transform, std::int32_t entityNetId)
+Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, std::int32_t entityNetId)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL, COMPONENT_TRANSFORM, 
 	                                    COMPONENT_NETWORK, COMPONENT_PHYSICS);
 
-
-	entity.transform = transform;
 	entity.network.id = entityNetId;
 
 	switch (modelId)
@@ -420,9 +418,9 @@ Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, const TransformC
 	return entity;
 }
 
-Entity& EntityUtils::createPlayerGhost(Scene& scene, const PlayerInfo& playerInfo, const TransformComponent& transform, std::int32_t entityNetId)
+Entity& EntityUtils::createPlayerGhost(Scene& scene, const PlayerInfo& playerInfo, std::int32_t entityNetId)
 {
-	Entity& entity = createPlayer(scene, transform);
+	Entity& entity = createPlayer(scene);
 	entity.removeComponents(COMPONENT_PLAYER_CONTROL);
 	entity.removeComponents(COMPONENT_INPUT_MAP);
 	entity.removeComponents(COMPONENT_INPUT);

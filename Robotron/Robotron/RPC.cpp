@@ -135,10 +135,9 @@ InBufferStream& RPCDestroyGhost::deserialize(InBufferStream& ibs)
 }
 
 RPCCreatePlayerGhost::RPCCreatePlayerGhost(std::int32_t entityNetId,
-	const PlayerInfo& playerInfo, const TransformComponent& transform)
+	const PlayerInfo& playerInfo)
 	: m_entityNetId(entityNetId)
 	, m_playerInfo(playerInfo)
-	, m_transform{ transform }
 {
 }
 
@@ -151,7 +150,7 @@ void RPCCreatePlayerGhost::execute()
 	}
 
 	if (g_clientSystem) {
-		g_clientSystem->createPlayerGhost(m_entityNetId, m_playerInfo, m_transform);
+		g_clientSystem->createPlayerGhost(m_entityNetId, m_playerInfo);
 	}
 	else {
 		// TODO: Add logging here
@@ -161,21 +160,17 @@ void RPCCreatePlayerGhost::execute()
 
 OutBufferStream& RPCCreatePlayerGhost::serialize(OutBufferStream& obs) const
 {
-	obs << RPC_CREATE_PLAYER_GHOST << m_entityNetId << m_playerInfo
-	    << m_transform;
-	return obs;
+	return obs << RPC_CREATE_PLAYER_GHOST << m_entityNetId << m_playerInfo;
 }
 
 InBufferStream& RPCCreatePlayerGhost::deserialize(InBufferStream& ibs)
 {
-	return ibs >> m_entityNetId >> m_playerInfo >> m_transform;
+	return ibs >> m_entityNetId >> m_playerInfo;
 }
 
-RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId, 
-	const TransformComponent& transform)
+RPCCreateGhost::RPCCreateGhost(std::int32_t entityNetId, ModelID modelId)
 	: m_entityNetId(entityNetId)
 	, m_modelId{ modelId }
-	, m_transform { transform }
 {
 }
 
@@ -188,7 +183,7 @@ void RPCCreateGhost::execute()
 	}
 
 	if (g_clientSystem) {
-		g_clientSystem->createGhost(m_entityNetId, m_modelId, m_transform);
+		g_clientSystem->createGhost(m_entityNetId, m_modelId);
 	} else {
 		// TODO: Add logging here
 		std::cout << "WARNING: Received create ghost RPC on a non-client, or RPC client not set" << std::endl;
@@ -197,7 +192,7 @@ void RPCCreateGhost::execute()
 
 OutBufferStream& RPCCreateGhost::serialize(OutBufferStream& obs) const
 {
-	obs << RPCType::RPC_CREATE_GHOST << m_entityNetId << m_modelId << m_transform;
+	obs << RPCType::RPC_CREATE_GHOST << m_entityNetId << m_modelId;
 	return obs;
 }
 
@@ -205,7 +200,7 @@ InBufferStream& RPCCreateGhost::deserialize(InBufferStream& ibs)
 {
 	// TODO: Add error checking when deserializing model
 	// Make sure we get a valid model id back
-	return ibs >> m_entityNetId >> m_modelId >> m_transform;
+	return ibs >> m_entityNetId >> m_modelId;
 }
 
 RPCRecordInput::RPCRecordInput(std::int32_t entityNetId, const InputComponent& input)

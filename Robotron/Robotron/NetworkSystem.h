@@ -24,7 +24,8 @@ public:
 	virtual bool isInGame() = 0;
 	virtual void startGame() = 0;
 
-	void registerLobbyEventListener(NetworkEventListener*);
+	void registerEventListener(NetworkEventListener*);
+	void removeEventListener(NetworkEventListener*);
 
 	static const std::chrono::milliseconds s_kKeepAliveTimout;
 
@@ -48,7 +49,7 @@ protected:
 	CSocket m_socket;
 	Scene& m_scene;
 	std::vector<Entity*> m_netEntities;
-	std::vector<NetworkEventListener*> m_netEventListener;
+	std::vector<NetworkEventListener*> m_eventListeners;
 
 	// Determines whether the implementing client/server will send out a packet
 	// this frame or not

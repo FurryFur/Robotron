@@ -161,9 +161,9 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 	std::vector<PlayerInfo> currentPlayers = getPlayers();
 	bufferRpc(std::make_unique<RPCUpdatePlayers>(currentPlayers));
 	
-	if (m_serverState == SERVER_STATE_LOBBY_MODE && m_netEventListener.size() > 0)
+	if (m_serverState == SERVER_STATE_LOBBY_MODE && m_eventListeners.size() > 0)
 	{
-		for (auto eventListener : m_netEventListener)
+		for (auto eventListener : m_eventListeners)
 			eventListener->onPlayersUpdated(getPlayers());
 	}
 	// TODO: Don't auto start the game, stay in lobby until game is started
@@ -225,9 +225,9 @@ void NetworkServerSystem::beginFrame()
 	}
 
 	// Notify UI of any client disconnections
-	if (clientDisconnected && m_netEventListener.size() > 0) {
+	if (clientDisconnected && m_eventListeners.size() > 0) {
 		std::vector<PlayerInfo> players = getPlayers();
-		for (auto eventListener : m_netEventListener)
+		for (auto eventListener : m_eventListeners)
 			eventListener->onPlayersUpdated(players);
 	}
 	
@@ -274,9 +274,9 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 		std::vector<PlayerInfo> currentPlayers = getPlayers();
 		bufferRpc(std::make_unique<RPCUpdatePlayers>(currentPlayers));
 
-		if (m_netEventListener.size() > 0)
+		if (m_eventListeners.size() > 0)
 		{
-			for (auto eventListener : m_netEventListener)
+			for (auto eventListener : m_eventListeners)
 				eventListener->onPlayersUpdated(currentPlayers);
 		}
 	}
@@ -318,7 +318,7 @@ void NetworkServerSystem::startGame()
 	m_serverPlayer->player.playerInfo = m_serverPlayerInfo;
 
 	// Tell clients to create the server player model
-	bufferRpc(std::make_unique<RPCCreatePlayerGhost>(m_serverPlayer->network.id, m_serverPlayer->player.playerInfo, m_serverPlayer->transform));
+	bufferRpc(std::make_unique<RPCCreatePlayerGhost>(m_serverPlayer->network.id, m_serverPlayer->player.playerInfo));
 
 	// Create entities for clients to possess
 	for (auto& addressClientInfoPair : m_clients) {
@@ -329,7 +329,7 @@ void NetworkServerSystem::startGame()
 		addressClientInfoPair.second.playerEntity = &newPlayer;
 
 		// Tell clients to create their player models
-		bufferRpc(std::make_unique<RPCCreatePlayerGhost>(newPlayer.network.id, newPlayer.player.playerInfo, newPlayer.transform));
+		bufferRpc(std::make_unique<RPCCreatePlayerGhost>(newPlayer.network.id, newPlayer.player.playerInfo));
 	}
 }
 
@@ -391,14 +391,6 @@ void NetworkServerSystem::selectGhostSnapshots(SnapshotBufT& dst,
 	using PriorityQT = std::priority_queue<Entity*, std::vector<Entity*>, EntityPriorityComparitor>;
 	static PriorityQT s_snapshotPriorityQ;
 
-	//for (size_t i = 0; i < src.size(); ++i) {
-	//	for (size_t j = i + 1; j < src.size(); ++j) {
-	//		if (src.at(i) && src.at(j) && src.at(i) == src.at(j)) {
-	//			std::cout << "ERROR: DUPLICATE ENTITY POINTER IN ENTITY LIST" << std::endl;
-	//		}
-	//	}
-	//}
-
 	// Create priority queue of entities from src
 	s_snapshotPriorityQ = {};
 	for (Entity* entity : src) {
@@ -445,29 +437,6 @@ void NetworkServerSystem::onEntityCreation(Entity & entity)
 		}
 	}
 
-	//for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
-	//	Entity& entity = m_scene.getEntity(i);
-	//	if (entity.hasComponents(COMPONENT_NETWORK)) {
-	//		bool inNetworkList = false;
-	//		for (size_t j = 0; j < m_netEntities.size(); ++j) {
-	//			Entity* netEntity = m_netEntities.at(j);
-	//			if (netEntity && entity.network.id == netEntity->network.id) {
-	//				inNetworkList = true;
-	//			}
-	//		}
-	//		if (!inNetworkList)
-	//			std::cout << "WARNING: NETWORK ENTITY MISSING FROM NETWORK LIST, CUR ID: " << entity.network.id << std::endl;
-	//	}
-	//}
-
-	//for (size_t i = 0; i < m_netEntities.size(); ++i) {
-	//	for (size_t j = i + 1; j < m_netEntities.size(); ++j) {
-	//		if (m_netEntities.at(i) && m_netEntities.at(j) && m_netEntities.at(i) == m_netEntities.at(j)) {
-	//			std::cout << "ERROR: TRIED TO ADD AN ENTITY TO NETWORKING THAT IS ALREADY BEING TRACKED" << std::endl;
-	//		}
-	//	}
-	//}
-
 	// Create remote procedure calls to inform clients of new entity creation
 	id = entity.network.id;
 	std::unique_ptr<RemoteProcedureCall> rpc;
@@ -476,30 +445,22 @@ void NetworkServerSystem::onEntityCreation(Entity & entity)
 		// Delay until we have player info
 		return;
 	} else if (entity.hasComponents(COMPONENT_ZOMBIE)) {
-		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_ZOMBIE,
-			entity.transform);
+		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_ZOMBIE);
 	} else if (entity.hasComponents(COMPONENT_SNAKE)) {
-		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SNAKE,
-			entity.transform);
+		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SNAKE);
 	} else if (entity.hasComponents(COMPONENT_ENEMY_SHOOTER)) {
-		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SHOOTER,
-			entity.transform);
+		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SHOOTER);
 	} else if (entity.hasComponents(COMPONENT_PLAYERBULLET)) {
-		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_PLAYER_BULLET,
-			entity.transform);
+		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_PLAYER_BULLET);
 	} else if (entity.hasComponents(COMPONENT_ENEMYBULLET)) {
-		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_ENEMY_BULLET,
-			entity.transform);
+		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_ENEMY_BULLET);
 	} else if (entity.hasComponents(COMPONENT_SCOREPICKUP)) {
 		if (entity.aiVariables.lifePickUp) {
-			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_HEALTH_PICKUP,
-				entity.transform);
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_HEALTH_PICKUP);
 		} else if (entity.aiVariables.score > 10) {
-			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_2,
-				entity.transform);
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_2);
 		} else {
-			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_1,
-				entity.transform);
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_1);
 		}
 	} else {
 		rpc = nullptr;
