@@ -27,14 +27,25 @@ int main()
 	GLFWwindow* window = GLUtils::initOpenGL();
 
 	Audio audio;
-
-	Game game(window, audio);
-
 	audio.playBgMusic();
+
+	bool resetGame = false;
+	std::unique_ptr<Game> game;
 
 	while (!glfwWindowShouldClose(window)) {		
 		// Execute a from of the game.
-		game.executeOneFrame();
+		if (!resetGame)
+		{
+			if(game == nullptr)
+				game = std::make_unique<Game>(window, audio);
+			game->executeOneFrame();
+			resetGame = game->checkReset();
+		}
+		else
+		{
+			game.reset(nullptr);
+			resetGame = false;
+		}
 	}
 
 	glfwDestroyWindow(window);

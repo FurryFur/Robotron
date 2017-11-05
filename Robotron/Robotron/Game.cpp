@@ -256,7 +256,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			// The mouse is within the back button click
 			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
 			{
-				m_gameState = MAINMENU;
+				m_resetGame = true;
 			}
 			break;
 		}
@@ -265,7 +265,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			// The mouse is within the back button click
 			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
 			{
-				m_gameState = MAINMENU;
+				m_resetGame = true;
 			}
 			break;
 		}
@@ -274,7 +274,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			// The mouse is within the back button click
 			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
 			{
-				m_gameState = MAINMENU;
+				m_resetGame = true;
 			}
 			// The mouse is within the start button click
 			if (m_mousePosX >= 635.0f && m_mousePosX <= 780.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == STARTDOWN)
@@ -290,7 +290,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			// The mouse is within the back button click
 			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
 			{
-				m_gameState = MAINMENU;
+				m_resetGame = true;
 			}
 			break;
 		}
@@ -398,6 +398,11 @@ void Game::executeOneFrame()
 	process(fDT);
 }
 
+bool Game::checkReset()
+{
+	return m_resetGame;
+}
+
 void Game::renderMenuScreens()
 {
 	m_renderSystem.beginRender();
@@ -415,6 +420,14 @@ void Game::renderMenuScreens()
 		{
 			m_uiMainMenuLabels.at(i).Render();
 			m_userNameInput.Render();
+		}
+		// Render the gameover labels only after the player has returned from the game
+		if (m_displayGameOverText == true)
+		{
+			for (unsigned int i = 0; i < m_uiGameOverLabels.size(); ++i)
+			{
+				m_uiGameOverLabels.at(i).Render();
+			}
 		}
 		break;
 	}
@@ -449,14 +462,6 @@ void Game::renderMenuScreens()
 		{
 			m_uiPlayerNames.at(i).Render();
 		}
-		// Render the gameover labels only after the player has returned from the game
-		if (m_displayGameOverText == true)
-		{
-			for (unsigned int i = 0; i < m_uiGameOverLabels.size(); ++i)
-			{
-				m_uiGameOverLabels.at(i).Render();
-			}
-		}
 		break;
 	}
 	case CLIENTLOBBY:
@@ -467,14 +472,6 @@ void Game::renderMenuScreens()
 		for (unsigned int i = 0; i < m_uiPlayerNames.size(); ++i)
 		{
 			m_uiPlayerNames.at(i).Render();
-		}
-		// Render the gameover labels only after the player has returned from the game
-		if (m_displayGameOverText == true)
-		{
-			for (unsigned int i = 0; i < m_uiGameOverLabels.size(); ++i)
-			{
-				m_uiGameOverLabels.at(i).Render();
-			}
 		}
 		break;
 	}
@@ -621,8 +618,8 @@ void Game::process(float deltaTick)
 			{
 				// Trigger the game over text to dispay and update it
 				m_displayGameOverText = true;
-				// Return to lobby
-				m_gameState = LOBBY;
+				// Return to main menu
+				m_resetGame = true;
 
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);
@@ -660,8 +657,8 @@ void Game::process(float deltaTick)
 			{
 				// Trigger the game over text to dispay and update it
 				m_displayGameOverText = true;
-				// Return to lobby
-				m_gameState = CLIENTLOBBY;
+				// Return to main menu
+				m_resetGame = true;
 
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);

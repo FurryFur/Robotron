@@ -60,7 +60,7 @@ public:
 	static std::vector<IKeyObserver*> s_keyObservers;
 
 	void executeOneFrame();
-
+	bool checkReset();
 	// Inherited via LobbyEventListener
 	virtual void handleBroadcastResponse(const std::string & serverName, const sockaddr_in & serverAddress) override;
 	virtual void handleJoinAccepted() override;
@@ -93,7 +93,7 @@ private:
 	size_t m_numConnectedPlayers; // Keeps track of the number of connected players. If this changes update the ui for player names
 	bool m_setPlayerIDNum;
 	std::uint8_t m_playerID;
-
+	bool m_resetGame;
 	GLFWwindow* m_window;
 	Clock m_clock;
 
