@@ -16,6 +16,10 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <chrono>
+
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
 const USHORT NetworkServerSystem::s_kDefaultServerPort = 8456;
 
@@ -90,6 +94,9 @@ void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr
 	// TODO: Handle out of order packets similar to client side
 	if (seqNumRecvd > seqNumSeen)
 		clientIt->second.lastSeqNumSeen = seqNumRecvd;
+
+	// Update keep alive
+	clientIt->second.tLastPacketRecvd = high_resolution_clock::now();
 }
 
 void NetworkServerSystem::handleLobbyPackets(const Packet& packet, const sockaddr_in& address)
@@ -175,6 +182,21 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 			m_netEntities.push_back(&entity);
 		}
 	}
+
+	//for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
+	//	Entity& entity = m_scene.getEntity(i);
+	//	if (entity.hasComponents(COMPONENT_NETWORK)) {
+	//		bool inNetworkList = false;
+	//		for (size_t j = 0; j < m_netEntities.size(); ++j) {
+	//			Entity* netEntity = m_netEntities.at(j);
+	//			if (netEntity && entity.network.id == netEntity->network.id) {
+	//				inNetworkList = true;
+	//			}
+	//		}
+	//		if (!inNetworkList)
+	//			std::cout << "WARNING: NETWORK ENTITY MISSING FROM NETWORK LIST, CUR ID: " << entity.network.id << std::endl;
+	//	}
+	//}
 
 	//for (size_t i = 0; i < m_netEntities.size(); ++i) {
 	//	for (size_t j = i + 1; j < m_netEntities.size(); ++j) {
@@ -271,6 +293,30 @@ void NetworkServerSystem::beginFrame()
 		default:
 			break;
 		}
+	}
+
+	// Check keep alives
+	auto now = high_resolution_clock::now();
+	auto clientIt = m_clients.begin();
+	bool clientDisconnected = false;
+	while (clientIt != m_clients.end()) {
+		auto tLastPacketRecvd = clientIt->second.tLastPacketRecvd;
+		auto timeSinceLastPacket = now - tLastPacketRecvd;
+		if (timeSinceLastPacket > NetworkSystem::s_kKeepAliveTimout) {
+			if (clientIt->second.playerEntity)
+				clientIt->second.playerEntity->destroy();
+			clientIt = m_clients.erase(clientIt);
+			clientDisconnected = true;
+		} else {
+			++clientIt;
+		}
+	}
+
+	// Notify UI of any client disconnections
+	if (clientDisconnected && m_lobbyEventListener.size() > 0) {
+		std::vector<PlayerInfo> players = getPlayers();
+		for (auto eventListener : m_lobbyEventListener)
+			eventListener->handleLobbyUpdate(players);
 	}
 	
 	// Check if we will send packets this frame

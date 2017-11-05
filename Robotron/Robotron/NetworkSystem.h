@@ -25,6 +25,8 @@ public:
 
 	void registerLobbyEventListener(LobbyEventListener*);
 
+	static const std::chrono::milliseconds s_kKeepAliveTimout;
+
 private:
 	std::vector<char> m_recvBuffer;
 

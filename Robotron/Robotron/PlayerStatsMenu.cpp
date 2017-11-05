@@ -73,6 +73,10 @@ void PlayerStatsMenu::handleGameStart()
 {
 }
 
+void PlayerStatsMenu::handleDisconnect()
+{
+}
+
 bool checkAlive(const std::vector<PlayerInfo>& playerInfo)
 {
 	for (unsigned int i = 0; i < playerInfo.size(); ++i)

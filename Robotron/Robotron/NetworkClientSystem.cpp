@@ -16,6 +16,10 @@
 #include <cmath>
 #include <iostream>
 #include <cstdint>
+#include <chrono>
+
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
 NetworkClientSystem::NetworkClientSystem(Scene& scene, Audio& audioSystem, const std::string& username)
 	: NetworkSystem(scene)
@@ -38,6 +42,9 @@ void NetworkClientSystem::beginFrame()
 {
 	sockaddr_in address;
 	while (receiveData(m_recvPacket, address)) {
+		// Keep alive update
+		m_tLastPacketRecvd = high_resolution_clock::now();
+
 		switch (m_clientState)
 		{
 		case CLIENT_STATE_NO_SERVER:
@@ -49,6 +56,19 @@ void NetworkClientSystem::beginFrame()
 			break;
 		default:
 			break;
+		}
+	}
+	
+	// Check keep alive
+	if (m_clientState != CLIENT_STATE_NO_SERVER) {
+		auto now = high_resolution_clock::now();
+		auto timeSinceLastPacket = now - m_tLastPacketRecvd;
+		if (timeSinceLastPacket > NetworkSystem::s_kKeepAliveTimout) {
+			m_clientState = CLIENT_STATE_NO_SERVER;
+			if (m_lobbyEventListener.size() > 0) {
+				for (auto eventListener : m_lobbyEventListener)
+					eventListener->handleDisconnect();
+			}
 		}
 	}
 

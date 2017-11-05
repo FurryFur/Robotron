@@ -36,6 +36,7 @@ public:
 	virtual void handleJoinAccepted() override;
 	virtual void handleJoinRejected() override;
 	virtual void handleGameStart() override;
+	virtual void handleDisconnect() override;
 private:
 	bool platersConnected; // A flag to check the players are properly connected before checking if they are dead
 	bool m_playersAlive;
