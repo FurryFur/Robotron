@@ -210,23 +210,27 @@ void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const Play
 	if (destroyIfExistsInNetwork(entityNetId))
 		std::cout << "INFO: Overwritting entity with network id: " << entityNetId << std::endl;
 
-	Entity& newEntity = EntityUtils::createPlayerGhost(m_scene, playerInfo, entityNetId);
+	Entity& newPlayer = EntityUtils::createPlayerGhost(m_scene, playerInfo, entityNetId);
 
-	// TODO: Conditionally add the player controller if the username matches the clients username
-	// newEntity.addComponents(COMPONENT_PLAYER_CONTROL);
-	if (newEntity.player.playerInfo.getPlayerID() == m_clientPlayerID) {
-		newEntity.addComponents(COMPONENT_INPUT_MAP, COMPONENT_INPUT);
-		newEntity.inputMap.mouseInputEnabled = false;
-		newEntity.inputMap.leftBtnMap = GLFW_KEY_A;
-		newEntity.inputMap.rightBtnMap = GLFW_KEY_D;
-		newEntity.inputMap.forwardBtnMap = GLFW_KEY_W;
-		newEntity.inputMap.backwardBtnMap = GLFW_KEY_S;
+	// Conditionally add the player controller if the username matches the clients username
+	if (newPlayer.player.playerInfo.getPlayerID() == m_clientPlayerID) {
+		newPlayer.addComponents(COMPONENT_INPUT_MAP, COMPONENT_INPUT);
+		newPlayer.inputMap.mouseInputEnabled = false;
+		newPlayer.inputMap.leftBtnMap = GLFW_KEY_A;
+		newPlayer.inputMap.rightBtnMap = GLFW_KEY_D;
+		newPlayer.inputMap.forwardBtnMap = GLFW_KEY_W;
+		newPlayer.inputMap.backwardBtnMap = GLFW_KEY_S;
+
+		// Give the local player a spotlight
+		newPlayer.addComponents(COMPONENT_SPOTLIGHT);
+		newPlayer.spotlight.direction = glm::vec3(0, -0.1, -1);
+		newPlayer.spotlight.color = glm::vec3(0.5, 0.75, 1.5) * 4.0f;
 	}
 
 	// Add entity to network system tracking
 	if (entityNetId >= m_netEntities.size())
 		m_netEntities.resize(entityNetId + 1);
-	m_netEntities.at(entityNetId) = &newEntity;
+	m_netEntities.at(entityNetId) = &newPlayer;
 }
 
 void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sockaddr_in& address)

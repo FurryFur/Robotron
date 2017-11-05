@@ -18,11 +18,19 @@
 
 #include <glm\glm.hpp>
 
+#include <array>
+
 struct UniformFormat {
+	static const GLuint s_kMaxSpotlights = 8;
+
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
 	glm::vec4 cameraPos;
+	std::array<glm::vec4, s_kMaxSpotlights> spotlightPositions;
+	std::array<glm::vec4, s_kMaxSpotlights> spotlightDirections;
+	std::array<glm::vec4, s_kMaxSpotlights> spotlightColors;
+	GLuint numSpotlights;
 	GLfloat metallicness;
 	GLfloat glossiness;
 	GLfloat specBias;

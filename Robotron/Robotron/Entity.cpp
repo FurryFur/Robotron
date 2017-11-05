@@ -1,8 +1,22 @@
 #include "Entity.h"
 
+#include "EntityEventListener.h"
+
+#include <glm\glm.hpp>
+
+#include <iostream>
+
 Entity::Entity()
 	: m_componentMask{ 0 }
 {
+}
+
+void Entity::destroy()
+{
+	triggerRemoveComponentsEvent(m_componentMask);
+
+	m_componentMask = 0;
+	m_eventListeners.clear();
 }
 
 bool Entity::operator==(const Entity& rhs) const
@@ -33,6 +47,41 @@ bool Entity::matches(size_t lhsComponentMask, size_t rhsComponentMask)
 bool Entity::matchesAny(size_t lhsComponentMask, size_t rhsComponentMask)
 {
 	return (lhsComponentMask & rhsComponentMask) > 0;
+}
+
+void Entity::registerEventListener(EntityEventListener* eventListener)
+{
+	if (eventListener) {
+		m_eventListeners.push_back(eventListener);
+	} else {
+		// TODO: Add logging here
+		std::cout << "WARNING: Tried to register a nullptr as an Entity Event Listener" << std::endl;
+	}
+}
+
+void Entity::removeEventListener(EntityEventListener* eventListener)
+{
+	auto removeIt = std::remove(m_eventListeners.begin(), m_eventListeners.end(), eventListener);
+	if (removeIt != m_eventListeners.end())
+		m_eventListeners.erase(removeIt);
+	else {
+		// TODO: Add logging here
+		std::cout << "WARNING: Tried to remove an Entity Event Listener that wasn't registered with the entity" << std::endl;
+	}
+}
+
+void Entity::triggerAddComponentsEvent(size_t componentMask)
+{
+	for (auto eventListener : m_eventListeners) {
+		eventListener->onAddComponents(*this, componentMask);
+	}
+}
+
+void Entity::triggerRemoveComponentsEvent(size_t componentMask)
+{
+	for (auto eventListener : m_eventListeners) {
+		eventListener->onRemoveComponents(*this, componentMask);
+	}
 }
 
 void Entity::addComponents(size_t componentMask)
@@ -101,6 +150,11 @@ void Entity::addComponents(size_t componentMask)
 	if (matches(componentMask, COMPONENT_ENEMYBULLET)) {
 		m_componentMask |= COMPONENT_ENEMYBULLET;
 	}
+	if (matches(componentMask, COMPONENT_SPOTLIGHT)) {
+		m_componentMask |= COMPONENT_SPOTLIGHT;
+		spotlight = {};
+		spotlight.color = glm::vec3(1, 1, 1);
+	}
 
 	if (matchesAny(componentMask, COMPONENT_ZOMBIE, COMPONENT_SNAKE, 
 	                              COMPONENT_ENEMY_SHOOTER, COMPONENT_SCOREPICKUP, 
@@ -109,9 +163,12 @@ void Entity::addComponents(size_t componentMask)
 		aiVariables.wanderPosition = { 0, 1, 0 };
 		controlVars = {};
 	}
+
+	triggerAddComponentsEvent(componentMask);
 }
 
 void Entity::removeComponents(size_t componentMask)
 {
+	triggerRemoveComponentsEvent(componentMask);
 	m_componentMask &= (~componentMask);
 }

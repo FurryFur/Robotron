@@ -12,7 +12,12 @@
 #include "AIComponent.h"
 #include "TransformComponent.h"
 #include "CameraComponent.h"
+#include "SpotlightComponent.h"
 
+#include <vector>
+
+class EntityEventListener;
+ 
 enum ComponentMask {
 	COMPONENT_TRANSFORM = 1 << 0,
 	COMPONENT_PHYSICS = 1 << 1,
@@ -30,6 +35,7 @@ enum ComponentMask {
 	COMPONENT_PLAYERBULLET = 1 << 13,
 	COMPONENT_ENEMYBULLET = 1 << 14,
 	COMPONENT_PLAYER = 1 << 15,
+	COMPONENT_SPOTLIGHT = 1 << 16
 };
 
 class Entity {
@@ -49,6 +55,7 @@ public:
 	NetworkComponent network;
 	AIComponent aiVariables;
 	CameraComponent camera;
+	SpotlightComponent spotlight;
 
 	Entity(Entity&&) = default;
 	Entity(const Entity&) = delete;
@@ -97,9 +104,6 @@ public:
 	template<typename ...ComponentTs>
 	void removeComponents(size_t first, ComponentTs... rest);
 
-private:
-	Entity();
-
 	// Returns true if ALL the specified components are present 
 	// in the entity.
 	template<typename ...ComponentTs>
@@ -118,7 +122,19 @@ private:
 	// mask are present in the entity.
 	static bool matchesAny(size_t lhsComponentMask, size_t rhsComponentMask);
 
+	void registerEventListener(EntityEventListener*);
+	void removeEventListener(EntityEventListener*);
+	void triggerAddComponentsEvent(size_t componentMask);
+	void triggerRemoveComponentsEvent(size_t componentMask);
+
+private:
+	Entity();
+
+	// Destroys to entity
+	void destroy();
+
 	size_t m_componentMask;
+	std::vector<EntityEventListener*> m_eventListeners;
 };
 
 template<typename ...ComponentTs>

@@ -3,6 +3,8 @@
 #include <GLFW\glfw3.h>
 #include <glad\glad.h>
 
+#include <vector>
+
 class Entity;
 
 struct RenderState {
@@ -14,4 +16,5 @@ struct RenderState {
 	bool hasIrradianceMap;
 	GLuint uboUniforms;
 	GLuint uniformBindingPoint;
+	std::vector<const Entity*> spotlights;
 };

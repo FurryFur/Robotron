@@ -57,8 +57,11 @@ private:
 	ServerState m_serverState;
 	PlayerInfo m_serverPlayerInfo;
 	Entity* m_serverPlayer;
+	bool m_willSpawnPlayersThisFrame;
 
 	using SnapshotBufT = decltype(m_sendPacket.ghostSnapshotBuffer);
+
+	void spawnPlayers();
 
 	void handleGamePackets(const Packet&, const sockaddr_in& address);
 	void handleLobbyPackets(const Packet&, const sockaddr_in& address);

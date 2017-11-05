@@ -129,7 +129,7 @@ GLuint GLUtils::getDebugShader()
 
 	if (!s_shaderBuilt) {
 		compileAndLinkShaders(
-			"Assets/Shaders/debug_vert.glsl",
+			"Assets/Shaders/default_vert.glsl",
 			"Assets/Shaders/debug_frag.glsl",
 			s_shader);
 		s_shaderBuilt = true;

@@ -14,6 +14,8 @@
 #pragma once
 
 #include "RenderState.h"
+#include "SceneEventListener.h"
+#include "EntityEventListener.h"
 
 #include <glad\glad.h>
 #include <glm\glm.hpp>
@@ -25,9 +27,10 @@ struct GLFWwindow;
 class Entity;
 struct ModelComponent;
 
-class RenderSystem {
+class RenderSystem : public SceneEventListener, public EntityEventListener {
 public:
 	RenderSystem(GLFWwindow* glContext, Scene&);
+	~RenderSystem();
 	RenderSystem(const RenderSystem&) = delete;
 	RenderSystem& operator=(const RenderSystem&) = delete;
 
@@ -62,6 +65,14 @@ public:
 
 	// Sets the irradiance map for image based lighting
 	void setIrradianceMap(GLuint irradianceMap);
+
+	// Inherited via SceneEventListener
+	virtual void onEntityCreation(Entity & entity) override;
+	virtual void onEntityDestruction(Entity & entity) override;
+
+	// Inherited via EntityEventListener
+	virtual void onAddComponents(Entity & entity, size_t componentMask) override;
+	virtual void onRemoveComponents(Entity & entity, size_t componentMask) override;
 
 private:
 	static void renderModel(const ModelComponent&, const glm::mat4& transform);

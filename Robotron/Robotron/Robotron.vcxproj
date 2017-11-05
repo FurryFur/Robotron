@@ -217,6 +217,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="Enemy03ControlSystem.h" />
     <ClInclude Include="EnemyBulletSystem.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityEventListener.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GhostSnapshot.h" />
     <ClInclude Include="NetworkEventListener.h" />
@@ -225,6 +226,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="SceneEventListener.h" />
     <ClInclude Include="ServerInfo.h" />
     <ClInclude Include="PlayerStatsMenu.h" />
+    <ClInclude Include="SpotlightComponent.h" />
     <ClInclude Include="StreamableEvictQueue.h" />
     <ClInclude Include="GameplayLogicSystem.h" />
     <ClInclude Include="GLMUtils.h" />
@@ -270,12 +272,13 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\debug_frag.glsl" />
-    <None Include="Assets\Shaders\debug_vert.glsl" />
     <None Include="Assets\Shaders\default_frag.glsl" />
     <None Include="Assets\Shaders\default_vert.glsl" />
     <None Include="Assets\Shaders\metal_frag.glsl" />
     <None Include="Assets\Shaders\skybox_frag.glsl" />
     <None Include="Assets\Shaders\skybox_vert.glsl" />
+    <None Include="Assets\Shaders\Text.fs" />
+    <None Include="Assets\Shaders\Text.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Textures\PlaneTexture.jpg" />

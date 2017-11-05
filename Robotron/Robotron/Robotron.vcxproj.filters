@@ -371,6 +371,12 @@
     <ClInclude Include="NetworkEventListener.h">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
+    <ClInclude Include="EntityEventListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotlightComponent.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\default_frag.glsl">
@@ -385,13 +391,16 @@
     <None Include="Assets\Shaders\skybox_vert.glsl">
       <Filter>Assets\Shaders</Filter>
     </None>
-    <None Include="Assets\Shaders\debug_vert.glsl">
-      <Filter>Assets\Shaders</Filter>
-    </None>
     <None Include="Assets\Shaders\debug_frag.glsl">
       <Filter>Assets\Shaders</Filter>
     </None>
     <None Include="Assets\Shaders\metal_frag.glsl">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\Text.vs">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\Text.fs">
       <Filter>Assets\Shaders</Filter>
     </None>
   </ItemGroup>

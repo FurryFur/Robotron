@@ -104,8 +104,8 @@ CollectionT getRandomPermutation(const CollectionT& collection) {
 }
 
 // Checks if the specified element exists in the range [start, end) exclusive
-template<typename Iter, typename T>
-bool in(Iter start, Iter end, T val) {
+template<typename IterT, typename T>
+bool isIn(IterT start, IterT end, T val) {
 	auto resultIt = std::find(start, end, val);
 	if (resultIt != end)
 		return true;
@@ -113,10 +113,21 @@ bool in(Iter start, Iter end, T val) {
 		return false;
 }
 
+// Checks if the specified element exists in the range [start, end) exclusive
+template<typename ContainerT, typename T>
+bool isIn(ContainerT container, T val) {
+	return isIn(container.begin(), container.end(), val);
+}
+
 // Checks if the specified element does not exists in the range [start, end) exclusive
-template<typename Iter, typename T>
-bool notIn(Iter start, Iter end, T val) {
-	return !in(start, end, val);
+template<typename IterT, typename T>
+bool isNotIn(IterT start, IterT end, T val) {
+	return !isIn(start, end, val);
+}
+// Checks if the specified element does not exists in the range [start, end) exclusive
+template<typename ContainerT, typename T>
+bool isNotIn(ContainerT container, T val) {
+	return isNotIn(container.begin(), container.end(), val);
 }
 
 // Converts a number to a string with the specified number of decimal places

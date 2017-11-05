@@ -27,6 +27,7 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& userna
 	: NetworkSystem(scene)
 	, m_serverState{ SERVER_STATE_LOBBY_MODE }
 	, m_serverName{ serverName }
+	, m_willSpawnPlayersThisFrame{ false }
 {
 	m_scene.registerEventListener(this);
 
@@ -58,6 +59,35 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& userna
 NetworkServerSystem::~NetworkServerSystem()
 {
 	m_scene.removeEventListener(this);
+}
+
+void NetworkServerSystem::spawnPlayers()
+{
+	// Create an entity for the server to possess
+	TransformComponent transform{};
+	transform.position.y = 1;
+	m_serverPlayer = &EntityUtils::createPlayer(m_scene, transform);
+	m_serverPlayer->player.playerInfo = m_serverPlayerInfo;
+
+	// Give the local player a spotlight
+	m_serverPlayer->addComponents(COMPONENT_SPOTLIGHT);
+	m_serverPlayer->spotlight.direction = glm::vec3(0, -0.1, -1);
+	m_serverPlayer->spotlight.color = glm::vec3(0.5, 0.75, 1.5) * 4.0f;
+
+	// Tell clients to create the server player model
+	bufferRpc(std::make_unique<RPCCreatePlayerGhost>(m_serverPlayer->network.id, m_serverPlayer->player.playerInfo));
+
+	// Create entities for clients to possess
+	for (auto& addressClientInfoPair : m_clients) {
+		Entity& newPlayer = EntityUtils::createPlayer(m_scene, transform);
+		newPlayer.removeComponents(COMPONENT_INPUT_MAP); // Input will come from the clients
+		newPlayer.network.clientAddress = addressClientInfoPair.first;
+		newPlayer.player.playerInfo = addressClientInfoPair.second.playerInfo;
+		addressClientInfoPair.second.playerEntity = &newPlayer;
+
+		// Tell clients to create their player models
+		bufferRpc(std::make_unique<RPCCreatePlayerGhost>(newPlayer.network.id, newPlayer.player.playerInfo));
+	}
 }
 
 void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr_in& address)
@@ -284,6 +314,12 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 
 void NetworkServerSystem::endFrame()
 {
+	// Spawn players if we need to
+	if (m_willSpawnPlayersThisFrame) {
+		spawnPlayers();
+		m_willSpawnPlayersThisFrame = false;
+	}
+
 	if (m_willSendPcktThisFrame) {
 		// Set packet sequence number
 		m_sendPacket.sequenceNum = m_curSeqenceNum;
@@ -311,26 +347,7 @@ void NetworkServerSystem::startGame()
 	// Tell the clients to start their game instance
 	bufferRpc(std::make_unique<RPCStartGame>());
 
-	// Create an entity for the server to possess
-	TransformComponent transform{};
-	transform.position.y = 1;
-	m_serverPlayer = &EntityUtils::createPlayer(m_scene, transform);
-	m_serverPlayer->player.playerInfo = m_serverPlayerInfo;
-
-	// Tell clients to create the server player model
-	bufferRpc(std::make_unique<RPCCreatePlayerGhost>(m_serverPlayer->network.id, m_serverPlayer->player.playerInfo));
-
-	// Create entities for clients to possess
-	for (auto& addressClientInfoPair : m_clients) {
-		Entity& newPlayer = EntityUtils::createPlayer(m_scene, transform);
-		newPlayer.removeComponents(COMPONENT_INPUT_MAP); // Input will come from the clients
-		newPlayer.network.clientAddress = addressClientInfoPair.first;
-		newPlayer.player.playerInfo = addressClientInfoPair.second.playerInfo;
-		addressClientInfoPair.second.playerEntity = &newPlayer;
-
-		// Tell clients to create their player models
-		bufferRpc(std::make_unique<RPCCreatePlayerGhost>(newPlayer.network.id, newPlayer.player.playerInfo));
-	}
+	m_willSpawnPlayersThisFrame = true;
 }
 
 void NetworkServerSystem::recordInput(std::int32_t entityNetId, const InputComponent& input)

@@ -8,6 +8,7 @@ out VertexData {
     vec3 normal;
     vec2 texCoord;
 	vec3 viewDir;
+	vec3 worldPos;
 } o;
 
 layout (std140) uniform Uniforms {
@@ -15,6 +16,10 @@ layout (std140) uniform Uniforms {
     mat4 view;
     mat4 projection;
 	vec4 cameraPos;
+	vec4 spotlightPositions[8];
+	vec4 spotlightDirections[8];
+	vec4 spotlightColors[8];
+	uint numSpotlights;
 	float metallicness;
 	float glossiness;
 	float specBias;
@@ -27,6 +32,7 @@ void main()
     o.normal = (u.model * vec4(inNormal, 0)).xyz; // TODO: Do inverse transpose
     o.texCoord = inTexCoord;
 	o.viewDir = (u.cameraPos.xyz - worldPos).xyz;
+	o.worldPos = worldPos;
 
     gl_Position = u.projection * u.view * vec4(worldPos, 1);
 }

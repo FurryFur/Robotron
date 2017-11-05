@@ -11,6 +11,10 @@ layout (std140) uniform Uniforms {
     mat4 view;
     mat4 projection;
 	vec4 cameraPos;
+	vec4 spotlightPositions[8];
+	vec4 spotlightDirections[8];
+	vec4 spotlightColors[8];
+	uint numSpotlights;
 	float metallicness;
 	float glossiness;
 	float specBias;

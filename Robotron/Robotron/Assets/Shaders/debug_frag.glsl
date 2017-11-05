@@ -4,6 +4,7 @@ in VertexData {
 	vec3 normal;
 	vec2 texCoord;
 	vec3 viewDir;
+	vec3 worldPos;
 } i;
 
 out vec4 outColor;
@@ -13,6 +14,10 @@ layout (std140) uniform Uniforms {
     mat4 view;
     mat4 projection;
 	vec4 cameraPos;
+	vec4 spotlightPositions[8];
+	vec4 spotlightDirections[8];
+	vec4 spotlightColors[8];
+	uint numSpotlights;
 	float metallicness;
 	float glossiness;
 	float specBias;
@@ -27,6 +32,9 @@ uniform samplerCube irradianceSampler;
 vec3 lightDir = vec3(1, 1, -1);
 const vec3 LiDirect = vec3(0.64, 0.39, 0.31);
 const int pmremMipCount = 11;
+const float spotlightCuttoff = 0.5;
+const float spotPow = 4;
+const float attenuationScale = 0.01;
 
 vec3 fresnel(vec3 specColor, vec3 lightDir, vec3 halfVector)
 {
@@ -36,6 +44,29 @@ vec3 fresnel(vec3 specColor, vec3 lightDir, vec3 halfVector)
 vec3 fresnelWithGloss(vec3 specColor, vec3 lightDir, vec3 halfVector, float gloss)
 {
     return specColor + (max(vec3(gloss, gloss, gloss), specColor) - specColor) * pow(1.0f - clamp(dot(lightDir, halfVector), 0, 1), 5);
+}
+
+vec3 calcLrSpotlight(vec3 Cdiff, vec3 Cspec, vec3 normal, vec3 viewDir, vec3 lightPos, vec3 spotlightDir, vec3 lightCol, float specPow, float specNorm) 
+{
+	vec3 lightDisplacement = lightPos - i.worldPos;
+	vec3 lightDir = normalize(lightDisplacement);
+	spotlightDir = normalize(spotlightDir);
+	float spotEffect = max(dot(-lightDir, spotlightDir), 0.0);
+	if (spotEffect > spotlightCuttoff) {
+		spotEffect = pow(spotEffect, spotPow);
+		float attenuation = 1.0 / (1.0 + attenuationScale * pow(length(lightDisplacement), 2));
+		vec3 halfVector = normalize(lightDir + viewDir);
+		float ndotl = clamp(dot(lightDir, normal), 0, 1);
+		float ndoth = clamp(dot(normal, halfVector), 0, 1);
+
+		vec3 Fspec = fresnel(Cspec, lightDir, halfVector);
+		vec3 Fdiff = Cdiff * (1 - Fspec) / (1.0000001 - Cspec);
+
+		vec3 BRDFspec = specNorm * Fspec * pow(ndoth, specPow);
+		return lightCol * spotEffect * attenuation * (Fdiff + BRDFspec) * ndotl;
+	} else {
+		return vec3(0, 0, 0);
+	}	
 }
 
 void main(void)
@@ -72,9 +103,13 @@ void main(void)
 
 	vec3 BRDFspec = specNorm * Fspec * pow(ndoth, specPow);
 
+	vec3 LrSpotlight = vec3(0, 0, 0);
+	for (uint i = 0; i < u.numSpotlights; ++i) {
+		LrSpotlight += calcLrSpotlight(Cdiff, Cspec, normal, viewDir, u.spotlightPositions[i].xyz, u.spotlightDirections[i].xyz, u.spotlightColors[i].rgb, specPow, specNorm);
+	}
 	vec3 LrDirect = LiDirect * (Fdiff + BRDFspec) * ndotl;
 	vec3 LrAmbDiff= LiIrr * FdiffRefl;
 	vec3 LrAmbSpec = LiRefl * FspecRefl;
 
-	outColor = vec4(LrDirect + LrAmbDiff + LrAmbSpec, 1);
+	outColor = vec4(LrDirect + LrSpotlight + LrAmbDiff + LrAmbSpec, 1);
 }

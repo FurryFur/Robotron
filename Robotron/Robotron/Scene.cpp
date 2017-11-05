@@ -33,7 +33,7 @@ Entity& Scene::createEntity(size_t componentMask)
 void Scene::destroyEntity(Entity& entity)
 {
 	triggerEntityDestructionEvent(entity);
-	entity.m_componentMask = 0;
+	entity.destroy();
 }
 
 Entity& Scene::getEntity(size_t entityID)

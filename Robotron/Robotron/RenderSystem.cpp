@@ -28,6 +28,8 @@
 #include <glm\gtc\type_ptr.hpp>
 #include <glm\gtx\euler_angles.hpp>
 
+#include <cmath>
+
 using glm::mat4;
 using glm::vec3;
 using glm::vec4;
@@ -37,6 +39,7 @@ RenderState RenderSystem::s_renderState;
 RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
 	: m_scene{ scene }
 {
+	m_scene.registerEventListener(this);
 	m_renderState.glContext = glContext;
 	m_renderState.uniformBindingPoint = 0;
 	m_renderState.hasIrradianceMap = false;
@@ -48,6 +51,11 @@ RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformFormat), nullptr, GL_DYNAMIC_DRAW);
 
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+}
+
+RenderSystem::~RenderSystem()
+{
+	m_scene.removeEventListener(this);
 }
 
 void RenderSystem::drawDebugArrow(const glm::vec3& base, const glm::vec3& tip,
@@ -219,7 +227,21 @@ void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& tra
 		uniforms.glossiness = material.shaderParams.glossiness;
 		uniforms.specBias = material.shaderParams.specBias;
 
-		// Send uniform data to the GPU (MVP matrices, cameraPos and shaderParams)
+		// Set spotlights
+		uniforms.numSpotlights = std::min(static_cast<GLuint>(s_renderState.spotlights.size()), UniformFormat::s_kMaxSpotlights);
+		for (GLuint i = 0; i < uniforms.numSpotlights; ++i) {
+			const Entity* spotlightEntity = s_renderState.spotlights.at(i);
+			glm::vec4 spotlightDir = glm::vec4(s_renderState.spotlights.at(i)->spotlight.direction, 0);
+			// Transform to local coordinates of containing entity
+			glm::mat4 orientation = GLMUtils::eulerToMat(spotlightEntity->transform.eulerAngles);
+			spotlightDir = orientation * spotlightDir;
+			// Set spotlights in GPU uniform
+			uniforms.spotlightDirections.at(i) = spotlightDir;
+			uniforms.spotlightPositions.at(i) = glm::vec4(spotlightEntity->transform.position, 1);
+			uniforms.spotlightColors.at(i) = glm::vec4(spotlightEntity->spotlight.color, 1);
+		}
+
+		// Send uniform data to the GPU
 		GLuint blockIndex = glGetUniformBlockIndex(material.shader, "Uniforms");
 		glUniformBlockBinding(material.shader, blockIndex, s_renderState.uniformBindingPoint);
 		glBindBufferBase(GL_UNIFORM_BUFFER, s_renderState.uniformBindingPoint, s_renderState.uboUniforms);
@@ -232,5 +254,43 @@ void RenderSystem::renderModel(const ModelComponent& model, const glm::mat4& tra
 		// Render the mesh
 		glBindVertexArray(mesh.VAO);
 		glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
+	}
+}
+
+void RenderSystem::onAddComponents(Entity& entity, size_t componentMask)
+{
+	if (!Entity::matches(componentMask, COMPONENT_SPOTLIGHT))
+		return;
+
+	m_renderState.spotlights.push_back(&entity);
+}
+
+void RenderSystem::onRemoveComponents(Entity& entity, size_t componentMask)
+{
+	if (!Entity::matches(componentMask, COMPONENT_SPOTLIGHT))
+		return;
+
+	auto removeIt = std::remove(m_renderState.spotlights.begin(), m_renderState.spotlights.end(), &entity);
+	if (removeIt != m_renderState.spotlights.end())
+		m_renderState.spotlights.erase(removeIt);
+}
+
+void RenderSystem::onEntityCreation(Entity& entity)
+{
+	entity.registerEventListener(this);
+
+	if (entity.hasComponents(COMPONENT_SPOTLIGHT)) {
+		m_renderState.spotlights.push_back(&entity);
+	}
+}
+
+void RenderSystem::onEntityDestruction(Entity& entity)
+{
+	entity.removeEventListener(this);
+
+	if (entity.hasComponents(COMPONENT_SPOTLIGHT)) {
+		auto removeIt = std::remove(m_renderState.spotlights.begin(), m_renderState.spotlights.end(), &entity);
+		if (removeIt != m_renderState.spotlights.end())
+			m_renderState.spotlights.erase(removeIt);
 	}
 }
