@@ -176,6 +176,14 @@ void NetworkServerSystem::addToNetworking(Entity& entity)
 		}
 	}
 
+	//for (size_t i = 0; i < m_netEntities.size(); ++i) {
+	//	for (size_t j = i + 1; j < m_netEntities.size(); ++j) {
+	//		if (m_netEntities.at(i) && m_netEntities.at(j) && m_netEntities.at(i) == m_netEntities.at(j)) {
+	//			std::cout << "ERROR: TRIED TO ADD AN ENTITY TO NETWORKING THAT IS ALREADY BEING TRACKED" << std::endl;
+	//		}
+	//	}
+	//}
+
 	// Update state to reflect that this entity has been seen by the
 	// network system.
 	entity.network.isNewEntity = false;
@@ -327,7 +335,8 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 
 void NetworkServerSystem::handleEntityDestruction(Entity& entity)
 {
-	if (!entity.hasComponents() && entity.hadComponentsPrev(COMPONENT_NETWORK)) {
+	if ((!entity.hasComponents() && entity.hadComponentsPrev(COMPONENT_NETWORK)) 
+	 || (entity.hasComponents(COMPONENT_NETWORK) && entity.network.isNewEntity)) { // Kill the old entity before creating a new one
 		std::int32_t id = entity.network.id;
 		if (0 <= id && id < m_netEntities.size()) {
 			if (!m_netEntities.at(id))
@@ -438,6 +447,14 @@ void NetworkServerSystem::selectGhostSnapshots(SnapshotBufT& dst,
 {
 	using PriorityQT = std::priority_queue<Entity*, std::vector<Entity*>, EntityPriorityComparitor>;
 	static PriorityQT s_snapshotPriorityQ;
+
+	//for (size_t i = 0; i < src.size(); ++i) {
+	//	for (size_t j = i + 1; j < src.size(); ++j) {
+	//		if (src.at(i) && src.at(j) && src.at(i) == src.at(j)) {
+	//			std::cout << "ERROR: DUPLICATE ENTITY POINTER IN ENTITY LIST" << std::endl;
+	//		}
+	//	}
+	//}
 
 	// Create priority queue of entities from src
 	s_snapshotPriorityQ = {};

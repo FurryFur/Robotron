@@ -118,8 +118,7 @@ void Entity::addComponents(size_t componentMask)
 		controlVars = {};
 	}
 
-	if (tmp != m_componentMask)
-		m_componentMaskPrev = tmp;
+	m_componentMaskPrev = tmp;
 }
 
 void Entity::removeComponents(size_t componentMask)
@@ -128,8 +127,7 @@ void Entity::removeComponents(size_t componentMask)
 
 	m_componentMask &= (~componentMask);
 
-	if (tmp != m_componentMask)
-		m_componentMaskPrev = tmp;
+	m_componentMaskPrev = tmp;
 }
 
 void Entity::destroy()
@@ -138,6 +136,5 @@ void Entity::destroy()
 
 	m_componentMask = 0;
 
-	if (tmp != m_componentMask)
-		m_componentMaskPrev = tmp;
+	m_componentMaskPrev = tmp;
 }

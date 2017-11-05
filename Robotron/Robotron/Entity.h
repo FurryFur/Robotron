@@ -152,8 +152,7 @@ inline void Entity::addComponents(size_t first, ComponentTs... rest)
 	addComponents(first);
 	addComponents(rest...);
 
-	if (tmp != m_componentMask)
-		m_componentMaskPrev = tmp;
+	m_componentMaskPrev = tmp;
 }
 
 template<typename ...ComponentTs>
@@ -164,8 +163,7 @@ inline void Entity::removeComponents(size_t first, ComponentTs ...rest)
 	removeComponents(first);
 	removeComponents(rest...);
 
-	if (tmp != m_componentMask)
-		m_componentMaskPrev = tmp;
+	m_componentMaskPrev = tmp;
 }
 
 template<typename ...ComponentTs>
