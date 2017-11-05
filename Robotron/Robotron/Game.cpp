@@ -611,8 +611,11 @@ void Game::process(float deltaTick)
 	case LOBBY:
 	{
 		// If you are the host create the network system
-		if (m_networkSystem == nullptr)
-			m_networkSystem = std::make_unique<NetworkServerSystem>(m_scene, m_userName, m_serverName);
+		if (m_networkSystem == nullptr) {
+			auto tmp = std::make_unique<NetworkServerSystem>(m_scene, m_userName, m_serverName);
+			m_audio.setNetworkAudioServer(tmp.get());
+			m_networkSystem = std::move(tmp);
+		}
 		m_networkSystem->registerLobbyEventListener(this);
 
 		// The mouse is within the back button click

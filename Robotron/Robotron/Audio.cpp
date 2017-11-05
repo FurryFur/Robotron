@@ -77,7 +77,7 @@ void Audio::playSFX(Sound sound)
 		m_networkAudioServer->sendAudio(sound);
 }
 
-void Audio::setNetworkAudioServer(NetworkServerSystem * audioServer)
+void Audio::setNetworkAudioServer(NetworkServerSystem* audioServer)
 {
 	m_networkAudioServer = audioServer;
 }
