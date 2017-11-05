@@ -42,6 +42,10 @@ enum ModelID : std::uint8_t {
 };
 
 namespace EntityUtils {
+
+	// Preload all the textures and models
+	void preloadModelsAndTextures();
+
 	// Creates a unit square facing down the positive z axis with the 
 	// specified lookAt
 	Entity& createQuad(Scene&, const TransformComponent& transform = {});

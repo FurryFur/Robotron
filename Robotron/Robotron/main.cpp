@@ -15,6 +15,7 @@
 #include "GLUtils.h"
 #include "Game.h"
 #include "Audio.h"
+#include "EntityUtils.h"
 
 #include <GLFW\glfw3.h>
 double oldTime = 0.0;
@@ -25,6 +26,8 @@ int main()
 	
 	// Init combined Window and OpenGL context.
 	GLFWwindow* window = GLUtils::initOpenGL();
+
+	EntityUtils::preloadModelsAndTextures();
 
 	Audio audio;
 	audio.playBgMusic();

@@ -14,6 +14,42 @@
 #include <iostream>
 #include <memory>
 
+void EntityUtils::preloadModelsAndTextures()
+{
+	// Pre-load the textures
+	GLUtils::loadTexture("Assets/Textures/dessert-floor.png");
+	GLUtils::loadTexture("Assets/Textures/purple.png");
+	GLUtils::loadTexture("Assets/Textures/random-texture3.png");
+	GLUtils::loadTexture("Assets/Textures/red.png");
+	GLUtils::loadTexture("Assets/Textures/voronoi_purple.png");
+	GLUtils::loadTexture("Assets/Textures/voronoi_red.png");
+
+	// Preload the models
+	ModelUtils::loadModel("Assets/Models/plane_dog/model.obj");
+	ModelUtils::loadModel("Assets/Models/spaceship/space_ship.obj");
+	ModelUtils::loadModel("Assets/Models/fox/model.obj");
+	ModelUtils::loadModel("Assets/Models/hotdog/model.obj");
+
+	//Preload the skybox
+	GLUtils::loadTexture("Assets/Textures/envmap_violentdays/violentdays_rt.tga");
+	GLUtils::loadTexture("Assets/Textures/envmap_violentdays/violentdays_lf.tga");
+	GLUtils::loadTexture("Assets/Textures/envmap_violentdays/violentdays_up.tga");
+	GLUtils::loadTexture("Assets/Textures/envmap_violentdays/violentdays_dn.tga");
+	GLUtils::loadTexture("Assets/Textures/envmap_violentdays/violentdays_bk.tga");
+	GLUtils::loadTexture("Assets/Textures/envmap_violentdays/violentdays_ft.tga");
+
+	Texture irradianceMap = GLUtils::loadCubeMapFaces({
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c00.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c01.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c02.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c03.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c04.bmp",
+		"Assets/Textures/envmap_violentdays/violentdays_irr_c05.bmp",
+	});
+
+	GLUtils::loadDDSTexture("Assets/Textures/envmap_violentdays/violentdays_pmrem.dds");
+}
+
 Entity& EntityUtils::createQuad(Scene& scene, const TransformComponent& transform)
 {
 	Entity& entity = scene.createEntity(COMPONENT_MODEL | COMPONENT_TRANSFORM 
