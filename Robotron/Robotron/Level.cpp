@@ -21,7 +21,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	Scene::makeSceneCurrent(&m_scene);
 	m_audio = audio;
 	m_inputSystem.registerKeyObserver(this);
-	m_networkSystem.registerEventListener(&m_playerStatsMenu);
+	m_networkSystem.registerEntityEventListener(&m_playerStatsMenu);
 
 	m_window = window;
 	m_levelNum = -1;
@@ -76,7 +76,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 
 Level::~Level()
 {
-	m_networkSystem.removeEventListener(&m_playerStatsMenu);
+	m_networkSystem.removeEntityEventListener(&m_playerStatsMenu);
 }
 
 void Level::spawnEnemies(int levelType)

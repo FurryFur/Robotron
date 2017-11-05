@@ -39,7 +39,7 @@ RenderState RenderSystem::s_renderState;
 RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
 	: m_scene{ scene }
 {
-	m_scene.registerEventListener(this);
+	m_scene.registerEntityEventListener(this);
 	m_renderState.glContext = glContext;
 	m_renderState.uniformBindingPoint = 0;
 	m_renderState.hasIrradianceMap = false;
@@ -55,7 +55,7 @@ RenderSystem::RenderSystem(GLFWwindow* glContext, Scene& scene)
 
 RenderSystem::~RenderSystem()
 {
-	m_scene.removeEventListener(this);
+	m_scene.removeEntityEventListener(this);
 }
 
 void RenderSystem::drawDebugArrow(const glm::vec3& base, const glm::vec3& tip,
@@ -277,20 +277,8 @@ void RenderSystem::onRemoveComponents(Entity& entity, size_t componentMask)
 
 void RenderSystem::onEntityCreation(Entity& entity)
 {
-	entity.registerEventListener(this);
-
-	if (entity.hasComponents(COMPONENT_SPOTLIGHT)) {
-		m_renderState.spotlights.push_back(&entity);
-	}
 }
 
 void RenderSystem::onEntityDestruction(Entity& entity)
 {
-	entity.removeEventListener(this);
-
-	if (entity.hasComponents(COMPONENT_SPOTLIGHT)) {
-		auto removeIt = std::remove(m_renderState.spotlights.begin(), m_renderState.spotlights.end(), &entity);
-		if (removeIt != m_renderState.spotlights.end())
-			m_renderState.spotlights.erase(removeIt);
-	}
 }

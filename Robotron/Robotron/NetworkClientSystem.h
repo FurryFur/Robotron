@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <cstdint>
+#include <utility>
 
 class Scene;
 class Entity;
@@ -53,6 +54,9 @@ public:
 	// This should be called via Remote Procedure Calls sent from the server.
 	void createPlayerGhost(std::int32_t entityNetId, const PlayerInfo& playerInfo);
 
+	// Spawns players in the playersToSpawn array
+	void spawnPlayers();
+
 	// Destroys the entity if one exists at the specified
 	// network id.
 	// Returns true if an entity was destroyed
@@ -73,5 +77,6 @@ private:
 	Audio& m_audioSystem;
 	// The time at which the last packet was received
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_tLastPacketRecvd;
+	std::vector<std::pair<std::int32_t, PlayerInfo>> playersToSpawn;
 };
 

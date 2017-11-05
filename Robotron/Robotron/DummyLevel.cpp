@@ -22,7 +22,7 @@ DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::stri
 	m_inputSystem.registerKeyObserver(this);
 	m_playerID = playerID;
 
-	m_networkSystem.registerEventListener(&m_playerStatsMenu);
+	m_networkSystem.registerEntityEventListener(&m_playerStatsMenu);
 
 	m_window = window;
 	// Set the UI position, scale, colour
@@ -67,7 +67,7 @@ DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::stri
 
 DummyLevel::~DummyLevel()
 {
-	m_networkSystem.removeEventListener(&m_playerStatsMenu);
+	m_networkSystem.removeEntityEventListener(&m_playerStatsMenu);
 }
 
 void DummyLevel::process(float deltaTick, Clock& clock)

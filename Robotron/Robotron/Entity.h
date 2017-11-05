@@ -104,6 +104,11 @@ public:
 	template<typename ...ComponentTs>
 	void removeComponents(size_t first, ComponentTs... rest);
 
+	// Assembles the component mask from multiple arguments
+	template<typename ...ComponentTs>
+	static size_t assembleComponentMask(size_t first, ComponentTs... rest);
+	static size_t assembleComponentMask(size_t componentMask);
+
 	// Returns true if ALL the specified components are present 
 	// in the entity.
 	template<typename ...ComponentTs>
@@ -122,19 +127,17 @@ public:
 	// mask are present in the entity.
 	static bool matchesAny(size_t lhsComponentMask, size_t rhsComponentMask);
 
-	void registerEventListener(EntityEventListener*);
-	void removeEventListener(EntityEventListener*);
 	void triggerAddComponentsEvent(size_t componentMask);
 	void triggerRemoveComponentsEvent(size_t componentMask);
 
 private:
-	Entity();
+	Entity(std::vector<EntityEventListener*>& eventListeners);
 
 	// Destroys to entity
 	void destroy();
 
 	size_t m_componentMask;
-	std::vector<EntityEventListener*> m_eventListeners;
+	std::vector<EntityEventListener*>& m_eventListeners;
 };
 
 template<typename ...ComponentTs>
@@ -152,15 +155,21 @@ inline bool Entity::hasComponentsAny(size_t first, ComponentTs ...rest) const
 template<typename ...ComponentTs>
 inline void Entity::addComponents(size_t first, ComponentTs... rest)
 {
-	addComponents(first);
-	addComponents(rest...);
+	size_t componentMask = assembleComponentMask(first, rest...);
+	addComponents(componentMask);
 }
 
 template<typename ...ComponentTs>
 inline void Entity::removeComponents(size_t first, ComponentTs ...rest)
 {
-	removeComponents(first);
-	removeComponents(rest...);
+	size_t componentMask = assembleComponentMask(first, rest...);
+	removeComponents(componentMask);
+}
+
+template<typename ...ComponentTs>
+inline size_t Entity::assembleComponentMask(size_t first, ComponentTs ...rest)
+{
+	return first | assembleComponentMask(rest...);
 }
 
 template<typename ...ComponentTs>

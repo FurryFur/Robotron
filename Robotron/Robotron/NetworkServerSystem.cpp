@@ -29,7 +29,7 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& userna
 	, m_serverName{ serverName }
 	, m_willSpawnPlayersThisFrame{ false }
 {
-	m_scene.registerEventListener(this);
+	m_scene.registerEntityEventListener(this);
 
 	m_socket.initialise(s_kDefaultServerPort);
 	allocateRecvBuffer();
@@ -58,7 +58,7 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& userna
 
 NetworkServerSystem::~NetworkServerSystem()
 {
-	m_scene.removeEventListener(this);
+	m_scene.removeEntityEventListener(this);
 }
 
 void NetworkServerSystem::spawnPlayers()
@@ -431,7 +431,17 @@ void NetworkServerSystem::selectGhostSnapshots(SnapshotBufT& dst,
 
 void NetworkServerSystem::onEntityCreation(Entity & entity)
 {
-	if (!entity.hasComponents(COMPONENT_NETWORK))
+
+}
+
+void NetworkServerSystem::onEntityDestruction(Entity& entity)
+{
+	
+}
+
+void NetworkServerSystem::onAddComponents(Entity& entity, size_t componentMaskAdded)
+{
+	if (!Entity::matches(componentMaskAdded, COMPONENT_NETWORK))
 		return;
 
 	std::int32_t id = entity.network.id;
@@ -440,14 +450,16 @@ void NetworkServerSystem::onEntityCreation(Entity & entity)
 	if (0 <= id && id < m_netEntities.size() && !m_netEntities.at(id)) {
 		// Reuse existing id from old entity
 		m_netEntities.at(id) = &entity;
-	} else {
+	}
+	else {
 		// Check for a free id
 		auto freeIt = std::find(m_netEntities.begin(), m_netEntities.end(), nullptr);
 		if (freeIt != m_netEntities.end()) {
 			// Assign the new entity a free id if found
 			entity.network.id = static_cast<std::int32_t>(std::distance(m_netEntities.begin(), freeIt));
 			*freeIt = &entity;
-		} else {
+		}
+		else {
 			// Otherwise assign the new entity a brand new id
 			entity.network.id = static_cast<std::int32_t>(m_netEntities.size());
 			m_netEntities.push_back(&entity);
@@ -461,25 +473,34 @@ void NetworkServerSystem::onEntityCreation(Entity & entity)
 	if (entity.hasComponents(COMPONENT_PLAYER)) {
 		// Delay until we have player info
 		return;
-	} else if (entity.hasComponents(COMPONENT_ZOMBIE)) {
+	}
+	else if (entity.hasComponents(COMPONENT_ZOMBIE)) {
 		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_ZOMBIE);
-	} else if (entity.hasComponents(COMPONENT_SNAKE)) {
+	}
+	else if (entity.hasComponents(COMPONENT_SNAKE)) {
 		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SNAKE);
-	} else if (entity.hasComponents(COMPONENT_ENEMY_SHOOTER)) {
+	}
+	else if (entity.hasComponents(COMPONENT_ENEMY_SHOOTER)) {
 		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SHOOTER);
-	} else if (entity.hasComponents(COMPONENT_PLAYERBULLET)) {
+	}
+	else if (entity.hasComponents(COMPONENT_PLAYERBULLET)) {
 		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_PLAYER_BULLET);
-	} else if (entity.hasComponents(COMPONENT_ENEMYBULLET)) {
+	}
+	else if (entity.hasComponents(COMPONENT_ENEMYBULLET)) {
 		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_ENEMY_BULLET);
-	} else if (entity.hasComponents(COMPONENT_SCOREPICKUP)) {
+	}
+	else if (entity.hasComponents(COMPONENT_SCOREPICKUP)) {
 		if (entity.aiVariables.lifePickUp) {
 			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_HEALTH_PICKUP);
-		} else if (entity.aiVariables.score > 10) {
+		}
+		else if (entity.aiVariables.score > 10) {
 			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_2);
-		} else {
+		}
+		else {
 			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_1);
 		}
-	} else {
+	}
+	else {
 		rpc = nullptr;
 		std::cout << "ERROR: Server received entity creation event for unknown entity type. Unable to update clients" << std::endl;
 	}
@@ -489,11 +510,11 @@ void NetworkServerSystem::onEntityCreation(Entity & entity)
 	}
 }
 
-void NetworkServerSystem::onEntityDestruction(Entity& entity)
+void NetworkServerSystem::onRemoveComponents(Entity& entity, size_t componentMaskToRemove)
 {
-	if (!entity.hasComponents(COMPONENT_NETWORK))
+	if (!Entity::matches(componentMaskToRemove, COMPONENT_NETWORK))
 		return;
-	
+
 	// Notify clients of entity destruction
 	std::int32_t id = entity.network.id;
 	auto rpc = std::make_unique<RPCDestroyGhost>(id);

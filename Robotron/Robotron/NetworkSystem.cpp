@@ -141,7 +141,7 @@ void NetworkSystem::bufferRpc(std::unique_ptr<RemoteProcedureCall> rpc)
 	rpcGroup.addRPC(std::move(rpc));
 }
 
-void NetworkSystem::registerEventListener(NetworkEventListener* eventListener)
+void NetworkSystem::registerEntityEventListener(NetworkEventListener* eventListener)
 {
 	if (eventListener)
 		m_eventListeners.push_back(eventListener);
@@ -151,7 +151,7 @@ void NetworkSystem::registerEventListener(NetworkEventListener* eventListener)
 	}
 }
 
-void NetworkSystem::removeEventListener(NetworkEventListener* eventListener)
+void NetworkSystem::removeEntityEventListener(NetworkEventListener* eventListener)
 {
 	auto removeIt = std::remove(m_eventListeners.begin(), m_eventListeners.end(), eventListener);
 	if (removeIt != m_eventListeners.end())

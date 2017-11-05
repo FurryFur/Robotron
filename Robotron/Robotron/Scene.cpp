@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 #include "Entity.h"
-#include "SceneEventListener.h"
+#include "EntityEventListener.h"
 
 #include <algorithm>
 #include <iostream>
@@ -20,7 +20,7 @@ Entity& Scene::createEntity(size_t componentMask)
 		newEntity = freeMem->get();
 	else {
 		// Allocate memory for new entity
-		newEntity = new Entity;
+		newEntity = new Entity(m_eventListeners);
 		m_entities.emplace_back(newEntity);
 	}
 
@@ -56,24 +56,24 @@ Scene * Scene::getCurrentScene()
 	return s_currentScene;
 }
 
-void Scene::registerEventListener(SceneEventListener* eventListener)
+void Scene::registerEntityEventListener(EntityEventListener* eventListener)
 {
 	if (eventListener) {
 		m_eventListeners.push_back(eventListener);
 	} else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Tried to register a nullptr as a Scene Event Listener" << std::endl;
+		std::cout << "WARNING: Tried to register a nullptr as an Entity Event Listener" << std::endl;
 	}
 }
 
-void Scene::removeEventListener(SceneEventListener* eventListener)
+void Scene::removeEntityEventListener(EntityEventListener* eventListener)
 {
 	auto removeIt = std::remove(m_eventListeners.begin(), m_eventListeners.end(), eventListener);
 	if (removeIt != m_eventListeners.end())
 		m_eventListeners.erase(removeIt);
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Tried to remove a Scene Event Listener that wasn't registered with the scene" << std::endl;
+		std::cout << "WARNING: Tried to remove an Entity Event Listener that wasn't registered with the scene" << std::endl;
 	}
 }
 

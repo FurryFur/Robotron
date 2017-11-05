@@ -24,8 +24,8 @@ public:
 	virtual bool isInGame() = 0;
 	virtual void startGame() = 0;
 
-	void registerEventListener(NetworkEventListener*);
-	void removeEventListener(NetworkEventListener*);
+	void registerEntityEventListener(NetworkEventListener*);
+	void removeEntityEventListener(NetworkEventListener*);
 
 	static const std::chrono::milliseconds s_kKeepAliveTimout;
 
