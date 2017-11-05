@@ -16,11 +16,11 @@
 
 #include "TextLabel.h"
 #include "Scene.h"
-#include "LobbyEventListener.h"
+#include "NetworkEventListener.h"
 
 #include <vector>
 
-class PlayerStatsMenu : public LobbyEventListener
+class PlayerStatsMenu : public NetworkEventListener
 {
 public:
 	PlayerStatsMenu(Scene& scene, std::uint8_t playerID);
@@ -31,12 +31,12 @@ public:
 	bool checkPlayersAlive(); // Checks if all the players are dead
 
 	std::uint8_t m_playerID;
-	virtual void handleLobbyUpdate(const std::vector<PlayerInfo>& playerInfo) override;
-	virtual void handleBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress) override;
-	virtual void handleJoinAccepted() override;
-	virtual void handleJoinRejected() override;
-	virtual void handleGameStart() override;
-	virtual void handleDisconnect() override;
+	virtual void onPlayersUpdated(const std::vector<PlayerInfo>& playerInfo) override;
+	virtual void onBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress) override;
+	virtual void onJoinAccepted() override;
+	virtual void onJoinRejected() override;
+	virtual void onGameStart() override;
+	virtual void onDisconnect() override;
 private:
 	bool platersConnected; // A flag to check the players are properly connected before checking if they are dead
 	bool m_playersAlive;

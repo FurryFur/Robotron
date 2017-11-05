@@ -5,7 +5,7 @@
 #include "Packet.h"
 #include "Scene.h"
 #include "RPC.h"
-#include "LobbyEventListener.h"
+#include "NetworkEventListener.h"
 
 #include <iostream>
 #include <memory>
@@ -33,6 +33,10 @@ NetworkSystem::NetworkSystem(Scene& scene)
 	m_sendPacket.rpcGroupBuffer.emplace();
 }
 
+NetworkSystem::~NetworkSystem()
+{
+}
+
 void NetworkSystem::beginFrame()
 {
 	// Decide whether we will send out packets this frame or not
@@ -48,20 +52,20 @@ void NetworkSystem::beginFrame()
 
 void NetworkSystem::endFrame()
 {
-	//for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
-	//	Entity& entity = m_scene.getEntity(i);
-	//	if (entity.hasComponents(COMPONENT_NETWORK)) {
-	//		bool inNetworkList = false;
-	//		for (size_t j = 0; j < m_netEntities.size(); ++j) {
-	//			Entity* netEntity = m_netEntities.at(j);
-	//			if (netEntity && entity.network.id == netEntity->network.id) {
-	//				inNetworkList = true;
-	//			}
-	//		}
-	//		if (!inNetworkList)
-	//			std::cout << "WARNING: NETWORK ENTITY MISSING FROM NETWORK LIST, CUR ID: " << entity.network.id << std::endl;
-	//	}
-	//}
+	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
+		Entity& entity = m_scene.getEntity(i);
+		if (entity.hasComponents(COMPONENT_NETWORK)) {
+			bool inNetworkList = false;
+			for (size_t j = 0; j < m_netEntities.size(); ++j) {
+				Entity* netEntity = m_netEntities.at(j);
+				if (netEntity && entity.network.id == netEntity->network.id) {
+					inNetworkList = true;
+				}
+			}
+			if (!inNetworkList)
+				std::cout << "WARNING: NETWORK ENTITY MISSING FROM NETWORK LIST, CUR ID: " << entity.network.id << std::endl;
+		}
+	}
 
 	if (m_willSendPcktThisFrame) {
 		++m_curSeqenceNum;
@@ -152,7 +156,7 @@ void NetworkSystem::bufferRpc(std::unique_ptr<RemoteProcedureCall> rpc)
 	rpcGroup.addRPC(std::move(rpc));
 }
 
-void NetworkSystem::registerLobbyEventListener(LobbyEventListener* eventListener)
+void NetworkSystem::registerLobbyEventListener(NetworkEventListener* eventListener)
 {
-	m_lobbyEventListener.push_back(eventListener);
+	m_netEventListener.push_back(eventListener);
 }

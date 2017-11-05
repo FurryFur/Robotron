@@ -25,11 +25,6 @@ bool Entity::hasComponents() const
 	return m_componentMask != 0;
 }
 
-bool Entity::hadComponentsPrev(size_t componentMask) const
-{
-	return (m_componentMaskPrev & componentMask) == componentMask;
-}
-
 bool Entity::matches(size_t lhsComponentMask, size_t rhsComponentMask)
 {
 	return (lhsComponentMask & rhsComponentMask) == rhsComponentMask;
@@ -42,8 +37,6 @@ bool Entity::matchesAny(size_t lhsComponentMask, size_t rhsComponentMask)
 
 void Entity::addComponents(size_t componentMask)
 {
-	size_t tmp = m_componentMask;
-
 	if (matches(componentMask, COMPONENT_TRANSFORM)) {
 		m_componentMask |= COMPONENT_TRANSFORM;
 		transform = {};
@@ -94,7 +87,6 @@ void Entity::addComponents(size_t componentMask)
 		// network.id should be left alone as a non-negative value in combination
 		// with an isNewEntity=true indicates to the network that an entity has
 		// been destroyed and its memory reused.
-		network.isNewEntity = true;
 		network.priority = 999;
 		network.lastInputReceived = {};
 		network.receivedInputThisFrame = false;
@@ -117,24 +109,9 @@ void Entity::addComponents(size_t componentMask)
 		aiVariables.wanderPosition = { 0, 1, 0 };
 		controlVars = {};
 	}
-
-	m_componentMaskPrev = tmp;
 }
 
 void Entity::removeComponents(size_t componentMask)
 {
-	size_t tmp = m_componentMask;
-
 	m_componentMask &= (~componentMask);
-
-	m_componentMaskPrev = tmp;
-}
-
-void Entity::destroy()
-{
-	size_t tmp = m_componentMask;
-
-	m_componentMask = 0;
-
-	m_componentMaskPrev = tmp;
 }

@@ -23,7 +23,7 @@
 #include "NetworkSystem.h"
 #include "NetworkServerSystem.h"
 #include "NetworkClientSystem.h"
-#include "LobbyEventListener.h"
+#include "NetworkEventListener.h"
 
 #include <memory>
 #include <string>
@@ -50,7 +50,7 @@ enum ButtonState
 };
 
 #pragma once
-class Game : LobbyEventListener
+class Game : NetworkEventListener
 {
 public:
 	Game(GLFWwindow* window, Audio audio);
@@ -62,13 +62,13 @@ public:
 
 	void executeOneFrame();
 	bool checkReset();
-	// Inherited via LobbyEventListener
-	virtual void handleBroadcastResponse(const std::string & serverName, const sockaddr_in & serverAddress) override;
-	virtual void handleJoinAccepted() override;
-	virtual void handleJoinRejected() override;
-	virtual void handleLobbyUpdate(const std::vector<PlayerInfo>&) override;
-	virtual void handleGameStart() override;
-	virtual void handleDisconnect() override;
+	// Inherited via NetworkEventListener
+	virtual void onBroadcastResponse(const std::string & serverName, const sockaddr_in & serverAddress) override;
+	virtual void onJoinAccepted() override;
+	virtual void onJoinRejected() override;
+	virtual void onPlayersUpdated(const std::vector<PlayerInfo>&) override;
+	virtual void onGameStart() override;
+	virtual void onDisconnect() override;
 
 private:
 	void mouseButtonCallBack(GLFWwindow * window, int button, int action, int mods);

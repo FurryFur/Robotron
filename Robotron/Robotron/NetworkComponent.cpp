@@ -4,8 +4,7 @@
 
 NetworkComponent::NetworkComponent()
 	: id{ -1 }
-	, isNewEntity{ true }
-	, priority{ 0 }
+	, priority{ 999 }
 	, lastInputReceived{}
 	, receivedInputThisFrame{ false }
 {

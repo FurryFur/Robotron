@@ -7,7 +7,7 @@
 #include "GhostSnapshot.h"
 #include "RPC.h"
 #include "NetworkServerSystem.h"
-#include "LobbyEventListener.h"
+#include "NetworkEventListener.h"
 
 #include <glm\gtx\matrix_interpolation.hpp>
 #include <glm\gtx\compatibility.hpp>
@@ -38,6 +38,10 @@ NetworkClientSystem::NetworkClientSystem(Scene& scene, Audio& audioSystem, const
 	//m_serverAddress.sin_family = AF_INET;
 }
 
+NetworkClientSystem::~NetworkClientSystem()
+{
+}
+
 void NetworkClientSystem::beginFrame()
 {
 	sockaddr_in address;
@@ -65,9 +69,9 @@ void NetworkClientSystem::beginFrame()
 		auto timeSinceLastPacket = now - m_tLastPacketRecvd;
 		if (timeSinceLastPacket > NetworkSystem::s_kKeepAliveTimout) {
 			m_clientState = CLIENT_STATE_NO_SERVER;
-			if (m_lobbyEventListener.size() > 0) {
-				for (auto eventListener : m_lobbyEventListener)
-					eventListener->handleDisconnect();
+			if (m_netEventListener.size() > 0) {
+				for (auto eventListener : m_netEventListener)
+					eventListener->onDisconnect();
 			}
 		}
 	}
@@ -123,8 +127,8 @@ void NetworkClientSystem::startGame()
 {
 	m_clientState = CLIENT_STATE_IN_GAME;
 
-	for (auto eventListener : m_lobbyEventListener)
-		eventListener->handleGameStart();
+	for (auto eventListener : m_netEventListener)
+		eventListener->onGameStart();
 }
 
 void NetworkClientSystem::broadcastForServers()
@@ -172,10 +176,10 @@ void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPl
 	//	std::cout << playerInfo.username << std::endl;
 	//}
 
-	if (m_lobbyEventListener.size() > 0)
+	if (m_netEventListener.size() > 0)
 	{
-		for (auto eventListener : m_lobbyEventListener)
-			eventListener->handleLobbyUpdate(currentPlayers);
+		for (auto eventListener : m_netEventListener)
+			eventListener->onPlayersUpdated(currentPlayers);
 	}
 }
 
@@ -235,10 +239,10 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 	case PACKET_TYPE_BROADCAST_RESPONSE:
 		// If we receive a broadcast response from a server in this mode, simple inform the 
 		// lobby event listener.
-		if (m_lobbyEventListener.size() > 0)
+		if (m_netEventListener.size() > 0)
 		{
-			for (auto eventListener : m_lobbyEventListener)
-				eventListener->handleBroadcastResponse(packet.serverName, address);
+			for (auto eventListener : m_netEventListener)
+				eventListener->onBroadcastResponse(packet.serverName, address);
 		}
 
 		std::cout << "Received broadcast response from server: " 
@@ -258,20 +262,20 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 
 			std::cout << "Received join accept from server at address: " 
 			          << toString(address) << std::endl;
-			if (m_lobbyEventListener.size() > 0)
+			if (m_netEventListener.size() > 0)
 			{
-				for (auto eventListener : m_lobbyEventListener)
-					eventListener->handleJoinAccepted();
+				for (auto eventListener : m_netEventListener)
+					eventListener->onJoinAccepted();
 			}
 		} else {
 			m_clientState = CLIENT_STATE_NO_SERVER;
 
 			std::cout << "Received join reject from server at address: " 
 			          << toString(address) << std::endl;
-			if (m_lobbyEventListener.size() > 0)
+			if (m_netEventListener.size() > 0)
 			{
-				for (auto eventListener : m_lobbyEventListener)
-					eventListener->handleJoinRejected();
+				for (auto eventListener : m_netEventListener)
+					eventListener->onJoinRejected();
 			}
 		}
 		break;
@@ -347,7 +351,7 @@ bool NetworkClientSystem::destroyIfExistsInNetwork(std::int32_t entityNetId)
 	if (0 <= entityNetId && entityNetId < m_netEntities.size()) {
 		Entity* existingEntity = m_netEntities.at(entityNetId);
 		if (existingEntity) {
-			existingEntity->destroy();
+			m_scene.destroyEntity(*existingEntity);
 			m_netEntities.at(entityNetId) = nullptr;
 			return true;
 		}

@@ -57,23 +57,23 @@ bool PlayerStatsMenu::checkPlayersAlive()
 	return m_playersAlive;
 }
 
-void PlayerStatsMenu::handleBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress)
+void PlayerStatsMenu::onBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress)
 {
 }
 
-void PlayerStatsMenu::handleJoinAccepted()
+void PlayerStatsMenu::onJoinAccepted()
 {
 }
 
-void PlayerStatsMenu::handleJoinRejected()
+void PlayerStatsMenu::onJoinRejected()
 {
 }
 
-void PlayerStatsMenu::handleGameStart()
+void PlayerStatsMenu::onGameStart()
 {
 }
 
-void PlayerStatsMenu::handleDisconnect()
+void PlayerStatsMenu::onDisconnect()
 {
 }
 
@@ -88,7 +88,7 @@ bool checkAlive(const std::vector<PlayerInfo>& playerInfo)
 	return false;
 }
 
-void PlayerStatsMenu::handleLobbyUpdate(const std::vector<PlayerInfo>& playerInfo)
+void PlayerStatsMenu::onPlayersUpdated(const std::vector<PlayerInfo>& playerInfo)
 {
 	// If no text labels exist, populate them
 	if (m_statsScreenLabels.size() != playerInfo.size())

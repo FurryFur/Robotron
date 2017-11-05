@@ -9,13 +9,14 @@
 class Scene;
 class Entity;
 class RemoteProcedureCall;
-class LobbyEventListener;
+class NetworkEventListener;
 struct Packet;
 struct sockaddr_in;
 
 class NetworkSystem {
 public:
 	NetworkSystem(Scene&);
+	virtual ~NetworkSystem() = 0;
 
 	virtual void beginFrame() = 0;
 	virtual void update(Entity&, float deltaTick) = 0;
@@ -23,7 +24,7 @@ public:
 	virtual bool isInGame() = 0;
 	virtual void startGame() = 0;
 
-	void registerLobbyEventListener(LobbyEventListener*);
+	void registerLobbyEventListener(NetworkEventListener*);
 
 	static const std::chrono::milliseconds s_kKeepAliveTimout;
 
@@ -47,7 +48,7 @@ protected:
 	CSocket m_socket;
 	Scene& m_scene;
 	std::vector<Entity*> m_netEntities;
-	std::vector<LobbyEventListener*> m_lobbyEventListener;
+	std::vector<NetworkEventListener*> m_netEventListener;
 
 	// Determines whether the implementing client/server will send out a packet
 	// this frame or not

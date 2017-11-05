@@ -19,6 +19,8 @@
 #include <vector>
 #include <memory>
 
+class SceneEventListener;
+
 class Scene {
 public:
 	template<typename ...ComponentTs>
@@ -29,13 +31,19 @@ public:
 	size_t getEntityCount();
 	static void makeSceneCurrent(Scene* scene);
 	static Scene* getCurrentScene();
+	void registerEventListener(SceneEventListener*);
+	void removeEventListener(SceneEventListener*);
 
 private:
 	// TODO: Change this to be a vector of 'observable' entities
 	// that can be observed robustly, even when a vector resize causes the
 	// entities to shift in memory.
 	std::vector<std::unique_ptr<Entity>> m_entities;
+	std::vector<SceneEventListener*> m_eventListeners;
 	static Scene* s_currentScene;
+
+	void triggerEntityCreationEvent(Entity&);
+	void triggerEntityDestructionEvent(Entity&);
 };
 
 template<typename ...ComponentTs>

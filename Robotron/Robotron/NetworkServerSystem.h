@@ -4,6 +4,7 @@
 #include "PlayerInfo.h"
 #include "ClientInfo.h"
 #include "Audio.h"
+#include "SceneEventListener.h"
 
 #include <vector>
 #include <unordered_map>
@@ -30,15 +31,20 @@ public:
 	}
 };
 
-class NetworkServerSystem : public NetworkSystem {
+class NetworkServerSystem : public NetworkSystem, public SceneEventListener {
 public:
 	NetworkServerSystem(Scene&, const std::string& username, const std::string& serverName);
+	virtual ~NetworkServerSystem() override;
 
 	virtual void beginFrame() override;
 	virtual void update(Entity&, float deltaTick) override;
 	virtual void endFrame() override;
 	virtual bool isInGame() override;
 	virtual void startGame() override;
+
+	// Inherited via SceneEventListener
+	virtual void onEntityCreation(Entity& entity) override;
+	virtual void onEntityDestruction(Entity& entity) override;
 
 	void recordInput(std::int32_t entityNetId, const InputComponent& input);
 	void sendAudio(Sound);
@@ -58,15 +64,9 @@ private:
 	void handleLobbyPackets(const Packet&, const sockaddr_in& address);
 	void handleBroadcastPacket(const Packet&, const sockaddr_in& address);
 	void handleJoinPacket(const Packet&, const sockaddr_in& address);
-	void addToNetworking(Entity& entity);
 	std::vector<PlayerInfo> getPlayers();
 
 	void broadcastToClients(const Packet& packet);
-
-	// Detects and handles entity destruction.
-	// Clients will be notified of entity destruction via a
-	// remote procedure call.
-	void handleEntityDestruction(Entity&);
 
 	// Selects 'maxSnapshots' entities from an array by their network priority
 	// and places snapshots of them into the supplied snapshot buffer.

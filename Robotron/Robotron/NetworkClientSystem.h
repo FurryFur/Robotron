@@ -24,6 +24,7 @@ class NetworkClientSystem : public NetworkSystem
 {
 public:
 	NetworkClientSystem(Scene&, Audio& audioSystem, const std::string& username);
+	virtual ~NetworkClientSystem() override;
 
 	virtual void beginFrame() override;
 	virtual void update(Entity&, float deltaTick) override;

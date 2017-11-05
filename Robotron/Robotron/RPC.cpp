@@ -64,7 +64,7 @@ InBufferStream& RPCGroup::deserialize(InBufferStream& ibs)
 			rpc = std::make_unique<RPCPlayAudio>();
 			break;
 		default:
-			ibs.setError(IBS_ERROR_CORRUPT_DATA);
+			ibs.setError(IBS_ERROR_CORRUPT_DATA); // Error logging is done in setError
 			break;
 		}
 		if (rpc)
@@ -112,7 +112,10 @@ void RPCDestroyGhost::execute()
 	}
 
 	if (g_clientSystem) {
-		g_clientSystem->destroyIfExistsInNetwork(m_entityNetId);
+		if (!g_clientSystem->destroyIfExistsInNetwork(m_entityNetId)) {
+			// TODO: Add logging here
+			std::cout << "WARNING: Recieved a destroy ghost RPC for an entity which doesn't exist on the client. ID: " << m_entityNetId << std::endl;
+		}
 	}
 	else {
 		// TODO: Add logging here

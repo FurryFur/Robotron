@@ -17,6 +17,8 @@
 #include "RenderSystem.h"
 #include "Audio.h"
 
+#include <cstdint>
+
 std::vector<IKeyObserver*>  Game::s_keyObservers;
 
 Game::Game(GLFWwindow* window, Audio audio)
@@ -707,29 +709,29 @@ void Game::process(float deltaTick)
 	glfwPollEvents();
 }
 
-void Game::handleBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress)
+void Game::onBroadcastResponse(const std::string& serverName, const sockaddr_in& serverAddress)
 {
 	++m_numServers;
 	m_serverNames.push_back(serverName);
 	m_serverAddresses.push_back(serverAddress);
 }
 
-void Game::handleJoinAccepted()
+void Game::onJoinAccepted()
 {
 	m_gameState = CLIENTLOBBY;
 }
 
-void Game::handleJoinRejected()
+void Game::onJoinRejected()
 {
 	std::cout << "Error: Failed to connect to the server.";
 }
 
-void Game::handleLobbyUpdate(const std::vector<PlayerInfo>& playerList)
+void Game::onPlayersUpdated(const std::vector<PlayerInfo>& playerList)
 {
 	//Set the ID num equal to the number of connected players
 	if (!m_setPlayerIDNum)
 	{
-		m_playerID = playerList.size() - 1;
+		m_playerID = static_cast<std::uint8_t>(playerList.size() - 1);
 		m_setPlayerIDNum = true;
 	}
 	
@@ -757,12 +759,12 @@ void Game::handleLobbyUpdate(const std::vector<PlayerInfo>& playerList)
 	}
 }
 
-void Game::handleGameStart()
+void Game::onGameStart()
 {
 	m_gameState = GAME;
 }
 
-void Game::handleDisconnect()
+void Game::onDisconnect()
 {
 	m_resetGame = true;
 }

@@ -8,7 +8,7 @@
 #include "Utils.h"
 #include "ClientInfo.h"
 #include "GhostSnapshot.h"
-#include "LobbyEventListener.h"
+#include "NetworkEventListener.h"
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -28,6 +28,8 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& userna
 	, m_serverState{ SERVER_STATE_LOBBY_MODE }
 	, m_serverName{ serverName }
 {
+	m_scene.registerEventListener(this);
+
 	m_socket.initialise(s_kDefaultServerPort);
 	allocateRecvBuffer();
 	RPC::setServer(this);
@@ -51,6 +53,11 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& userna
 
 	// Temp socket for receiving from self for testing.
 	//m_socket2.initialise(4567);
+}
+
+NetworkServerSystem::~NetworkServerSystem()
+{
+	m_scene.removeEventListener(this);
 }
 
 void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr_in& address)
@@ -140,6 +147,8 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 	ClientInfo client;
 	client.playerInfo.setUniquePlayerID();
 	client.playerInfo.username = packet.username;
+	client.tLastPacketRecvd = high_resolution_clock::now();
+
 	m_clients.insert(std::make_pair(address, client));
 
 	Packet joinResp;
@@ -152,110 +161,13 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 	std::vector<PlayerInfo> currentPlayers = getPlayers();
 	bufferRpc(std::make_unique<RPCUpdatePlayers>(currentPlayers));
 	
-	if (m_serverState == SERVER_STATE_LOBBY_MODE && m_lobbyEventListener.size() > 0)
+	if (m_serverState == SERVER_STATE_LOBBY_MODE && m_netEventListener.size() > 0)
 	{
-		for (auto eventListener : m_lobbyEventListener)
-			eventListener->handleLobbyUpdate(getPlayers());
+		for (auto eventListener : m_netEventListener)
+			eventListener->onPlayersUpdated(getPlayers());
 	}
 	// TODO: Don't auto start the game, stay in lobby until game is started
 	//startGame();
-}
-
-void NetworkServerSystem::addToNetworking(Entity& entity)
-{
-	std::int32_t id = entity.network.id;
-
-	// Check if we can reuse the entities current id
-	if (0 <= id && id < m_netEntities.size() && !m_netEntities.at(id)) {
-		// Reuse existing id from old entity
-		m_netEntities.at(id) = &entity;
-	} else {
-		// Check for a free id
-		auto freeIt = std::find(m_netEntities.begin(), m_netEntities.end(), nullptr);
-		if (freeIt != m_netEntities.end()) {
-			// Assign the new entity a free id if found
-			entity.network.id = static_cast<std::int32_t>(std::distance(m_netEntities.begin(), freeIt));
-			*freeIt = &entity;
-		} else {
-			// Otherwise assign the new entity a brand new id
-			entity.network.id = static_cast<std::int32_t>(m_netEntities.size());
-			m_netEntities.push_back(&entity);
-		}
-	}
-
-	//for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
-	//	Entity& entity = m_scene.getEntity(i);
-	//	if (entity.hasComponents(COMPONENT_NETWORK)) {
-	//		bool inNetworkList = false;
-	//		for (size_t j = 0; j < m_netEntities.size(); ++j) {
-	//			Entity* netEntity = m_netEntities.at(j);
-	//			if (netEntity && entity.network.id == netEntity->network.id) {
-	//				inNetworkList = true;
-	//			}
-	//		}
-	//		if (!inNetworkList)
-	//			std::cout << "WARNING: NETWORK ENTITY MISSING FROM NETWORK LIST, CUR ID: " << entity.network.id << std::endl;
-	//	}
-	//}
-
-	//for (size_t i = 0; i < m_netEntities.size(); ++i) {
-	//	for (size_t j = i + 1; j < m_netEntities.size(); ++j) {
-	//		if (m_netEntities.at(i) && m_netEntities.at(j) && m_netEntities.at(i) == m_netEntities.at(j)) {
-	//			std::cout << "ERROR: TRIED TO ADD AN ENTITY TO NETWORKING THAT IS ALREADY BEING TRACKED" << std::endl;
-	//		}
-	//	}
-	//}
-
-	// Update state to reflect that this entity has been seen by the
-	// network system.
-	entity.network.isNewEntity = false;
-
-	// Create remote procedure calls to inform clients of new entity creation
-	id = entity.network.id;
-	std::unique_ptr<RemoteProcedureCall> rpc;
-	if (entity.hasComponents(COMPONENT_PLAYER)) {
-		// TODO: Replace this
-		rpc = std::make_unique<RPCCreatePlayerGhost>(id, entity.player.playerInfo, entity.transform);
-	}
-	else if (entity.hasComponents(COMPONENT_ZOMBIE)) {
-		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_ZOMBIE,
-			entity.transform);
-	}
-	else if (entity.hasComponents(COMPONENT_SNAKE)) {
-		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SNAKE,
-			entity.transform);
-	}
-	else if (entity.hasComponents(COMPONENT_ENEMY_SHOOTER)) {
-		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SHOOTER,
-			entity.transform);
-	}
-	else if (entity.hasComponents(COMPONENT_PLAYERBULLET)) {
-		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_PLAYER_BULLET,
-			entity.transform);
-	}
-	else if (entity.hasComponents(COMPONENT_ENEMYBULLET)) {
-		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_ENEMY_BULLET,
-			entity.transform);
-	}
-	else if (entity.hasComponents(COMPONENT_SCOREPICKUP)) {
-		if (entity.aiVariables.lifePickUp) {
-			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_HEALTH_PICKUP,
-				entity.transform);
-		} else if (entity.aiVariables.score > 10) {
-			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_2,
-				entity.transform);
-		} else {
-			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_1,
-				entity.transform);
-		}
-	}
-	else {
-		rpc = nullptr;
-	}
-
-	if (rpc) {
-		bufferRpc(std::move(rpc));
-	}
 }
 
 std::vector<PlayerInfo> NetworkServerSystem::getPlayers()
@@ -304,7 +216,7 @@ void NetworkServerSystem::beginFrame()
 		auto timeSinceLastPacket = now - tLastPacketRecvd;
 		if (timeSinceLastPacket > NetworkSystem::s_kKeepAliveTimout) {
 			if (clientIt->second.playerEntity)
-				clientIt->second.playerEntity->destroy();
+				m_scene.destroyEntity(*clientIt->second.playerEntity);
 			clientIt = m_clients.erase(clientIt);
 			clientDisconnected = true;
 		} else {
@@ -313,10 +225,10 @@ void NetworkServerSystem::beginFrame()
 	}
 
 	// Notify UI of any client disconnections
-	if (clientDisconnected && m_lobbyEventListener.size() > 0) {
+	if (clientDisconnected && m_netEventListener.size() > 0) {
 		std::vector<PlayerInfo> players = getPlayers();
-		for (auto eventListener : m_lobbyEventListener)
-			eventListener->handleLobbyUpdate(players);
+		for (auto eventListener : m_netEventListener)
+			eventListener->onPlayersUpdated(players);
 	}
 	
 	// Check if we will send packets this frame
@@ -334,19 +246,10 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 		return;
 
 	std::int32_t id = entity.network.id;
-	bool isNewEntity = entity.network.isNewEntity;
-
-	// Detect and handle entity destruction
-	handleEntityDestruction(entity);
 
 	// Filter out non-networked entities
 	if (!entity.hasComponents(COMPONENT_NETWORK))
 		return;
-
-	// Detect new entities
-	if (isNewEntity) {
-		addToNetworking(entity);
-	}
 
 	// Fast forward input state to the last input received
 	// if we didn't receive input this frame.
@@ -367,32 +270,14 @@ void NetworkServerSystem::update(Entity& entity, float deltaTick)
 			m_clients.at(entity.network.clientAddress).playerInfo = playerInfo;
 		}
 
-
+		// Trigger events
 		std::vector<PlayerInfo> currentPlayers = getPlayers();
 		bufferRpc(std::make_unique<RPCUpdatePlayers>(currentPlayers));
 
-		if (m_lobbyEventListener.size() > 0)
+		if (m_netEventListener.size() > 0)
 		{
-			for (auto eventListener : m_lobbyEventListener)
-				eventListener->handleLobbyUpdate(currentPlayers);
-		}
-	}
-}
-
-void NetworkServerSystem::handleEntityDestruction(Entity& entity)
-{
-	if ((!entity.hasComponents() && entity.hadComponentsPrev(COMPONENT_NETWORK)) 
-	 || (entity.hasComponents(COMPONENT_NETWORK) && entity.network.isNewEntity)) { // Kill the old entity before creating a new one
-		std::int32_t id = entity.network.id;
-		if (0 <= id && id < m_netEntities.size()) {
-			if (!m_netEntities.at(id))
-				return;
-
-			auto rpc = std::make_unique<RPCDestroyGhost>(id);
-			bufferRpc(std::move(rpc));
-
-			// Stop tracking entity on the server
-			m_netEntities.at(id) = nullptr;
+			for (auto eventListener : m_netEventListener)
+				eventListener->onPlayersUpdated(currentPlayers);
 		}
 	}
 }
@@ -426,18 +311,25 @@ void NetworkServerSystem::startGame()
 	// Tell the clients to start their game instance
 	bufferRpc(std::make_unique<RPCStartGame>());
 
-	// Create entities for each player to possess
+	// Create an entity for the server to possess
 	TransformComponent transform{};
 	transform.position.y = 1;
 	m_serverPlayer = &EntityUtils::createPlayer(m_scene, transform);
 	m_serverPlayer->player.playerInfo = m_serverPlayerInfo;
+
+	// Tell clients to create the server player model
+	bufferRpc(std::make_unique<RPCCreatePlayerGhost>(m_serverPlayer->network.id, m_serverPlayer->player.playerInfo, m_serverPlayer->transform));
+
+	// Create entities for clients to possess
 	for (auto& addressClientInfoPair : m_clients) {
 		Entity& newPlayer = EntityUtils::createPlayer(m_scene, transform);
 		newPlayer.removeComponents(COMPONENT_INPUT_MAP); // Input will come from the clients
 		newPlayer.network.clientAddress = addressClientInfoPair.first;
 		newPlayer.player.playerInfo = addressClientInfoPair.second.playerInfo;
 		addressClientInfoPair.second.playerEntity = &newPlayer;
-		addToNetworking(newPlayer);
+
+		// Tell clients to create their player models
+		bufferRpc(std::make_unique<RPCCreatePlayerGhost>(newPlayer.network.id, newPlayer.player.playerInfo, newPlayer.transform));
 	}
 }
 
@@ -526,4 +418,109 @@ void NetworkServerSystem::selectGhostSnapshots(SnapshotBufT& dst,
 		dst.emplace_back(entity->network.id, entity->transform, entity->physics);
 		entity->network.priority = 0;
 	}
+}
+
+void NetworkServerSystem::onEntityCreation(Entity & entity)
+{
+	if (!entity.hasComponents(COMPONENT_NETWORK))
+		return;
+
+	std::int32_t id = entity.network.id;
+
+	// Check if we can reuse the entities current id
+	if (0 <= id && id < m_netEntities.size() && !m_netEntities.at(id)) {
+		// Reuse existing id from old entity
+		m_netEntities.at(id) = &entity;
+	} else {
+		// Check for a free id
+		auto freeIt = std::find(m_netEntities.begin(), m_netEntities.end(), nullptr);
+		if (freeIt != m_netEntities.end()) {
+			// Assign the new entity a free id if found
+			entity.network.id = static_cast<std::int32_t>(std::distance(m_netEntities.begin(), freeIt));
+			*freeIt = &entity;
+		} else {
+			// Otherwise assign the new entity a brand new id
+			entity.network.id = static_cast<std::int32_t>(m_netEntities.size());
+			m_netEntities.push_back(&entity);
+		}
+	}
+
+	//for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
+	//	Entity& entity = m_scene.getEntity(i);
+	//	if (entity.hasComponents(COMPONENT_NETWORK)) {
+	//		bool inNetworkList = false;
+	//		for (size_t j = 0; j < m_netEntities.size(); ++j) {
+	//			Entity* netEntity = m_netEntities.at(j);
+	//			if (netEntity && entity.network.id == netEntity->network.id) {
+	//				inNetworkList = true;
+	//			}
+	//		}
+	//		if (!inNetworkList)
+	//			std::cout << "WARNING: NETWORK ENTITY MISSING FROM NETWORK LIST, CUR ID: " << entity.network.id << std::endl;
+	//	}
+	//}
+
+	//for (size_t i = 0; i < m_netEntities.size(); ++i) {
+	//	for (size_t j = i + 1; j < m_netEntities.size(); ++j) {
+	//		if (m_netEntities.at(i) && m_netEntities.at(j) && m_netEntities.at(i) == m_netEntities.at(j)) {
+	//			std::cout << "ERROR: TRIED TO ADD AN ENTITY TO NETWORKING THAT IS ALREADY BEING TRACKED" << std::endl;
+	//		}
+	//	}
+	//}
+
+	// Create remote procedure calls to inform clients of new entity creation
+	id = entity.network.id;
+	std::unique_ptr<RemoteProcedureCall> rpc;
+	// TODO: Remove redundant transform
+	if (entity.hasComponents(COMPONENT_PLAYER)) {
+		// Delay until we have player info
+		return;
+	} else if (entity.hasComponents(COMPONENT_ZOMBIE)) {
+		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_ZOMBIE,
+			entity.transform);
+	} else if (entity.hasComponents(COMPONENT_SNAKE)) {
+		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SNAKE,
+			entity.transform);
+	} else if (entity.hasComponents(COMPONENT_ENEMY_SHOOTER)) {
+		rpc = std::make_unique<RPCCreateGhost>(id, ModelID::MODEL_ENEMY_SHOOTER,
+			entity.transform);
+	} else if (entity.hasComponents(COMPONENT_PLAYERBULLET)) {
+		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_PLAYER_BULLET,
+			entity.transform);
+	} else if (entity.hasComponents(COMPONENT_ENEMYBULLET)) {
+		rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_ENEMY_BULLET,
+			entity.transform);
+	} else if (entity.hasComponents(COMPONENT_SCOREPICKUP)) {
+		if (entity.aiVariables.lifePickUp) {
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_HEALTH_PICKUP,
+				entity.transform);
+		} else if (entity.aiVariables.score > 10) {
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_2,
+				entity.transform);
+		} else {
+			rpc = std::make_unique <RPCCreateGhost>(id, ModelID::MODEL_SCORE_PICKUP_1,
+				entity.transform);
+		}
+	} else {
+		rpc = nullptr;
+		std::cout << "ERROR: Server received entity creation event for unknown entity type. Unable to update clients" << std::endl;
+	}
+
+	if (rpc) {
+		bufferRpc(std::move(rpc));
+	}
+}
+
+void NetworkServerSystem::onEntityDestruction(Entity& entity)
+{
+	if (!entity.hasComponents(COMPONENT_NETWORK))
+		return;
+	
+	// Notify clients of entity destruction
+	std::int32_t id = entity.network.id;
+	auto rpc = std::make_unique<RPCDestroyGhost>(id);
+	bufferRpc(std::move(rpc));
+
+	// Stop tracking entity on the server
+	m_netEntities.at(id) = nullptr;
 }

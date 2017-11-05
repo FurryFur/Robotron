@@ -33,6 +33,9 @@ enum ComponentMask {
 };
 
 class Entity {
+	// The scene will handle all entity creation and destruction
+	friend class Scene;
+
 public:
 	TransformComponent transform;
 	PhysicsComponent physics;
@@ -47,7 +50,6 @@ public:
 	AIComponent aiVariables;
 	CameraComponent camera;
 
-	Entity();
 	Entity(Entity&&) = default;
 	Entity(const Entity&) = delete;
 	Entity& operator=(const Entity&) = delete;
@@ -77,11 +79,6 @@ public:
 	// Returns true if this entity has any components
 	bool hasComponents() const;
 
-	bool hadComponentsPrev(size_t componentMask) const;
-
-	template<typename ...ComponentTs>
-	bool hadComponentsPrev(size_t first, ComponentTs... rest) const;
-
 	// Adds multiple components to the entity
 	template<typename ...ComponentTs>
 	void addComponents(size_t first, ComponentTs... rest);
@@ -100,10 +97,9 @@ public:
 	template<typename ...ComponentTs>
 	void removeComponents(size_t first, ComponentTs... rest);
 
-	// Destroys the entity
-	void destroy();
-
 private:
+	Entity();
+
 	// Returns true if ALL the specified components are present 
 	// in the entity.
 	template<typename ...ComponentTs>
@@ -123,7 +119,6 @@ private:
 	static bool matchesAny(size_t lhsComponentMask, size_t rhsComponentMask);
 
 	size_t m_componentMask;
-	size_t m_componentMaskPrev;
 };
 
 template<typename ...ComponentTs>
@@ -139,31 +134,17 @@ inline bool Entity::hasComponentsAny(size_t first, ComponentTs ...rest) const
 }
 
 template<typename ...ComponentTs>
-inline bool Entity::hadComponentsPrev(size_t first, ComponentTs ...rest) const
-{
-	return hadComponentsPrev(first) && hadComponentsPrev(rest...);
-}
-
-template<typename ...ComponentTs>
 inline void Entity::addComponents(size_t first, ComponentTs... rest)
 {
-	size_t tmp = m_componentMask;
-
 	addComponents(first);
 	addComponents(rest...);
-
-	m_componentMaskPrev = tmp;
 }
 
 template<typename ...ComponentTs>
 inline void Entity::removeComponents(size_t first, ComponentTs ...rest)
 {
-	size_t tmp = m_componentMask;
-
 	removeComponents(first);
 	removeComponents(rest...);
-
-	m_componentMaskPrev = tmp;
 }
 
 template<typename ...ComponentTs>
