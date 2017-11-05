@@ -2,7 +2,7 @@
 
 #include "BufferStream.h"
 
-const std::uint8_t PlayerInfo::s_kDefaultLives = 100;
+const std::uint8_t PlayerInfo::s_kDefaultLives = 2;
 
 PlayerInfo::PlayerInfo()
 	: m_lives{ s_kDefaultLives }

@@ -256,7 +256,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			// The mouse is within the back button click
 			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
 			{
-				m_gameState = MAINMENU;
+				m_resetGame = true;
 			}
 			break;
 		}
@@ -265,7 +265,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			// The mouse is within the back button click
 			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
 			{
-				m_gameState = MAINMENU;
+				m_resetGame = true;
 			}
 			break;
 		}
@@ -274,7 +274,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			// The mouse is within the back button click
 			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
 			{
-				m_gameState = MAINMENU;
+				m_resetGame = true;
 			}
 			// The mouse is within the start button click
 			if (m_mousePosX >= 635.0f && m_mousePosX <= 780.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == STARTDOWN)
@@ -290,7 +290,7 @@ void Game::mouseButtonCallBack(GLFWwindow* window, int button, int action, int m
 			// The mouse is within the back button click
 			if (m_mousePosX >= 135.0f && m_mousePosX <= 280.0f && m_mousePosY >= 650 && m_mousePosY <= 695 && m_buttonState == BACKDOWN)
 			{
-				m_gameState = MAINMENU;
+				m_resetGame = true;
 			}
 			break;
 		}
@@ -396,6 +396,11 @@ void Game::executeOneFrame()
 	m_clock.Process();
 	float fDT = m_clock.GetDeltaTick();
 	process(fDT);
+}
+
+bool Game::checkReset()
+{
+	return m_resetGame;
 }
 
 void Game::renderMenuScreens()
@@ -613,8 +618,8 @@ void Game::process(float deltaTick)
 			{
 				// Trigger the game over text to dispay and update it
 				m_displayGameOverText = true;
-				// Return to lobby
-				m_gameState = MAINMENU;
+				// Return to main menu
+				m_resetGame = true;
 
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);
@@ -652,8 +657,8 @@ void Game::process(float deltaTick)
 			{
 				// Trigger the game over text to dispay and update it
 				m_displayGameOverText = true;
-				// Return to lobby
-				m_gameState = MAINMENU;
+				// Return to main menu
+				m_resetGame = true;
 
 				// Register input system as a listener for keyboard events
 				glfwSetWindowUserPointer(m_window, this);
