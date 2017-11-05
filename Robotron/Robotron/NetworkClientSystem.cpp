@@ -159,9 +159,9 @@ void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPl
 	}
 }
 
-void NetworkClientSystem::playAudio(Sound)
+void NetworkClientSystem::playAudio(Sound sound)
 {
-
+	m_audioSystem.playSFX(sound);
 }
 
 void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId, const TransformComponent& transform)
