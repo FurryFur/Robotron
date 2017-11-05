@@ -156,12 +156,10 @@ void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_
 
 void NetworkServerSystem::addToNetworking(Entity& entity)
 {
-	entity.addComponents(COMPONENT_NETWORK);
-
 	std::int32_t id = entity.network.id;
 
 	// Check if we can reuse the entities current id
-	if (0 <= id && id < m_netEntities.size()) {
+	if (0 <= id && id < m_netEntities.size() && !m_netEntities.at(id)) {
 		// Reuse existing id from old entity
 		m_netEntities.at(id) = &entity;
 	} else {

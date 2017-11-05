@@ -119,7 +119,8 @@ void Enemy03ControlSystem::update(Entity& entity, float deltaTick, Clock& clock)
 
 			firingPosition.y = currentPosition.y;
 			
-			glm::vec3 bulletVelocity = ((firingPosition - currentPosition) / (glm::length(firingPosition - currentPosition))) * 10.0f;
+			glm::vec3 displacement = firingPosition - currentPosition;
+			glm::vec3 bulletVelocity = (displacement / (glm::length(displacement))) * 10.0f;
 
 			bulletVelocity.y = 0.0f;
 			bullet.physics.velocity = bulletVelocity;

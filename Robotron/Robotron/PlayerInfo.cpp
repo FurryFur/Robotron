@@ -2,6 +2,8 @@
 
 #include "BufferStream.h"
 
+const std::uint8_t PlayerInfo::s_kDefaultLives = 100;
+
 PlayerInfo::PlayerInfo()
 	: m_lives{ s_kDefaultLives }
 	, m_score{ 0 }

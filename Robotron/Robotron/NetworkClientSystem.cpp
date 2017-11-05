@@ -76,7 +76,7 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 	}
 
 	// Send input updates to server
-	if (entity.hasComponents(COMPONENT_INPUT)) {
+	if (entity.hasComponents(COMPONENT_INPUT_MAP, COMPONENT_INPUT)) {
 		bufferRpc(std::make_unique<RPCRecordInput>(id, entity.input));
 	}
 }
@@ -146,10 +146,10 @@ void NetworkClientSystem::joinServer(const sockaddr_in& address)
 void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPlayers)
 {
 	// TODO: Add logging here
-	std::cout << "Received a lobby update, current players:" << std::endl;
-	for (auto& playerInfo : currentPlayers) {
-		std::cout << playerInfo.username << std::endl;
-	}
+	//std::cout << "Received a lobby update, current players:" << std::endl;
+	//for (auto& playerInfo : currentPlayers) {
+	//	std::cout << playerInfo.username << std::endl;
+	//}
 
 	if (m_lobbyEventListener.size() > 0)
 	{
@@ -185,7 +185,7 @@ void NetworkClientSystem::createPlayerGhost(std::int32_t entityNetId, const Play
 	// TODO: Conditionally add the player controller if the username matches the clients username
 	// newEntity.addComponents(COMPONENT_PLAYER_CONTROL);
 	if (newEntity.player.playerInfo.getPlayerID() == m_clientPlayerID) {
-		newEntity.addComponents(COMPONENT_INPUT_MAP);
+		newEntity.addComponents(COMPONENT_INPUT_MAP, COMPONENT_INPUT);
 		newEntity.inputMap.mouseInputEnabled = false;
 		newEntity.inputMap.leftBtnMap = GLFW_KEY_A;
 		newEntity.inputMap.rightBtnMap = GLFW_KEY_D;
@@ -205,6 +205,7 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 	{
 	case PACKET_TYPE_NORMAL:
 		handleGamePackets(packet, address);
+		break;
 	case PACKET_TYPE_BROADCAST_RESPONSE:
 		// If we receive a broadcast response from a server in this mode, simple inform the 
 		// lobby event listener.

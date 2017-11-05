@@ -177,7 +177,6 @@ Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transf
 	                                  | COMPONENT_NETWORK | COMPONENT_PHYSICS
 									  | COMPONENT_PLAYER);
 
-	entity.player.playerInfo.setLives(255);
 	entity.player.extraLifeThreshhold = 1000;
 	entity.transform = transform; // Scale the player model up by default
 	entity.transform.scale *= 5.0f;
@@ -390,6 +389,7 @@ Entity& EntityUtils::createPlayerGhost(Scene& scene, const PlayerInfo& playerInf
 	Entity& entity = createPlayer(scene, transform);
 	entity.removeComponents(COMPONENT_PLAYER_CONTROL);
 	entity.removeComponents(COMPONENT_INPUT_MAP);
+	entity.removeComponents(COMPONENT_INPUT);
 	entity.network.id = entityNetId;
 	entity.player.playerInfo = playerInfo;
 	return entity;

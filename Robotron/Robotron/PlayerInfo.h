@@ -9,7 +9,7 @@ class InBufferStream;
 
 class PlayerInfo {
 public:
-	static const std::uint8_t s_kDefaultLives = 5;
+	static const std::uint8_t s_kDefaultLives;
 
 	PlayerInfo();
 

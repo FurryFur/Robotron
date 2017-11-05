@@ -46,6 +46,21 @@ void NetworkSystem::beginFrame()
 
 void NetworkSystem::endFrame()
 {
+	for (size_t i = 0; i < m_scene.getEntityCount(); ++i) {
+		Entity& entity = m_scene.getEntity(i);
+		if (entity.hasComponents(COMPONENT_NETWORK)) {
+			bool inNetworkList = false;
+			for (size_t j = 0; j < m_netEntities.size(); ++j) {
+				Entity* netEntity = m_netEntities.at(j);
+				if (netEntity && entity.network.id == netEntity->network.id) {
+					inNetworkList = true;
+				}
+			}
+			if (!inNetworkList)
+				std::cout << "WARNING: NETWORK ENTITY MISSING FROM NETWORK LIST, CUR ID: " << entity.network.id << std::endl;
+		}
+	}
+
 	if (m_willSendPcktThisFrame) {
 		++m_curSeqenceNum;
 		// New RPC group for new sequence number
