@@ -19,10 +19,17 @@ PlayerStatsMenu::PlayerStatsMenu(Scene& scene, std::uint8_t playerID, const std:
 
 	m_playersAlive = true;
 
-	// If no text labels exist, populate them
-	if (m_statsScreenLabels.size() != playerInfo.size())
+	// There is only one player connected
+	if (playerInfo.size() == 0)
 	{
-		m_statsScreenLabels.clear();
+		TextLabel playerInfo("Player Lives: 5 Score: 0", "Assets/Fonts/NYCTALOPIATILT.TTF");
+		playerInfo.setScale(0.3f);
+		playerInfo.setPosition(glm::vec2(1030.0f, 770.0f));
+		playerInfo.setColor(glm::vec3(0.8f, 0.8f, 0.8f));
+		m_statsScreenLabels.push_back(playerInfo);
+	}
+	else
+	{
 		for (size_t i = 0; i < playerInfo.size(); ++i)
 		{
 
