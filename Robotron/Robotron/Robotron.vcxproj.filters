@@ -365,9 +365,6 @@
     <ClInclude Include="PlayerBulletComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="SceneEventListener.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NetworkEventListener.h">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>

@@ -4,7 +4,7 @@
 #include "PlayerInfo.h"
 #include "ClientInfo.h"
 #include "Audio.h"
-#include "SceneEventListener.h"
+#include "EntityEventListener.h"
 
 #include <vector>
 #include <unordered_map>
@@ -31,7 +31,7 @@ public:
 	}
 };
 
-class NetworkServerSystem : public NetworkSystem, public SceneEventListener {
+class NetworkServerSystem : public NetworkSystem, public EntityEventListener {
 public:
 	NetworkServerSystem(Scene&, const std::string& username, const std::string& serverName);
 	virtual ~NetworkServerSystem() override;
@@ -45,6 +45,8 @@ public:
 	// Inherited via SceneEventListener
 	virtual void onEntityCreation(Entity& entity) override;
 	virtual void onEntityDestruction(Entity& entity) override;
+	virtual void onAddComponents(Entity& entity, size_t componentMaskAdded) override;
+	virtual void onRemoveComponents(Entity& entity, size_t componentMaskToRemove) override;
 
 	void recordInput(std::int32_t entityNetId, const InputComponent& input);
 	void sendAudio(Sound);
