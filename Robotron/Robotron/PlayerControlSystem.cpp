@@ -87,7 +87,8 @@ void PlayerControlSystem::update(Entity& entity, Clock& clock)
 	{
 		if (m_scene.getEntity(i).hasComponentsAny(COMPONENT_ZOMBIE,
 			COMPONENT_SNAKE, COMPONENT_ENEMY_SHOOTER, COMPONENT_ENEMYBULLET) // its an enemy bullet
-			&& glm::length(m_scene.getEntity(i).transform.position - pos) < 1)		    // the player is within range to be damaged by it
+			&& glm::length(m_scene.getEntity(i).transform.position - pos) < 1 // the player is within range to be damaged by it
+			&& clock.GetCurTime() > entity.player.invunTimer + entity.player.lastSpawnTime)// the player is not currently in their respawn time
 		{
 			entity.player.deathTime = clock.GetCurTime();
 			entity.player.playerInfo.subtractLives(1);

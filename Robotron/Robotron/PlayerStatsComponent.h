@@ -22,5 +22,7 @@ struct PlayerStatsComponent {
 	int extraLifeTrack; // Keeps track of the players score until they get a new life. Refreshes when they do.
 	int extraLifeThreshhold; // How many points the player needs to get another life
 	bool isRespawning; // Is true when they are dead and will respawn
+	double invunTimer; // Players are invun after spawn
+	double lastSpawnTime; // The last time the player spawn in, used to check invun timer
 	double deathTime; // The time it takes for them to respawn
 };
