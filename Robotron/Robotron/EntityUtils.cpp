@@ -182,7 +182,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transf
 	entity.transform.scale *= 5.0f;
 
 	setModelPlayer(entity);
-
+	entity.player.invunTimer = 10.0f;
 	entity.inputMap = {};
 	entity.inputMap.mouseInputEnabled = false;
 	entity.inputMap.leftBtnMap = GLFW_KEY_A;
@@ -210,7 +210,7 @@ Entity& EntityUtils::createPlayerBullet(Scene& scene, const TransformComponent& 
 
 	setModelPlayerBullet(entity);
 
-	entity.controlVars.maxMoveSpeed = 10.0f;
+	entity.controlVars.maxMoveSpeed = 3.0f;
 	entity.controlVars.maxAcceleration = 10.0f;
 	entity.controlVars.worldSpaceMove = true;
 
