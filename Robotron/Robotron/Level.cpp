@@ -328,7 +328,10 @@ void Level::initalizeNextLevel()
 		{
 			// If there is a dead player, give them an extra life.
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER) && m_scene.getEntity(i).player.playerInfo.getLives() == 0)
+			{
 				m_scene.getEntity(i).player.playerInfo.addLives(1);
+				m_scene.getEntity(i).player.isRespawning = false;
+			}
 			
 			// Move the players back to the centre point of the level
 			m_scene.getEntity(i).transform.position.x = 0.0f;
@@ -422,8 +425,6 @@ void Level::process(float deltaTick, Clock& clock)
 		}
 	}
 
-
-	
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();
@@ -469,7 +470,8 @@ void Level::process(float deltaTick, Clock& clock)
 		for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 		{
 			if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER_CONTROL)
-			 && m_scene.getEntity(i).transform.position.y > 1.0f)
+			 && m_scene.getEntity(i).transform.position.y > 1.0f
+			 && m_scene.getEntity(i).player.isRespawning == false)
 			{
 				--m_scene.getEntity(i).transform.position.y;
 				m_descendingPlayers = true;
