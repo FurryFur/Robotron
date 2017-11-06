@@ -72,6 +72,20 @@ DummyLevel::~DummyLevel()
 
 void DummyLevel::process(float deltaTick, Clock& clock)
 {
+	// Cycle over all objects in the scene and find the player object
+	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
+	{
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER, COMPONENT_SPOTLIGHT))
+		{
+			if (clock.GetCurTime() <= (m_scene.getEntity(i).player.invunTimer + (m_scene.getEntity(i).player.lastSpawnTime)))
+			{
+				m_scene.getEntity(i).spotlight.color = glm::vec3(0.0f, 5.6f, 0.0f);
+			}
+			else
+				m_scene.getEntity(i).spotlight.color = glm::vec3(0.5f, 0.75f, 1.5f) * 4.0f;
+		}
+	}
+	
 	// Do any operations that should only happen once per frame.
 	m_inputSystem.beginFrame();
 	m_renderSystem.beginRender();

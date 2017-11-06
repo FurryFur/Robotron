@@ -28,6 +28,7 @@ NetworkServerSystem::NetworkServerSystem(Scene& scene, const std::string& userna
 	, m_serverState{ SERVER_STATE_LOBBY_MODE }
 	, m_serverName{ serverName }
 	, m_willSpawnPlayersThisFrame{ false }
+	, m_firstFrame {true}
 {
 	m_scene.registerEntityEventListener(this);
 
@@ -330,6 +331,12 @@ void NetworkServerSystem::endFrame()
 		// Send packet to clients
 		m_sendPacket.packetType = PACKET_TYPE_NORMAL;
 		broadcastToClients(m_sendPacket);
+	}
+
+	if (m_firstFrame){
+		for (auto eventListener : m_eventListeners)
+			eventListener->onPlayersUpdated(getPlayers());
+		m_firstFrame = false;
 	}
 
 	NetworkSystem::endFrame();
