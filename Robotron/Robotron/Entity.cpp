@@ -4,7 +4,7 @@
 
 #include <glm\glm.hpp>
 
-#include <iostream>
+#include "Log.h"
 
 Entity::Entity(std::vector<EntityEventListener*>& eventListeners)
 	: m_componentMask{ 0 }

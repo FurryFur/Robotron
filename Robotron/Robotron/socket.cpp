@@ -13,7 +13,7 @@
 
 #include "socket.h"
 
-#include <iostream>
+#include "Log.h"
 
 CSocket::CSocket()
 	:m_hSocket(0)
@@ -35,8 +35,8 @@ bool CSocket::initialise(unsigned short portNumber)
 	if (INVALID_SOCKET == m_hSocket)
 	{
 		error = WSAGetLastError();
-		std::cout << "Unable to create socket\n";
-		std::cout << "Error code: " << error;
+		g_out << "Unable to create socket\n";
+		g_out << "Error code: " << error;
 		return false;
 	}
 	else
@@ -47,7 +47,7 @@ bool CSocket::initialise(unsigned short portNumber)
 		if (result != NO_ERROR)
 			printf("ioctlsocket failed with error: %ld\n", result);
 		else
-			std::cout << "Successfully created the socket" << std::endl;
+			g_out << "Successfully created the socket\n";
 	}
 
 	// now bind the socket to the address and port number supplied.
@@ -64,7 +64,7 @@ bool CSocket::initialise(unsigned short portNumber)
 		m_socketAddress.sin_port = htons(portNumber);
 
 	}
-	std::cout << "Successfully bound the socket " << "to " << getLocalAddress() << ":" << portNumber << std::endl;
+	g_out << "Successfully bound the socket " << "to " << getLocalAddress() << ":" << portNumber << "\n";
 	
 	return true;
 }
@@ -109,8 +109,8 @@ int CSocket::enableBroadcast()
 	if (reult == SOCKET_ERROR)
 	{
 		int error = WSAGetLastError();
-		std::cout << "Unable to enable broadcast option on the socket" << std::endl;
-		std::cout << "Error code: " << error;
+		g_out << "Unable to enable broadcast option on the socket\n";
+		g_out << "Error code: " << error;
 		closesocket(m_hSocket);
 		return error;
 	}
@@ -126,8 +126,8 @@ int CSocket::disableBroadcast()
 	if (result == SOCKET_ERROR)
 	{
 		int error = WSAGetLastError();
-		std::cout << "Unable to disable broadcast option on the socket" << std::endl;
-		std::cout << "Error code: " << error;
+		g_out << "Unable to disable broadcast option on the socket\n";
+		g_out << "Error code: " << error;
 		closesocket(m_hSocket);
 		return error;
 	}

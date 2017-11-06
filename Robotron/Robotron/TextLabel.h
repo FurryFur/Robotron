@@ -14,7 +14,7 @@
 
 #include <map>
 #include <string>
-#include <iostream>
+#include "Log.h"
 
 struct Character {
 	GLuint     TextureID;  // ID handle of the glyph texture

@@ -2,7 +2,14 @@
 
 Log::Log()
 	: m_willWriteToConsole{ false }
+	, m_filePath{}
 {
+}
+
+Log::~Log()
+{
+	if (m_file.is_open())
+		m_file.close();
 }
 
 void Log::setConsoleOut(bool willWriteToConsole)
@@ -12,5 +19,11 @@ void Log::setConsoleOut(bool willWriteToConsole)
 
 void Log::setOutputFile(const std::string & filePath)
 {
-
+	if (m_filePath != "")
+		m_file.close();
+	
+	m_filePath = filePath;
+	m_file.open(m_filePath);
 }
+
+Log g_out;

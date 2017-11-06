@@ -7,7 +7,7 @@
 #include "RPC.h"
 #include "NetworkEventListener.h"
 
-#include <iostream>
+#include "Log.h"
 #include <memory>
 #include <cstdint>
 
@@ -27,7 +27,7 @@ NetworkSystem::NetworkSystem(Scene& scene)
 	if (WSAStartup(0x0202, &wsaData) != 0)
 	{
 		error = WSAGetLastError();
-		std::cout << "Windows Socket Error: " << error << std::endl;
+		g_out << "Windows Socket Error: " << error << "\n";
 	}
 
 	m_sendPacket.rpcGroupBuffer.emplace();
@@ -80,7 +80,7 @@ void NetworkSystem::sendData(const Packet& packet, const sockaddr_in& address)
 	int error = WSAGetLastError();
 	if (error != 0) {
 		// TODO: Log these error messages properly
-		std::cout << "Error sending data, error code: " << error << std::endl;
+		g_out << "Error sending data, error code: " << error << "\n";
 	}
 }
 
@@ -103,7 +103,7 @@ bool NetworkSystem::receiveData(Packet& outPacket, sockaddr_in& outAddress)
 	if (error == WSAEWOULDBLOCK)
 		return false;
 	if (error != 0 && error != WSAEWOULDBLOCK) {
-		std::cout << "Error receiving data, error code: " << error << std::endl;
+		g_out << "Error receiving data, error code: " << error << "\n";
 		return false;
 	}
 
@@ -127,7 +127,7 @@ void NetworkSystem::allocateRecvBuffer()
 	int result = getsockopt(m_socket.getSocketHandle(), SOL_SOCKET, SO_MAX_MSG_SIZE, (char *)&maxBufferSize, &maxBufferSizeSize);
 	if (result == SOCKET_ERROR) {
 		// TODO: Add logging here
-		std::cout << "Warning: Unable to get maximum datagram size" << std::endl;
+		g_out << "Warning: Unable to get maximum datagram size\n";
 		m_recvBuffer.resize(64000);
 	} else {
 		m_recvBuffer.resize(maxBufferSize);
@@ -147,7 +147,7 @@ void NetworkSystem::registerEntityEventListener(NetworkEventListener* eventListe
 		m_eventListeners.push_back(eventListener);
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Tried to register nullptr as a Network Event Listener" << std::endl;
+		g_out << "WARNING: Tried to register nullptr as a Network Event Listener\n";
 	}
 }
 
@@ -158,6 +158,6 @@ void NetworkSystem::removeEntityEventListener(NetworkEventListener* eventListene
 		m_eventListeners.erase(removeIt);
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Tried to remove a Network Event Listener that wasn't registered with the network system" << std::endl;
+		g_out << "WARNING: Tried to remove a Network Event Listener that wasn't registered with the network system\n";
 	}
 }

@@ -11,7 +11,7 @@
 // Mail         : lance.cha7337@mediadesign.school.nz
 //
 
-#include <iostream>
+#include "Log.h"
 #include <fstream>
 #include "ShaderHelper.h"
 
@@ -50,7 +50,7 @@ GLuint compileFragmentShader(const char* shaderCode) {
 GLuint compileShader(GLenum ShaderType, const char* shaderCode) {
 	const  GLuint shaderObjectId = glCreateShader(ShaderType);
 	if (shaderObjectId == 0) {
-		std::cout << "Error creating shader type " << ShaderType << std::endl;
+		g_out << "Error creating shader type " << ShaderType << "\n";
 		exit(0);
 	}
 	const GLchar* p[1];
@@ -65,7 +65,7 @@ GLuint compileShader(GLenum ShaderType, const char* shaderCode) {
 	if (!compileStatus) {
 		GLchar InfoLog[1024];
 		glGetShaderInfoLog(shaderObjectId, 1024, NULL, InfoLog);
-		std::cout << "Error compiling shader type" << ShaderType << std::endl << InfoLog << std::endl;
+		g_out << "Error compiling shader type" << ShaderType << "\n" << InfoLog << "\n";
 		exit(1);
 	}
 
@@ -78,7 +78,7 @@ GLuint linkProgram(GLuint vertexShaderId, GLuint fragmentShaderId) {
 	const GLuint programObjectId = glCreateProgram();
 
 	if (programObjectId == 0) {
-		std::cout << "Error creating shader program " << std::endl;
+		g_out << "Error creating shader program \n";
 		exit(1);
 	}
 
@@ -89,7 +89,7 @@ GLuint linkProgram(GLuint vertexShaderId, GLuint fragmentShaderId) {
 	glGetProgramiv(programObjectId, GL_LINK_STATUS, &linkStatus);
 	if (linkStatus == 0) {
 		glGetProgramInfoLog(programObjectId, sizeof(ErrorLog), NULL, ErrorLog);
-		std::cout << "Error linking shader program: " << std::endl << ErrorLog << std::endl;
+		g_out << "Error linking shader program: \n" << ErrorLog << "\n";
 		exit(1);
 	}
 	return programObjectId;
@@ -102,7 +102,7 @@ GLint validateProgram(GLuint programObjectId) {
 	glGetProgramiv(programObjectId, GL_VALIDATE_STATUS, &Success);
 	if (!Success) {
 		glGetProgramInfoLog(programObjectId, sizeof(ErrorLog), NULL, ErrorLog);
-		std::cout << "Invalid shader program: " << std::endl << ErrorLog;
+		g_out << "Invalid shader program: \n" << ErrorLog;
 		exit(1);
 	}
 	return Success;

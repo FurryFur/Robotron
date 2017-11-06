@@ -15,7 +15,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
+#include "Log.h"
 #include <chrono>
 
 using namespace std::chrono;
@@ -94,7 +94,7 @@ void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr
 {
 	if (packet.packetType != PACKET_TYPE_NORMAL) {
 		// TODO: Add logging here
-		std::cout << "WARNING: Received lobby packet while in game" << std::endl;
+		g_out << "WARNING: Received lobby packet while in game\n";
 		return;
 	}
 
@@ -102,8 +102,8 @@ void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr
 	auto clientIt = m_clients.find(address);
 	if (clientIt == m_clients.end()) {
 		// TODO: Add logging here
-		std::cout << "INFO: Received a packet from an unassociated client" 
-		          << std::endl;
+		g_out << "INFO: Received a packet from an unassociated client" 
+		          << "\n";
 		return;
 	}
 
@@ -113,7 +113,7 @@ void NetworkServerSystem::handleGamePackets(const Packet& packet, const sockaddr
 	std::uint32_t seqNumRecvd = packet.sequenceNum;
 	std::int32_t bufferOffset = static_cast<std::int32_t>(seqNumRecvd - seqNumSeen - 1);
 	if (bufferOffset > packet.rpcGroupBuffer.size() - 1) {
-		std::cout << "WARNING: Missed packet count exceeds redundancy buffer size, may miss Remote Procedure Calls" << std::endl;
+		g_out << "WARNING: Missed packet count exceeds redundancy buffer size, may miss Remote Procedure Calls\n";
 		bufferOffset = static_cast<std::int32_t>(packet.rpcGroupBuffer.size()) - 1;
 	}
 		
@@ -157,8 +157,8 @@ void NetworkServerSystem::handleLobbyPackets(const Packet& packet, const sockadd
 void NetworkServerSystem::handleBroadcastPacket(const Packet& packet, const sockaddr_in& address)
 {
 	// TODO: Add logging here
-	std::cout << "INFO: Server received a broadcast packet from address: " 
-	          << toString(address) << std::endl;
+	g_out << "INFO: Server received a broadcast packet from address: " 
+	          << toString(address) << "\n";
 
 	Packet broadcastResp;
 	broadcastResp.packetType = PACKET_TYPE_BROADCAST_RESPONSE;
@@ -170,9 +170,9 @@ void NetworkServerSystem::handleBroadcastPacket(const Packet& packet, const sock
 void NetworkServerSystem::handleJoinPacket(const Packet& packet, const sockaddr_in& address)
 {
 	// TODO: Add logging here
-	std::cout << "INFO: Server received a join request from user: " 
+	g_out << "INFO: Server received a join request from user: " 
 	          << packet.username << ", at address: " << toString(address) 
-	          << std::endl;
+	          << "\n";
 
 	ClientInfo client;
 	client.playerInfo.setUniquePlayerID();
@@ -380,12 +380,12 @@ void NetworkServerSystem::recordInput(std::int32_t entityNetId, const InputCompo
 		}
 		else {
 			// TODO: Add logging here
-			std::cout << "Info: Received input for a destroyed entity" << std::endl;
+			g_out << "Info: Received input for a destroyed entity\n";
 		}
 	}
 	else {
 		// TODO: Add logging here
-		std::cout << "ERROR: Received input for an entity with an out of range network id" << std::endl;
+		g_out << "ERROR: Received input for an entity with an out of range network id\n";
 	}
 }
 
@@ -502,7 +502,7 @@ void NetworkServerSystem::onAddComponents(Entity& entity, size_t componentMaskAd
 	}
 	else {
 		rpc = nullptr;
-		std::cout << "ERROR: Server received entity creation event for unknown entity type. Unable to update clients" << std::endl;
+		g_out << "ERROR: Server received entity creation event for unknown entity type. Unable to update clients\n";
 	}
 
 	if (rpc) {

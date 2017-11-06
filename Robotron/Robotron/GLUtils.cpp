@@ -26,7 +26,7 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <gli\gli.hpp>
 
-#include <iostream>
+#include "Log.h"
 #include <unordered_map>
 #include <string>
 #include <sstream>
@@ -59,7 +59,7 @@ GLFWwindow* GLUtils::initOpenGL()
 	GLFWwindow* glContext = glfwCreateWindow(1400, 800, "Doge-otron 2017", nullptr, nullptr);
 	if (!glContext)
 	{
-		std::cerr << "Failed to create GLFW window" << std::endl;
+		std::cerr << "Failed to create GLFW window\n";
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
@@ -72,7 +72,7 @@ GLFWwindow* GLUtils::initOpenGL()
 	// Load opengl functinos
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		std::cerr << "Failed to initialize GLAD" << std::endl;
+		std::cerr << "Failed to initialize GLAD\n";
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
@@ -228,7 +228,7 @@ Texture GLUtils::loadTexture(const std::string& path)
 		s_loadedTextures.insert(std::make_pair(path, texture));
 	} else {
 		// TODO: Throw excpetion here
-		std::cout << "Texture failed to load at path: " << path << std::endl;
+		g_out << "Texture failed to load at path: " << path << "\n";
 	}
 
 	stbi_image_free(textureData);
@@ -277,7 +277,7 @@ Texture GLUtils::loadCubeMapFaces(const std::vector<std::string>& facePaths)
 				0, format, width, height, 0, format, GL_UNSIGNED_BYTE, faceData);
 		} else {
 			// TODO: Throw excpetion here
-			std::cout << "Texture failed to load at path: " << facePaths.at(i) << std::endl;
+			g_out << "Texture failed to load at path: " << facePaths.at(i) << "\n";
 		}
 
 		stbi_image_free(faceData);
@@ -302,7 +302,7 @@ Texture GLUtils::loadDDSTexture(const std::string& path)
 	gli::texture texture = gli::load(path);
 	if (texture.empty()) {
 		// TODO: Throw error here
-		std::cout << "Texture failed to load at path: " << path << std::endl;
+		g_out << "Texture failed to load at path: " << path << "\n";
 		return finalTexture;
 	}
 

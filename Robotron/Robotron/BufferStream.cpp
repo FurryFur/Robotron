@@ -1,7 +1,7 @@
 #include "BufferStream.h"
 
 #include <cstring>
-#include <iostream>
+#include "Log.h"
 
 OutBufferStream::OutBufferStream()
 	: m_writeHeadIdx{ 0 }
@@ -79,14 +79,14 @@ IBSError InBufferStream::getError()
 void InBufferStream::setError(IBSError error)
 {
 	if (error != IBS_ERROR_NONE) {
-		std::cout << "Error occured reading data from input buffer stream" << std::endl;
+		g_out << "Error occured reading data from input buffer stream\n";
 		switch (error)
 		{
 		case IBS_ERROR_CORRUPT_DATA:
-			std::cout << "Data was corrupted" << std::endl;
+			g_out << "Data was corrupted\n";
 			break;
 		case IBS_ERROR_WOULD_READ_PAST_END:
-			std::cout << "Detected would overrun buffer" << std::endl;
+			g_out << "Detected would overrun buffer\n";
 			break;
 		default:
 			break;

@@ -6,7 +6,7 @@
 #include "NetworkClientSystem.h"
 #include "NetworkServerSystem.h"
 
-#include <iostream>
+#include "Log.h"
 
 NetworkClientSystem* g_clientSystem = nullptr;
 NetworkServerSystem* g_serverSystem = nullptr;
@@ -107,19 +107,19 @@ void RPCDestroyGhost::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Received Destroy Ghost RPC with an unset network entity id" << std::endl;
+		g_out << "ERROR: Received Destroy Ghost RPC with an unset network entity id\n";
 		return;
 	}
 
 	if (g_clientSystem) {
 		if (!g_clientSystem->destroyIfExistsInNetwork(m_entityNetId)) {
 			// TODO: Add logging here
-			std::cout << "WARNING: Recieved a destroy ghost RPC for an entity which doesn't exist on the client. ID: " << m_entityNetId << std::endl;
+			g_out << "WARNING: Recieved a destroy ghost RPC for an entity which doesn't exist on the client. ID: " << m_entityNetId << "\n";
 		}
 	}
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Received destroy ghost RPC on a non-client, or RPC client not set" << std::endl;
+		g_out << "WARNING: Received destroy ghost RPC on a non-client, or RPC client not set\n";
 	}
 }
 
@@ -145,7 +145,7 @@ void RPCCreatePlayerGhost::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Received Create Player Ghost RPC with an unset network entity id" << std::endl;
+		g_out << "ERROR: Received Create Player Ghost RPC with an unset network entity id\n";
 		return;
 	}
 
@@ -154,7 +154,7 @@ void RPCCreatePlayerGhost::execute()
 	}
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Received create player ghost RPC on a non-client, or RPC client not set" << std::endl;
+		g_out << "WARNING: Received create player ghost RPC on a non-client, or RPC client not set\n";
 	}
 }
 
@@ -178,7 +178,7 @@ void RPCCreateGhost::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Received a Create Ghost RPC with an unset network entity id" << std::endl;
+		g_out << "ERROR: Received a Create Ghost RPC with an unset network entity id\n";
 		return;
 	}
 
@@ -186,7 +186,7 @@ void RPCCreateGhost::execute()
 		g_clientSystem->createGhost(m_entityNetId, m_modelId);
 	} else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Received create ghost RPC on a non-client, or RPC client not set" << std::endl;
+		g_out << "WARNING: Received create ghost RPC on a non-client, or RPC client not set\n";
 	}
 }
 
@@ -213,7 +213,7 @@ void RPCRecordInput::execute()
 {
 	if (m_entityNetId < 0) {
 		// TODO: Add logging here
-		std::cout << "ERROR: Received Record Input RPC with an unset network entity id" << std::endl;
+		g_out << "ERROR: Received Record Input RPC with an unset network entity id\n";
 		return;
 	}
 
@@ -221,7 +221,7 @@ void RPCRecordInput::execute()
 		g_serverSystem->recordInput(m_entityNetId, m_input);
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Received input on a non-server, or RPC server not set" << std::endl;
+		g_out << "WARNING: Received input on a non-server, or RPC server not set\n";
 	}
 
 	//if (m_entityNetId < netEntities.size()) {
@@ -229,11 +229,11 @@ void RPCRecordInput::execute()
 	//		netEntities.at(m_entityNetId)->input = m_input;
 	//	else {
 	//		// TODO: Add logging here
-	//		std::cout << "Info: Received RPC for destroyed entity" << std::endl;
+	//		g_out << "Info: Received RPC for destroyed entity\n";
 	//	}
 	//} else {
 	//	// TODO: Add logging here
-	//	std::cout << "Warning: Received RPC with out of range network id" << std::endl;
+	//	g_out << "Warning: Received RPC with out of range network id\n";
 	//}
 }
 
@@ -269,7 +269,7 @@ void RPCUpdatePlayers::execute()
 		g_clientSystem->updatePlayers(m_currentPlayers);
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Received lobby update RPC on a non-client, or RPC client not set" << std::endl;
+		g_out << "WARNING: Received lobby update RPC on a non-client, or RPC client not set\n";
 	}
 }
 
@@ -299,7 +299,7 @@ void RPCStartGame::execute()
 		g_clientSystem->startGame();
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Received a Start Game RPC on a non-client, or RPC client not set" << std::endl;
+		g_out << "WARNING: Received a Start Game RPC on a non-client, or RPC client not set\n";
 	}
 }
 
@@ -324,7 +324,7 @@ void RPCPlayAudio::execute()
 		g_clientSystem->playAudio(m_sound);
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Received a Play Audio RPC on a non-client, or RPC client not set" << std::endl;
+		g_out << "WARNING: Received a Play Audio RPC on a non-client, or RPC client not set\n";
 	}
 }
 

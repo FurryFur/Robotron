@@ -353,7 +353,7 @@ const ModelComponent& GLPrimitives::getSphereModel()
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();
-		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture2.jpg"));
+		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
 		material.willDrawDepth = true;
 		material.shaderParams.metallicness = 0;
 		material.shaderParams.glossiness = 0; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason
@@ -427,7 +427,7 @@ const ModelComponent& GLPrimitives::getPyramidModel()
 
 		Material material;
 		material.shader = GLUtils::getDefaultShader();
-		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture.jpg"));
+		material.colorMaps.push_back(GLUtils::loadTexture("Assets/Textures/random-texture3.png"));
 		material.willDrawDepth = true;
 		material.shaderParams.metallicness = 0;
 		material.shaderParams.glossiness = 1.0f; // TODO: Fix values getting messed up on the gpu when this is 0 for some reason

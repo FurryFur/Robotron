@@ -10,7 +10,7 @@
 #include <assimp\scene.h>
 #include <assimp\postprocess.h>
 
-#include <iostream>
+#include "Log.h"
 #include <unordered_map>
 
 // Checks all material textures of a given type and loads the textures if they're not loaded yet.
@@ -201,7 +201,7 @@ ModelComponent ModelUtils::loadModel(const std::string& path)
 	// TODO: Throw an exception here
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
-		std::cout << "ERROR::ASSIMP:: " << s_importer.GetErrorString() << std::endl;
+		g_out << "ERROR::ASSIMP:: " << s_importer.GetErrorString() << "\n";
 		return model;
 	}
 	std::string textureDir = path.substr(0, path.find_last_of('/'));

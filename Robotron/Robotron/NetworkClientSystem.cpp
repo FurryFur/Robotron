@@ -14,7 +14,7 @@
 #include <glm\gtx\matrix_interpolation.hpp>
 
 #include <cmath>
-#include <iostream>
+#include "Log.h"
 #include <cstdint>
 #include <chrono>
 
@@ -96,7 +96,7 @@ void NetworkClientSystem::update(Entity& entity, float deltaTick)
 
 	// TODO: Add logging here
 	if (id < 0) {
-		//std::cout << "Error: Entity with unassigned network id seen by client" << std::endl;
+		//g_out << "Error: Entity with unassigned network id seen by client\n";
 		return;
 	}
 
@@ -154,7 +154,7 @@ void NetworkClientSystem::broadcastForServers()
 	{
 		address.sin_port = htons(NetworkServerSystem::s_kDefaultServerPort + i);
 		// TODO: Add logging here
-		std::cout << "INFO: Sending broadcast packet to address: " << toString(address) << std::endl;
+		g_out << "INFO: Sending broadcast packet to address: " << toString(address) << "\n";
 		sendData(broadcastPacket, address);
 	}
 
@@ -174,9 +174,9 @@ void NetworkClientSystem::joinServer(const sockaddr_in& address)
 void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPlayers)
 {
 	// TODO: Add logging here
-	//std::cout << "Received a lobby update, current players:" << std::endl;
+	//g_out << "Received a lobby update, current players:\n";
 	//for (auto& playerInfo : currentPlayers) {
-	//	std::cout << playerInfo.username << std::endl;
+	//	g_out << playerInfo.username << "\n";
 	//}
 
 	if (m_eventListeners.size() > 0)
@@ -196,7 +196,7 @@ void NetworkClientSystem::createGhost(std::int32_t entityNetId, ModelID modelId)
 	// Destroy existing entities with the same id before creating new ones
 	// TODO: Add logging here
 	if (destroyIfExistsInNetwork(entityNetId))
-		std::cout << "INFO: Overwritting entity with network id: " << entityNetId << std::endl;
+		g_out << "INFO: Overwritting entity with network id: " << entityNetId << "\n";
 
 	Entity& newEntity = EntityUtils::createGhost(m_scene, modelId, entityNetId);
 
@@ -220,7 +220,7 @@ void NetworkClientSystem::spawnPlayers()
 		// Destroy existing entities with the same id before creating new ones
 		// TODO: Add logging here
 		if (destroyIfExistsInNetwork(entityNetId))
-			std::cout << "INFO: Overwritting entity with network id: " << entityNetId << std::endl;
+			g_out << "INFO: Overwritting entity with network id: " << entityNetId << "\n";
 
 		Entity& newPlayer = EntityUtils::createPlayerGhost(m_scene, playerInfo, entityNetId);
 
@@ -264,13 +264,13 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 				eventListener->onBroadcastResponse(packet.serverName, address);
 		}
 
-		std::cout << "Received broadcast response from server: " 
+		g_out << "Received broadcast response from server: " 
 		          << packet.serverName << ", at address: " << toString(address)
-		          << std::endl;
+		          << "\n";
 
 		// TODO: Remove auto join, replace with lobby
-		//std::cout << "Attempting to auto join server: " << packet.serverName 
-		//          << std::endl;
+		//g_out << "Attempting to auto join server: " << packet.serverName 
+		//          << "\n";
 		//joinServer(address);
 
 		break;
@@ -279,8 +279,8 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 			m_clientState = CLIENT_STATE_IN_LOBBY;
 			m_clientPlayerID = packet.playerID;
 
-			std::cout << "Received join accept from server at address: " 
-			          << toString(address) << std::endl;
+			g_out << "Received join accept from server at address: " 
+			          << toString(address) << "\n";
 			if (m_eventListeners.size() > 0)
 			{
 				for (auto eventListener : m_eventListeners)
@@ -289,8 +289,8 @@ void NetworkClientSystem::handlePreLobbyPackets(const Packet& packet, const sock
 		} else {
 			m_clientState = CLIENT_STATE_NO_SERVER;
 
-			std::cout << "Received join reject from server at address: " 
-			          << toString(address) << std::endl;
+			g_out << "Received join reject from server at address: " 
+			          << toString(address) << "\n";
 			if (m_eventListeners.size() > 0)
 			{
 				for (auto eventListener : m_eventListeners)
@@ -307,7 +307,7 @@ void NetworkClientSystem::handleGamePackets(const Packet& packet, const sockaddr
 {
 	if (address != m_serverAddress) {
 		// TODO: Add logging here
-		std::cout << "INFO: Received packet from unknown host" << std::endl;
+		g_out << "INFO: Received packet from unknown host\n";
 		return;
 	}
 
@@ -319,7 +319,7 @@ void NetworkClientSystem::handleGamePackets(const Packet& packet, const sockaddr
 	std::uint32_t seqNumRecvd = packet.sequenceNum;
 	std::int32_t bufferOffset = static_cast<std::int32_t>(seqNumRecvd - m_lastSeqNumSeen - 1);
 	if (bufferOffset > rpcGroups.size() - 1) {
-		std::cout << "WARNING: Missed packet count exceeds redundancy buffer size, may miss Remote Procedure Calls" << std::endl;
+		g_out << "WARNING: Missed packet count exceeds redundancy buffer size, may miss Remote Procedure Calls\n";
 		bufferOffset = static_cast<std::int32_t>(rpcGroups.size()) - 1;
 	}
 
@@ -339,7 +339,7 @@ void NetworkClientSystem::handleGamePackets(const Packet& packet, const sockaddr
 
 			// TODO: Add logging here
 			if (id < 0) {
-				std::cout << "Error: Ghost Snapshot with unassigned network id received by client" << std::endl;
+				g_out << "Error: Ghost Snapshot with unassigned network id received by client\n";
 				return;
 			}
 
@@ -352,11 +352,11 @@ void NetworkClientSystem::handleGamePackets(const Packet& packet, const sockaddr
 				}
 				else {
 					// TODO: Add logging here
-					std::cout << "Warning: Client received snapshot of deleted ghost" << std::endl;
+					g_out << "Warning: Client received snapshot of deleted ghost\n";
 				}
 			} else {
 				// TODO: Add logging here
-				std::cout << "Warning: Client received snapshot of non-existant ghost" << std::endl;
+				g_out << "Warning: Client received snapshot of non-existant ghost\n";
 			}
 		}
 

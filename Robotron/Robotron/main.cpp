@@ -24,10 +24,7 @@ double newTime = 0.0;
 
 int main()
 {
-	Log testLog;
-	testLog << "no console";
-	testLog.setConsoleOut(true);
-	testLog << "writes to console";
+	g_out.setOutputFile("Log.txt");
 
 	// Init combined Window and OpenGL context.
 	GLFWwindow* window = GLUtils::initOpenGL();

@@ -1,6 +1,6 @@
 #include "Level.h"
 
-#include <iostream>
+#include "Log.h"
 #include <string>
 
 Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem, const std::vector<PlayerInfo>& playerInfo)
@@ -69,7 +69,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	m_renderSystem.setIrradianceMap(irradianceMap.id);
 
 	// Setup the camera
-	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
+	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 23, 26 }, { 0, 0, 5 }, { 0, 1, 0 });
 	m_renderSystem.setCamera(&cameraEntity);
 }
 
@@ -96,6 +96,9 @@ void Level::spawnEnemies(int levelType)
 	if (m_levelNum == 0)
 	{
 		zombieCount = 2;
+		healthPickUpCount = 1;
+		score1PickUpCount = 0;
+		score2PickUpCount = 0;
 
 	}
 	else if (m_levelNum == 1)
@@ -106,9 +109,11 @@ void Level::spawnEnemies(int levelType)
 	else if (m_levelNum == 2)
 	{
 		snakePartsCount = 8 + m_levelNum + randomInt(0, 2);
-		zombieCount = 3;
-		score1PickUpCount = 4;
-		int healthPickUpCount = 1;
+		score2PickUpCount = 4;
+	}
+	else if (m_levelNum == 3)
+	{
+		shooterCount = 1;
 	}
 	// Spawn Zombies level type
 	else if (levelType == 0)

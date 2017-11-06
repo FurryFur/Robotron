@@ -29,12 +29,12 @@ TextLabel::TextLabel(std::string text, std::string font){
 
 	// All functions return a value different than 0 whenever an error occurred
 	if (FT_Init_FreeType(&ft))
-		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		g_out << "ERROR::FREETYPE: Could not init FreeType Library\n";
 	
 	// Load font as face
 	FT_Face face;
 	if (FT_New_Face(ft, font.c_str(), 0, &face))
-		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+		g_out << "ERROR::FREETYPE: Failed to load font\n";
 
 	// Set size to load glyphs as
 	FT_Set_Pixel_Sizes(face, 0, 48);
@@ -48,7 +48,7 @@ TextLabel::TextLabel(std::string text, std::string font){
 	{
 		// Load character glyph 
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER)){
-			std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+			g_out << "ERROR::FREETYTPE: Failed to load Glyph\n";
 			continue;
 		}
 

@@ -4,7 +4,7 @@
 #include "EntityEventListener.h"
 
 #include <algorithm>
-#include <iostream>
+#include "Log.h"
 
 Scene* Scene::s_currentScene = nullptr;
 
@@ -62,7 +62,7 @@ void Scene::registerEntityEventListener(EntityEventListener* eventListener)
 		m_eventListeners.push_back(eventListener);
 	} else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Tried to register a nullptr as an Entity Event Listener" << std::endl;
+		g_out << "WARNING: Tried to register a nullptr as an Entity Event Listener\n";
 	}
 }
 
@@ -73,7 +73,7 @@ void Scene::removeEntityEventListener(EntityEventListener* eventListener)
 		m_eventListeners.erase(removeIt);
 	else {
 		// TODO: Add logging here
-		std::cout << "WARNING: Tried to remove an Entity Event Listener that wasn't registered with the scene" << std::endl;
+		g_out << "WARNING: Tried to remove an Entity Event Listener that wasn't registered with the scene\n";
 	}
 }
 

@@ -11,7 +11,7 @@
 
 #include <glm\gtc\matrix_transform.hpp>
 
-#include <iostream>
+#include "Log.h"
 #include <memory>
 
 void EntityUtils::preloadModelsAndTextures()
@@ -411,7 +411,7 @@ Entity& EntityUtils::createGhost(Scene& scene, ModelID modelId, std::int32_t ent
 		break;
 	default:
 		// TODO: Add logging here.
-		std::cout << "Error: Invalid modelID when trying to create entity ghost" << std::endl;
+		g_out << "Error: Invalid modelID when trying to create entity ghost\n";
 		break;
 	}
 

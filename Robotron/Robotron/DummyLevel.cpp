@@ -60,7 +60,7 @@ DummyLevel::DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::stri
 	m_renderSystem.setIrradianceMap(irradianceMap.id);
 
 	// Setup the camera
-	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 40, 20 }, { 0, 0, 0 }, { 0, 1, 0 });
+	Entity& cameraEntity = EntityUtils::createCamera(m_scene, { 0, 23, 26 }, { 0, 0, 5 }, { 0, 1, 0 });
 	m_renderSystem.setCamera(&cameraEntity);
 }
 

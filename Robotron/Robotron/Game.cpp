@@ -579,7 +579,7 @@ void Game::process(float deltaTick)
 				if (m_serverNames.size() >= i)
 					createTextLabel(m_serverNames.at(i), glm::vec2(137.0f, 750.0f - i * 40), &m_uiSearchLobbyLabels, 0.5f);
 				else
-					std::cout << "Error: Tried to create a label for a server that does not exist";
+					g_out << "Error: Tried to create a label for a server that does not exist";
 			}
 		}
 
@@ -737,7 +737,7 @@ void Game::onJoinAccepted()
 
 void Game::onJoinRejected()
 {
-	std::cout << "Error: Failed to connect to the server.";
+	g_out << "Error: Failed to connect to the server.";
 }
 
 void Game::onPlayersUpdated(const std::vector<PlayerInfo>& playerList)
@@ -760,7 +760,7 @@ void Game::onPlayersUpdated(const std::vector<PlayerInfo>& playerList)
 				createTextLabel(playerList.at(i).username, glm::vec2(180.0f, 550.0f - i * 40), &m_uiPlayerNames, 0.5f);
 			}
 			else
-				std::cout << "Error: Tried to create a label for a player that does not exist";
+				g_out << "Error: Tried to create a label for a player that does not exist";
 		}
 
 		m_numConnectedPlayers = playerList.size();
