@@ -75,7 +75,8 @@ void DummyLevel::process(float deltaTick, Clock& clock)
 	// Update the flash light colour for the player depending if they are on their respawn timer or not.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).player.lastSpawnTime == 0)
+		if (m_scene.getEntity(i).player.lastSpawnTime == 0
+		 || m_scene.getEntity(i).transform.position.y == 50)
 			m_scene.getEntity(i).player.lastSpawnTime = clock.GetCurTime();
 		
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER, COMPONENT_SPOTLIGHT)
