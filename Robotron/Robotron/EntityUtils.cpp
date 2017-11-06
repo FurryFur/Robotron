@@ -218,7 +218,7 @@ Entity& EntityUtils::createPlayer(Scene& scene, const TransformComponent& transf
 	entity.transform.scale *= 5.0f;
 
 	setModelPlayer(entity);
-	entity.player.invunTimer = 10.0f;
+	entity.player.invunTimer = 3.0f;
 	entity.inputMap = {};
 	entity.inputMap.mouseInputEnabled = false;
 	entity.inputMap.leftBtnMap = GLFW_KEY_A;

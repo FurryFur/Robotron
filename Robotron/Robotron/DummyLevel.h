@@ -28,7 +28,7 @@ class DummyLevel : public IKeyObserver
 {
 public:
 	//DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerIDNum);
-	DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem);
+	DummyLevel(GLFWwindow* window, Clock& clock, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem, const std::vector<PlayerInfo>& playerInfo);
 	~DummyLevel();
 
 	void process(float deltaTick, Clock& clock);

@@ -635,7 +635,7 @@ void Game::process(float deltaTick)
 		{			
 			// Create a level if one does not exist
 			if (m_level == nullptr)
-				m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_scene, m_userName, m_playerID, *m_networkSystem);
+				m_level = std::make_unique<Level>(m_window, m_clock, m_audio, m_scene, m_userName, m_playerID, *m_networkSystem, m_playerList);
 
 			// Process the level
 			m_level->process(deltaTick, m_clock);
@@ -648,6 +648,15 @@ void Game::process(float deltaTick)
 			if (!m_level->checkPlayersAlive())
 			{
 				// Return to main menu
+				m_uiPlayerNames.clear();
+				for (size_t i = 0; i < m_playerList.size(); ++i)
+				{
+					if (m_playerList.at(i).getScore() != 0)
+					{
+						std::string temp = m_playerList.at(i).username + ": " + std::to_string(m_playerList.at(i).getScore());
+						createTextLabel(temp, glm::vec2(180.0f, 550.0f - i * 40), &m_uiPlayerNames, 0.5f);
+					}
+				}
 				m_gameState = GAMEOVER;
 
 				// Register input system as a listener for keyboard events
@@ -657,16 +666,13 @@ void Game::process(float deltaTick)
 					game->keyCallback(key, scancode, action, mods);
 				};
 				glfwSetKeyCallback(m_window, keyFunc);
-
-				// Reset the level
-				m_level.reset(nullptr);
 			}
 		}
 		else
 		{
 			// Create a level if one does not exist
 			if (m_dummyLevel == nullptr)
-				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName, m_playerID, *m_networkSystem);
+				m_dummyLevel = std::make_unique<DummyLevel>(m_window, m_clock, m_scene, m_userName, m_playerID, *m_networkSystem, m_playerList);
 
 			// Process the level
 			m_dummyLevel->process(deltaTick, m_clock);
@@ -685,6 +691,15 @@ void Game::process(float deltaTick)
 			if (m_checkLoss && !m_dummyLevel->checkPlayersAlive())
 			{
 				// Return to main menu
+				m_uiPlayerNames.clear();
+				for (size_t i = 0; i < m_playerList.size(); ++i)
+				{
+					if (m_playerList.at(i).getScore() != 0)
+					{
+						std::string temp = m_playerList.at(i).username + ": " + std::to_string(m_playerList.at(i).getScore());
+						createTextLabel(temp, glm::vec2(180.0f, 550.0f - i * 40), &m_uiPlayerNames, 0.5f);
+					}
+				}
 				m_gameState = GAMEOVER;
 
 				// Register input system as a listener for keyboard events
@@ -694,9 +709,6 @@ void Game::process(float deltaTick)
 					game->keyCallback(key, scancode, action, mods);
 				};
 				glfwSetKeyCallback(m_window, keyFunc);
-
-				// Reset the level
-				m_dummyLevel.reset(nullptr);
 			}
 		}
 		break;
@@ -745,13 +757,7 @@ void Game::onPlayersUpdated(const std::vector<PlayerInfo>& playerList)
 		{
 			if (m_uiPlayerNames.size() >= i)
 			{
-				if (playerList.at(i).getScore() != 0)
-				{
-					std::string temp = playerList.at(i).username + ": " + std::to_string(playerList.at(i).getScore());
-					createTextLabel(temp, glm::vec2(180.0f, 550.0f - i * 40), &m_uiPlayerNames, 0.5f);
-				}
-				else 
-					createTextLabel(playerList.at(i).username, glm::vec2(180.0f, 550.0f - i * 40), &m_uiPlayerNames, 0.5f);
+				createTextLabel(playerList.at(i).username, glm::vec2(180.0f, 550.0f - i * 40), &m_uiPlayerNames, 0.5f);
 			}
 			else
 				std::cout << "Error: Tried to create a label for a player that does not exist";
@@ -759,6 +765,8 @@ void Game::onPlayersUpdated(const std::vector<PlayerInfo>& playerList)
 
 		m_numConnectedPlayers = playerList.size();
 	}
+	
+	m_playerList = playerList;
 }
 
 void Game::onGameStart()

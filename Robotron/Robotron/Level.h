@@ -49,7 +49,7 @@
 class Level : public IKeyObserver
 {
 public:
-	Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem);
+	Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem, const std::vector<PlayerInfo>& playerInfo);
 	~Level();
 
 	// Increases the level count of the game and spawns the next enemies.

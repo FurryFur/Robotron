@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem)
+Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::string username, std::uint8_t playerID, NetworkSystem& networkSystem, const std::vector<PlayerInfo>& playerInfo)
 	: m_scene(scene)
 	, m_networkSystem(networkSystem)
 	, m_renderSystem(window, m_scene)
@@ -16,7 +16,7 @@ Level::Level(GLFWwindow* window, Clock& clock, Audio audio, Scene& scene, std::s
 	, m_playerbulletsystem(m_scene, audio)
 	, m_enemybulletsystem(m_scene)
 	, m_physicsSystem(m_scene)
-	, m_playerStatsMenu(m_scene, playerID)
+	, m_playerStatsMenu(m_scene, playerID, playerInfo)
 {
 	Scene::makeSceneCurrent(&m_scene);
 	m_audio = audio;
@@ -419,6 +419,13 @@ void Level::process(float deltaTick, Clock& clock)
 				// Increase the player's life by 1.
 				m_scene.getEntity(i).player.playerInfo.addLives(1);
 			}
+
+			if (clock.GetCurTime() <= (m_scene.getEntity(i).player.invunTimer + (m_scene.getEntity(i).player.lastSpawnTime)))
+			{
+				m_scene.getEntity(i).spotlight.color = glm::vec3(0.0f, 5.6f, 0.0f);
+			}
+			else
+				m_scene.getEntity(i).spotlight.color = glm::vec3(0.5f, 0.75f, 1.5f) * 4.0f;
 		}
 	}
 

@@ -79,7 +79,7 @@ private:
 	void renderMenuScreens();
 	void process(float deltaTick);
 	void keyCallback(int key, int scancode, int action, int mods);
-
+	std::vector<PlayerInfo> m_playerList;
 
 	GameState m_gameState;
 	ButtonState m_buttonState;
