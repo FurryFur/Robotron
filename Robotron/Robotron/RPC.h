@@ -36,6 +36,7 @@ namespace RPC {
 class RemoteProcedureCall {
 public:
 	RemoteProcedureCall() = default;
+	virtual ~RemoteProcedureCall() {};
 
 	virtual void execute() = 0;
 	virtual OutBufferStream& serialize(OutBufferStream&) const = 0;
