@@ -76,7 +76,7 @@ void DummyLevel::process(float deltaTick, Clock& clock)
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
 		if (m_scene.getEntity(i).player.lastSpawnTime == 0
-		 || (m_scene.getEntity(i).transform.position.y >= 49.9f && m_scene.getEntity(i).transform.position.y <= 50.1f))
+		 || (m_scene.getEntity(i).transform.position.y >= 48.5f && m_scene.getEntity(i).transform.position.y <= 50.5f))
 			m_scene.getEntity(i).player.lastSpawnTime = clock.GetCurTime();
 		
 		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER, COMPONENT_SPOTLIGHT)
