@@ -16,6 +16,7 @@
 #include "Game.h"
 #include "Audio.h"
 #include "EntityUtils.h"
+#include "Log.h"
 
 #include <GLFW\glfw3.h>
 double oldTime = 0.0;
@@ -23,7 +24,11 @@ double newTime = 0.0;
 
 int main()
 {
-	
+	Log testLog;
+	testLog << "no console";
+	testLog.setConsoleOut(true);
+	testLog << "writes to console";
+
 	// Init combined Window and OpenGL context.
 	GLFWwindow* window = GLUtils::initOpenGL();
 

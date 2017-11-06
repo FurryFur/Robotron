@@ -180,6 +180,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClCompile Include="InputComponent.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModelUtils.cpp" />
     <ClCompile Include="NetworkClientSystem.cpp" />
@@ -220,6 +221,7 @@ xcopy "$(ProjectDir)ext\assimp\lib_64\assimp-vc140-mt.dll" "$(OutDir)" /dsy</Com
     <ClInclude Include="EntityEventListener.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GhostSnapshot.h" />
+    <ClInclude Include="Log.h" />
     <ClInclude Include="NetworkEventListener.h" />
     <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="PlayerBulletComponent.h" />
