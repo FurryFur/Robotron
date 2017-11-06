@@ -1,4 +1,0 @@
-Successfully created the socket
-Successfully bound the socket to 10.18.0.114:8456
-INFO: Server received a broadcast packet from address: 10.18.0.83:4567
-INFO: Server received a join request from user: , at address: 10.18.0.83:4567

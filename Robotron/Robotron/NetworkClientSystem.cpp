@@ -179,8 +179,17 @@ void NetworkClientSystem::updatePlayers(const std::vector<PlayerInfo>& currentPl
 	//	g_out << playerInfo.username << "\n";
 	//}
 
-	if (m_eventListeners.size() > 0)
-	{
+	// Update the clients entities lives and score
+	if (m_clientPlayer) {
+		for (const PlayerInfo& playerInfo : currentPlayers) {
+			if (playerInfo.getPlayerID() == m_clientPlayerID) {
+				m_clientPlayer->player.playerInfo = playerInfo;
+			}
+		}
+	}
+
+	// Trigger Players Updated event on event listeners
+	if (m_eventListeners.size() > 0) {
 		for (auto eventListener : m_eventListeners)
 			eventListener->onPlayersUpdated(currentPlayers);
 	}
@@ -222,27 +231,27 @@ void NetworkClientSystem::spawnPlayers()
 		if (destroyIfExistsInNetwork(entityNetId))
 			g_out << "INFO: Overwritting entity with network id: " << entityNetId << "\n";
 
-		Entity& newPlayer = EntityUtils::createPlayerGhost(m_scene, playerInfo, entityNetId);
+		m_clientPlayer = &EntityUtils::createPlayerGhost(m_scene, playerInfo, entityNetId);
 
-		// Conditionally add the player controller if the username matches the clients username
-		if (newPlayer.player.playerInfo.getPlayerID() == m_clientPlayerID) {
-			newPlayer.addComponents(COMPONENT_INPUT_MAP, COMPONENT_INPUT);
-			newPlayer.inputMap.mouseInputEnabled = false;
-			newPlayer.inputMap.leftBtnMap = GLFW_KEY_A;
-			newPlayer.inputMap.rightBtnMap = GLFW_KEY_D;
-			newPlayer.inputMap.forwardBtnMap = GLFW_KEY_W;
-			newPlayer.inputMap.backwardBtnMap = GLFW_KEY_S;
+		// Conditionally add the playerInfo controller if the username matches the clients username
+		if (m_clientPlayer->player.playerInfo.getPlayerID() == m_clientPlayerID) {
+			m_clientPlayer->addComponents(COMPONENT_INPUT_MAP, COMPONENT_INPUT);
+			m_clientPlayer->inputMap.mouseInputEnabled = false;
+			m_clientPlayer->inputMap.leftBtnMap = GLFW_KEY_A;
+			m_clientPlayer->inputMap.rightBtnMap = GLFW_KEY_D;
+			m_clientPlayer->inputMap.forwardBtnMap = GLFW_KEY_W;
+			m_clientPlayer->inputMap.backwardBtnMap = GLFW_KEY_S;
 
-			// Give the local player a spotlight
-			newPlayer.addComponents(COMPONENT_SPOTLIGHT);
-			newPlayer.spotlight.direction = glm::vec3(0, -0.1, -1);
-			newPlayer.spotlight.color = glm::vec3(0.5, 0.75, 1.5) * 4.0f;
+			// Give the local playerInfo a spotlight
+			m_clientPlayer->addComponents(COMPONENT_SPOTLIGHT);
+			m_clientPlayer->spotlight.direction = glm::vec3(0, -0.1, -1);
+			m_clientPlayer->spotlight.color = glm::vec3(0.5, 0.75, 1.5) * 4.0f;
 		}
 
 		// Add entity to network system tracking
 		if (entityNetId >= m_netEntities.size())
 			m_netEntities.resize(entityNetId + 1);
-		m_netEntities.at(entityNetId) = &newPlayer;
+		m_netEntities.at(entityNetId) = m_clientPlayer;
 	}
 
 	playersToSpawn.clear();

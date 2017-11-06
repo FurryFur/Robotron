@@ -74,6 +74,7 @@ private:
 	ClientState m_clientState;
 	std::string m_username;
 	std::uint8_t m_clientPlayerID;
+	Entity* m_clientPlayer;
 	Audio& m_audioSystem;
 	// The time at which the last packet was received
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_tLastPacketRecvd;
