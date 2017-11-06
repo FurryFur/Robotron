@@ -53,7 +53,7 @@ public:
 
 	static const USHORT s_kDefaultServerPort;
 private:
-
+	bool m_firstFrame;
 	std::string m_serverName;
 	std::unordered_map<sockaddr_in, ClientInfo> m_clients;
 	ServerState m_serverState;
