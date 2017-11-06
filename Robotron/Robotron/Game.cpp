@@ -629,6 +629,12 @@ void Game::process(float deltaTick)
 		checkButtonHighlight(635.0f, 780.0f, 650.0f, 695.0f, &m_uiLobbyLabels.at(2), STARTDOWN);
 		break;
 	}
+	case GAMEOVER:
+	{
+		// The mouse is within the back button click
+		checkButtonHighlight(135.0f, 280.0f, 650.0f, 695.0f, &m_uiLobbyLabels.at(1), BACKDOWN);
+		break;
+	}
 	case GAME:
 	{
 		if (m_isHost)
