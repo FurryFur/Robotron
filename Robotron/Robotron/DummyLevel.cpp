@@ -72,17 +72,30 @@ DummyLevel::~DummyLevel()
 
 void DummyLevel::process(float deltaTick, Clock& clock)
 {
-	// Cycle over all objects in the scene and find the player object
+	// Update the flash light colour for the player depending if they are on their respawn timer or not.
 	for (unsigned int i = 0; i < m_scene.getEntityCount(); ++i)
 	{
-		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER, COMPONENT_SPOTLIGHT))
+		if (m_scene.getEntity(i).hasComponents(COMPONENT_PLAYER, COMPONENT_SPOTLIGHT)
+		&& m_scene.getEntity(i).player.playerInfo.getPlayerID() == m_playerID)
 		{
+			// The actual lives are less than the lives tracker
+			if (m_scene.getEntity(i).player.playerInfo.getLives() < m_livesTracker)
+			{
+				m_scene.getEntity(i).player.lastSpawnTime = clock.GetCurTime() + m_scene.getEntity(i).player.respawnTime;
+				m_livesTracker = m_scene.getEntity(i).player.playerInfo.getLives();
+			}
+			// The actual lives are more than the lives tracker
+			else if (m_scene.getEntity(i).player.playerInfo.getLives() > m_livesTracker)
+				m_livesTracker = m_scene.getEntity(i).player.playerInfo.getLives();
+
 			if (clock.GetCurTime() <= (m_scene.getEntity(i).player.invunTimer + (m_scene.getEntity(i).player.lastSpawnTime)))
 			{
 				m_scene.getEntity(i).spotlight.color = glm::vec3(0.0f, 5.6f, 0.0f);
 			}
 			else
 				m_scene.getEntity(i).spotlight.color = glm::vec3(0.5f, 0.75f, 1.5f) * 4.0f;
+
+			break;
 		}
 	}
 	

@@ -396,7 +396,7 @@ void Level::respawnDeadPlayers(Clock& clock)
 			&& m_scene.getEntity(i).player.isRespawning == true
 			&& m_scene.getEntity(i).player.playerInfo.getLives() > 0
 			&& m_scene.getEntity(i).player.playerInfo.getLives() != 255
-			&& m_scene.getEntity(i).player.deathTime + 3.0f <= clock.GetCurTime())
+			&& m_scene.getEntity(i).player.deathTime + m_scene.getEntity(i).player.respawnTime <= clock.GetCurTime())
 		{
 			m_scene.getEntity(i).player.isRespawning = false;
 			m_scene.getEntity(i).transform.position = glm::vec4{ 0.0f, 50.0f, 0.0f, 1.0f };
